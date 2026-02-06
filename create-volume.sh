@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # CONFIG
-VOLUME_NAME=nextjs_scenario_1
-LOCAL_PROJECT_PATH="$HOME/Desktop/GH/test-proj/projects/tech-stacks/nextjs/scenario-1"
+VOLUME_NAME=PERN_POS_SYSTEM
+LOCAL_PROJECT_PATH="/mnt/c/capstone/DevSim-Sample-Projects/devsim-sample-projects/projects/tech-stacks/PERN/POS_SYSTEM" 
 CONTAINER_MOUNT_PATH=/data
 
 # Directories / files to exclude
