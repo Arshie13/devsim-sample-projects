@@ -124,16 +124,24 @@ export default function Home() {
     setCheckoutLoading(true);
 
     try {
+      const freshStock: Record<string, number> = {};
+
       for (const item of cart) {
-        const { data: currentProduct } = await supabase
+        const { data, error } = await supabase
           .from('products')
           .select('quantity')
           .eq('product_id', item.product_id)
           .single();
-        
-        if (currentProduct && currentProduct.quantity < item.cartQuantity) {
+
+        if (error || !data) {
+          throw new Error(`Failed to check stock for ${item.product_name}`);
+        }
+
+        if (data.quantity < item.cartQuantity) {
           throw new Error(`Insufficient stock for ${item.product_name}`);
         }
+
+        freshStock[item.product_id] = data.quantity;
       }
 
       const { data: orderData, error: orderError } = await supabase
@@ -147,7 +155,9 @@ export default function Home() {
         .select()
         .single();
 
-      if (orderError) throw orderError;
+      if (orderError || !orderData?.order_id) {
+        throw new Error('Failed to create order');
+      }
 
       const orderItems = cart.map(item => ({
         order_id: orderData.order_id,
@@ -161,27 +171,35 @@ export default function Home() {
         .from('order_items')
         .insert(orderItems);
 
-      if (itemsError) throw itemsError;
+      if (itemsError) {
+        throw new Error('Failed to insert order items');
+      }
 
       for (const item of cart) {
         const { error: updateError } = await supabase
           .from('products')
-          .update({ quantity: item.quantity - item.cartQuantity })
+          .update({
+            quantity: freshStock[item.product_id] - item.cartQuantity,
+          })
           .eq('product_id', item.product_id);
-        
-        if (updateError) throw updateError;
+
+        if (updateError) {
+          throw new Error(`Failed to update stock for ${item.product_name}`);
+        }
       }
 
-      alert(`Order #${orderData.order_id} completed!\nTotal: ₱${calculateGrandTotal().toFixed(2)}`);
+      alert(
+        `Order #${orderData.order_id} completed!\nTotal: ₱${calculateGrandTotal().toFixed(2)}`
+      );
+
       setCart([]);
-      setShowCheckoutModal(false);
       setCustomerName('Walk-in Customer');
-      
+      setShowCheckoutModal(false);
       await fetchProducts();
 
     } catch (err) {
       console.error('Checkout error:', err);
-      alert('Checkout failed: ' + (err instanceof Error ? err.message : 'Unknown error'));
+      alert(err instanceof Error ? err.message : 'Checkout failed');
     } finally {
       setCheckoutLoading(false);
     }
