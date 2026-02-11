@@ -1,12 +1,12 @@
-import { useState, useEffect, type FormEvent } from 'react';
+import { useState, type SubmitEvent } from 'react';
 import { z } from 'zod';
-import { useLibrary } from '../../context/LibraryContext';
-import { Button } from '../../components/ui/Button';
-import { Input } from '../../components/ui/Input';
-import { Modal } from '../../components/ui/Modal';
-import { LoadingSpinner } from '../../components/ui/LoadingSpinner';
-import { GENRES } from '../../types';
-import type { Book } from '../../types';
+import { useLibrary } from '../context/LibraryContext';
+import { Button } from '../components/ui/Button';
+import { Input } from '../components/ui/Input';
+import { Modal } from '../components/ui/Modal';
+import { LoadingSpinner } from '../components/ui/LoadingSpinner';
+import { GENRES } from '../types';
+import type { Book } from '../types';
 
 const bookSchema = z.object({
   title: z.string().min(1, 'Title is required'),
@@ -26,41 +26,43 @@ const emptyForm = {
   totalCopies: '1',
 };
 
-export function ManageBooks() {
+export function Books() {
   const { books, loading, addBook, updateBook, archiveBook } = useLibrary();
 
+  const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingBook, setEditingBook] = useState<Book | null>(null);
   const [formData, setFormData] = useState(emptyForm);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
-  useEffect(() => {
-    if (editingBook) {
-      setFormData({
-        title: editingBook.title,
-        author: editingBook.author,
-        genre: editingBook.genre,
-        description: editingBook.description,
-        isbn: editingBook.isbn,
-        totalCopies: String(editingBook.totalCopies),
-      });
-    } else {
-      setFormData(emptyForm);
-    }
-    setFieldErrors({});
-  }, [editingBook]);
+  const filteredBooks = books.filter(
+    (b) =>
+      search === '' ||
+      b.title.toLowerCase().includes(search.toLowerCase()) ||
+      b.author.toLowerCase().includes(search.toLowerCase()) ||
+      b.isbn.includes(search),
+  );
 
   const openAdd = () => {
     setEditingBook(null);
+    setFormData(emptyForm);
+    setFieldErrors({});
     setIsModalOpen(true);
   };
-
   const openEdit = (book: Book) => {
     setEditingBook(book);
+    setFormData({
+      title: book.title,
+      author: book.author,
+      genre: book.genre,
+      description: book.description,
+      isbn: book.isbn,
+      totalCopies: String(book.totalCopies),
+    });
+    setFieldErrors({});
     setIsModalOpen(true);
   };
-
   const closeModal = () => {
     setIsModalOpen(false);
     setEditingBook(null);
@@ -71,9 +73,8 @@ export function ManageBooks() {
     setFieldErrors((prev) => ({ ...prev, [field]: '' }));
   };
 
-  const handleSubmit = async (e: FormEvent) => {
+  const handleSubmit = async (e: SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
-
     const parsed = bookSchema.safeParse({
       ...formData,
       totalCopies: parseInt(formData.totalCopies, 10) || 0,
@@ -83,31 +84,22 @@ export function ManageBooks() {
       const errors: Record<string, string> = {};
       for (const issue of parsed.error.issues) {
         const key = String(issue.path[0] ?? '');
-        if (key && !errors[key]) {
-          errors[key] = issue.message;
-        }
+        if (key && !errors[key]) errors[key] = issue.message;
       }
       setFieldErrors(errors);
       return;
     }
 
     setSubmitting(true);
-    let success: boolean;
-
-    if (editingBook) {
-      success = await updateBook(editingBook.id, parsed.data);
-    } else {
-      success = await addBook(parsed.data);
-    }
-
+    const success = editingBook
+      ? await updateBook(editingBook.id, parsed.data)
+      : await addBook(parsed.data);
     setSubmitting(false);
-    if (success) {
-      closeModal();
-    }
+    if (success) closeModal();
   };
 
   const handleArchive = async (id: string) => {
-    if (window.confirm('Are you sure you want to archive this book?')) {
+    if (window.confirm('Archive this book?')) {
       await archiveBook(id);
     }
   };
@@ -117,41 +109,47 @@ export function ManageBooks() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold text-gray-900">Manage Books</h1>
+        <h1 className="text-2xl font-bold text-gray-900">Books</h1>
         <Button onClick={openAdd}>+ Add Book</Button>
       </div>
 
-      {books.length === 0 ? (
-        <p className="text-gray-500 text-center py-12">
-          No books in the system yet.
-        </p>
+      <input
+        type="text"
+        placeholder="Search by title, author, or ISBN..."
+        value={search}
+        onChange={(e) => setSearch(e.target.value)}
+        className="w-full mb-6 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      />
+
+      {filteredBooks.length === 0 ? (
+        <p className="text-gray-500 text-center py-12">No books found.</p>
       ) : (
-        <div className="overflow-x-auto">
+        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
           <table className="w-full">
-            <thead>
-              <tr className="border-b border-gray-200">
-                <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
+            <thead className="bg-gray-50">
+              <tr>
+                <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase">
                   Title
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
+                <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase">
                   Author
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
+                <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase">
                   Genre
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
+                <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase">
                   Copies
                 </th>
-                <th className="text-left py-3 px-4 text-sm font-medium text-gray-500">
+                <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase">
                   Actions
                 </th>
               </tr>
             </thead>
             <tbody>
-              {books.map((book) => (
+              {filteredBooks.map((book) => (
                 <tr
                   key={book.id}
-                  className="border-b border-gray-100 hover:bg-gray-50"
+                  className="border-t border-gray-100 hover:bg-gray-50"
                 >
                   <td className="py-3 px-4 text-sm font-medium text-gray-900">
                     {book.title}
@@ -165,7 +163,16 @@ export function ManageBooks() {
                     </span>
                   </td>
                   <td className="py-3 px-4 text-sm text-gray-600">
-                    {book.availableCopies}/{book.totalCopies}
+                    <span
+                      className={
+                        book.availableCopies === 0
+                          ? 'text-red-600 font-medium'
+                          : ''
+                      }
+                    >
+                      {book.availableCopies}
+                    </span>
+                    /{book.totalCopies}
                   </td>
                   <td className="py-3 px-4">
                     <div className="flex gap-2">
@@ -192,7 +199,6 @@ export function ManageBooks() {
         </div>
       )}
 
-      {/* Add / Edit Modal */}
       <Modal
         isOpen={isModalOpen}
         onClose={closeModal}
@@ -213,12 +219,8 @@ export function ManageBooks() {
             onChange={(e) => handleChange('author', e.currentTarget.value)}
             error={fieldErrors.author}
           />
-
           <div className="flex flex-col gap-1">
-            <label
-              htmlFor="genre"
-              className="text-sm font-medium text-gray-700"
-            >
+            <label htmlFor="genre" className="text-sm font-medium text-gray-700">
               Genre
             </label>
             <select
@@ -240,7 +242,6 @@ export function ManageBooks() {
               <p className="text-sm text-red-600">{fieldErrors.genre}</p>
             )}
           </div>
-
           <div className="flex flex-col gap-1">
             <label
               htmlFor="description"
@@ -261,7 +262,6 @@ export function ManageBooks() {
               <p className="text-sm text-red-600">{fieldErrors.description}</p>
             )}
           </div>
-
           <Input
             id="isbn"
             label="ISBN"
@@ -278,10 +278,9 @@ export function ManageBooks() {
             onChange={(e) => handleChange('totalCopies', e.currentTarget.value)}
             error={fieldErrors.totalCopies}
           />
-
           <div className="flex gap-3 mt-2">
             <Button type="submit" loading={submitting}>
-              {editingBook ? 'Update Book' : 'Add Book'}
+              {editingBook ? 'Update' : 'Add Book'}
             </Button>
             <Button type="button" variant="secondary" onClick={closeModal}>
               Cancel

@@ -1,13 +1,25 @@
-export type Role = 'MEMBER' | 'LIBRARIAN' | 'ADMIN';
-
 export type BorrowStatus = 'BORROWED' | 'RETURNED' | 'OVERDUE';
+export type BorrowerType = 'MEMBER' | 'WALK_IN';
 
-export interface User {
+export interface Member {
   id: string;
-  email: string;
-  password: string;
   name: string;
-  role: Role;
+  email: string;
+  phone: string;
+  idNumber: string;
+  /** Base-64 data-URL of the captured ID photo */
+  idPhoto: string | null;
+  createdAt: string;
+}
+
+export interface WalkInBorrower {
+  id: string;
+  name: string;
+  email: string;
+  phone: string;
+  idNumber: string;
+  /** Base-64 data-URL of the captured ID photo */
+  idPhoto: string | null;
   createdAt: string;
 }
 
@@ -25,23 +37,16 @@ export interface Book {
 
 export interface BorrowRecord {
   id: string;
-  userId: string;
   bookId: string;
+  borrowerType: BorrowerType;
+  /** Set when borrowerType === 'MEMBER' */
+  memberId: string | null;
+  /** Set when borrowerType === 'WALK_IN' */
+  walkInBorrowerId: string | null;
   borrowedAt: string;
   dueDate: string;
   returnedAt: string | null;
   status: BorrowStatus;
-}
-
-export interface LoginCredentials {
-  email: string;
-  password: string;
-}
-
-export interface RegisterData {
-  name: string;
-  email: string;
-  password: string;
 }
 
 export const GENRES = [

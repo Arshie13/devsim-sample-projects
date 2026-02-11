@@ -1,41 +1,18 @@
 import { mockBooks } from '../data/books.mock';
-import { mockUsers } from '../data/users.mock';
+import { mockMembers } from '../data/members.mock';
+import { mockWalkInBorrowers } from '../data/walkInBorrowers.mock';
 import { mockBorrowRecords } from '../data/borrowRecords.mock';
-import type { Book, BorrowRecord, User, RegisterData } from '../types';
+import type { Book, BorrowRecord, Member, WalkInBorrower } from '../types';
 import { generateId, getDueDate } from '../utils/helpers';
 
-// Mutable internal state (simulates a real database)
 let books: Book[] = [...mockBooks];
-let users: User[] = [...mockUsers];
+let members: Member[] = [...mockMembers];
+let walkInBorrowers: WalkInBorrower[] = [...mockWalkInBorrowers];
 let borrowRecords: BorrowRecord[] = [...mockBorrowRecords];
 
 const delay = (ms: number = 500) => new Promise((res) => setTimeout(res, ms));
 
 export const libraryService = {
-  // ── Auth ──────────────────────────────────────────────
-  async login(email: string, password: string): Promise<User | null> {
-    await delay();
-    const user = users.find(
-      (u) => u.email === email && u.password === password,
-    );
-    return user ? { ...user } : null;
-  },
-
-  async register(data: RegisterData): Promise<User> {
-    await delay();
-    if (users.some((u) => u.email === data.email)) {
-      throw new Error('Email already exists');
-    }
-    const newUser: User = {
-      id: generateId(),
-      ...data,
-      role: 'MEMBER',
-      createdAt: new Date().toISOString(),
-    };
-    users.push(newUser);
-    return { ...newUser };
-  },
-
   // ── Books ─────────────────────────────────────────────
   async getBooks(): Promise<Book[]> {
     await delay();
@@ -75,8 +52,62 @@ export const libraryService = {
     books = books.filter((b) => b.id !== id);
   },
 
+  // ── Members ───────────────────────────────────────────
+  async getMembers(): Promise<Member[]> {
+    await delay();
+    return members.map((m) => ({ ...m }));
+  },
+
+  async getMemberById(id: string): Promise<Member | null> {
+    await delay();
+    const member = members.find((m) => m.id === id);
+    return member ? { ...member } : null;
+  },
+
+  async addMember(data: Omit<Member, 'id' | 'createdAt'>): Promise<Member> {
+    await delay();
+    if (members.some((m) => m.email === data.email)) {
+      throw new Error('A member with this email already exists');
+    }
+    const newMember: Member = {
+      id: generateId(),
+      ...data,
+      createdAt: new Date().toISOString(),
+    };
+    members.push(newMember);
+    return { ...newMember };
+  },
+
+  // ── Walk-in Borrowers ─────────────────────────────────
+  async getWalkInBorrowers(): Promise<WalkInBorrower[]> {
+    await delay();
+    return walkInBorrowers.map((w) => ({ ...w }));
+  },
+
+  async addWalkInBorrower(
+    data: Omit<WalkInBorrower, 'id' | 'createdAt'>,
+  ): Promise<WalkInBorrower> {
+    await delay();
+    const newWalkIn: WalkInBorrower = {
+      id: generateId(),
+      ...data,
+      createdAt: new Date().toISOString(),
+    };
+    walkInBorrowers.push(newWalkIn);
+    return { ...newWalkIn };
+  },
+
+  async getWalkInBorrowerById(id: string): Promise<WalkInBorrower | null> {
+    await delay(100);
+    const w = walkInBorrowers.find((b) => b.id === id);
+    return w ? { ...w } : null;
+  },
+
   // ── Borrowing ─────────────────────────────────────────
-  async borrowBook(bookId: string, userId: string): Promise<BorrowRecord> {
+  async borrowBookMember(
+    bookId: string,
+    memberId: string,
+  ): Promise<BorrowRecord> {
     await delay();
     const book = books.find((b) => b.id === bookId);
     if (!book) throw new Error('Book not found');
@@ -86,8 +117,10 @@ export const libraryService = {
     const now = new Date().toISOString();
     const record: BorrowRecord = {
       id: generateId(),
-      userId,
       bookId,
+      borrowerType: 'MEMBER',
+      memberId,
+      walkInBorrowerId: null,
       borrowedAt: now,
       dueDate: getDueDate(now),
       returnedAt: null,
@@ -95,6 +128,40 @@ export const libraryService = {
     };
     borrowRecords.push(record);
     return { ...record };
+  },
+
+  async borrowBookWalkIn(
+    bookId: string,
+    walkInData: Omit<WalkInBorrower, 'id' | 'createdAt'>,
+  ): Promise<{ record: BorrowRecord; walkIn: WalkInBorrower }> {
+    await delay();
+    const book = books.find((b) => b.id === bookId);
+    if (!book) throw new Error('Book not found');
+    if (book.availableCopies <= 0) throw new Error('No copies available');
+
+    // Create the walk-in borrower record first
+    const walkIn: WalkInBorrower = {
+      id: generateId(),
+      ...walkInData,
+      createdAt: new Date().toISOString(),
+    };
+    walkInBorrowers.push(walkIn);
+
+    book.availableCopies -= 1;
+    const now = new Date().toISOString();
+    const record: BorrowRecord = {
+      id: generateId(),
+      bookId,
+      borrowerType: 'WALK_IN',
+      memberId: null,
+      walkInBorrowerId: walkIn.id,
+      borrowedAt: now,
+      dueDate: getDueDate(now),
+      returnedAt: null,
+      status: 'BORROWED',
+    };
+    borrowRecords.push(record);
+    return { record: { ...record }, walkIn: { ...walkIn } };
   },
 
   async returnBook(recordId: string): Promise<BorrowRecord> {
@@ -110,13 +177,6 @@ export const libraryService = {
     return { ...record };
   },
 
-  async getBorrowHistory(userId: string): Promise<BorrowRecord[]> {
-    await delay();
-    return borrowRecords
-      .filter((r) => r.userId === userId)
-      .map((r) => ({ ...r }));
-  },
-
   async getAllBorrowRecords(): Promise<BorrowRecord[]> {
     await delay();
     return borrowRecords.map((r) => ({ ...r }));
@@ -128,17 +188,5 @@ export const libraryService = {
     return borrowRecords
       .filter((r) => r.status !== 'RETURNED' && new Date(r.dueDate) < now)
       .map((r) => ({ ...r }));
-  },
-
-  // ── Users (admin) ─────────────────────────────────────
-  async getUsers(): Promise<User[]> {
-    await delay();
-    return users.map((u) => ({ ...u }));
-  },
-
-  async getUserById(id: string): Promise<User | null> {
-    await delay();
-    const user = users.find((u) => u.id === id);
-    return user ? { ...user } : null;
   },
 };
