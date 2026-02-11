@@ -8,7 +8,13 @@ export default function LogoutButton() {
   const supabase = createClient();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    const { error } = await supabase.auth.signOut();
+    if (error) {
+      // Force redirect even if signOut fails
+      document.cookie.split(';').forEach((c) => {
+        document.cookie = c.replace(/^ +/, '').replace(/=.*/, '=;expires=' + new Date().toUTCString() + ';path=/');
+      });
+    }
     router.push('/');
     router.refresh();
   };

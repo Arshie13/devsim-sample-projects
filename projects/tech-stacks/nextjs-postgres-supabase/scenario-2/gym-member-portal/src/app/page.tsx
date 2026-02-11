@@ -19,6 +19,10 @@ export default function Login() {
   const handleLogin = async () => {
     setLoading(true);
     setMessage('');
+    
+    // Clear any stale session first
+    await supabase.auth.signOut();
+    
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
       setMessage(`Login error: ${error.message}`);

@@ -9,9 +9,9 @@ import LogoutButton from './logout-button';
 
 export default async function Portal() {
   const supabase = await createServerClient();
-  const { data: { user } } = await supabase.auth.getUser();
+  const { data: { user }, error } = await supabase.auth.getUser();
   
-  if (!user) {
+  if (error || !user) {
     redirect('/');
   }
 
