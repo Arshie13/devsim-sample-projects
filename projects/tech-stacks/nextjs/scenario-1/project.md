@@ -1,0 +1,1 @@
+You are a newly hired full-stack developer at NOVO Enterprises Inc. One of the tasks assigned to you is to build a POS system for tracking inventory, managing sales, and managing coupons and discounts, etc. For this level, set up your dependencies in this environment by following the step-by-step on-screen guide.
