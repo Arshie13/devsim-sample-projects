@@ -1,0 +1,77 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Book {
+  id              String   @id @default(uuid())
+  title           String
+  author          String
+  genre           String
+  description     String   @db.Text
+  isbn            String   @unique
+  totalCopies     Int      @map("total_copies")
+  availableCopies Int      @map("available_copies")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  borrowRecords BorrowRecord[]
+
+  @@map("books")
+}
+
+model Member {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  phone     String
+  idNumber  String   @map("id_number")
+  idPhoto   String?  @map("id_photo") @db.Text // Base64 data URL
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  borrowRecords BorrowRecord[]
+
+  @@map("members")
+}
+
+model WalkInBorrower {
+  id        String   @id @default(uuid())
+  name      String
+  email     String
+  phone     String
+  idNumber  String   @map("id_number")
+  idPhoto   String?  @map("id_photo") @db.Text // Base64 data URL
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  borrowRecords BorrowRecord[]
+
+  @@map("walk_in_borrowers")
+}
+
+model BorrowRecord {
+  id                String   @id @default(uuid())
+  bookId            String   @map("book_id")
+  borrowerType      String   @map("borrower_type") // 'MEMBER' | 'WALK_IN'
+  memberId          String?  @map("member_id")
+  walkInBorrowerId  String?  @map("walk_in_borrower_id")
+  borrowedAt        DateTime @default(now()) @map("borrowed_at")
+  dueDate           DateTime @map("due_date")
+  returnedAt        DateTime? @map("returned_at")
+  status            String   @default("BORROWED") // 'BORROWED' | 'RETURNED' | 'OVERDUE'
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  book            Book             @relation(fields: [bookId], references: [id], onDelete: Cascade)
+  member          Member?          @relation(fields: [memberId], references: [id], onDelete: SetNull)
+  walkInBorrower  WalkInBorrower?  @relation(fields: [walkInBorrowerId], references: [id], onDelete: SetNull)
+
+  @@map("borrow_records")
+}
