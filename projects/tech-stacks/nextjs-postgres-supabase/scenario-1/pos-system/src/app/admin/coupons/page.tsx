@@ -11,6 +11,11 @@ interface Coupon {
   created_at: string;
 }
 
+const formatDate = (dateStr: string) => {
+  const d = new Date(dateStr);
+  return `${d.getMonth() + 1}/${d.getDate()}/${d.getFullYear()}`;
+};
+
 export default function CouponsPage() {
   const [coupons, setCoupons] = useState<Coupon[]>([]);
   const [loading, setLoading] = useState(true);
@@ -173,7 +178,7 @@ export default function CouponsPage() {
                 </span>
               </div>
               <p className="text-sm text-gray-500 mb-4">
-                Created: {new Date(coupon.created_at).toLocaleDateString()}
+                Created: {formatDate(coupon.created_at)}
               </p>
               <div className="flex gap-2">
                 <button

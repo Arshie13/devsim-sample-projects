@@ -78,7 +78,7 @@ export default function OrdersPage() {
               <div>
                 <h2 className="text-xl font-bold text-gray-900">Order #{selectedOrder.order_id}</h2>
                 <p className="text-gray-900">
-                  {new Date(selectedOrder.order_date).toLocaleString()}
+                  {new Date(selectedOrder.order_date).toLocaleString('en-US')}
                 </p>
               </div>
               <button
@@ -143,7 +143,7 @@ export default function OrdersPage() {
                 <tr key={order.order_id} className="border-b hover:bg-gray-50">
                   <td className="px-6 py-4 font-medium text-gray-900">{order.order_id}</td>
                   <td className="px-6 py-4 text-gray-900">
-                    {new Date(order.order_date).toLocaleDateString()}
+                    {new Date(order.order_date).toLocaleDateString('en-US')}
                   </td>
                   <td className="px-6 py-4 text-gray-900">{order.customer_name}</td>
                   <td className="px-6 py-4 text-right text-gray-900">₱{order.total_amount.toFixed(2)}</td>
