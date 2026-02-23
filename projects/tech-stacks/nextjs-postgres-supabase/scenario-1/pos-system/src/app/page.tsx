@@ -46,7 +46,7 @@ export default function Login() {
           first_name: firstName,
           last_name: lastName,
         },
-        emailRedirectTo: `${window.location.origin}/admin/pos`,
+        emailRedirectTo: `${typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'}/admin/pos`,
       },
     });
 

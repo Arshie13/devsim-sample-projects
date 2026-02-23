@@ -2,11 +2,12 @@
 
 import { useEffect, useState } from 'react';
 import { createClient } from '@/lib/supabase';
+import { User } from '@supabase/supabase-js';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<any>(null);
+  const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const pathname = usePathname();
@@ -15,8 +16,8 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   useEffect(() => {
     const checkUser = async () => {
       const { data: { user } } = await supabase.auth.getUser();
-      if (!user && pathname !== '/admin/login') {
-        router.push('/admin/login');
+      if (!user && pathname !== '/') {
+        router.push('/');
       } else {
         setUser(user);
       }
@@ -27,7 +28,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   const handleLogout = async () => {
     await supabase.auth.signOut();
-    router.push('/admin/login');
+    router.push('/');
   };
 
   if (loading) {
