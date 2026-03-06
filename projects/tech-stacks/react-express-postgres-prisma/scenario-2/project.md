@@ -1,0 +1,1 @@
+You have been onboarded as a Junior Full Stack Developer at a software consultancy. You have been assigned to develop an enterprise-grade e-commerce platform for UrbanPottery, a local artisanal ceramics business transitioning to direct-to-consumer online sales. 
