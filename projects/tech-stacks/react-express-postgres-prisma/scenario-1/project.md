@@ -1,0 +1,1 @@
+You are a newly hired junior full-stack developer at a software consultancy. One of the tasks assigned to you is to build a Library Management System for BookWise Public Library for managing books, members, and borrowing workflows. 
