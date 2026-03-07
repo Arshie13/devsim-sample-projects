@@ -1,0 +1,1 @@
+You are a newly hired junior full-stack developer at a software consultancy. One of the tasks assigned to you is to build FlexiSpend, a personal finance management platform that allows users to track income and expenses, organize transactions by accounts and categories, set monthly budgets, and generate financial reports.

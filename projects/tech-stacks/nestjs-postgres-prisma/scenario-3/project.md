@@ -1,0 +1,1 @@
+You are a newly hired junior full-stack developer at a software consultancy. One of the tasks assigned to you is to build a Point of Sale (POS) System for a retail store that enables admins and cashiers to manage products, track inventory, process sales transactions, generate receipts, and view basic sales reports.
