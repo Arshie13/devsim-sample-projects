@@ -98,6 +98,13 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
   /* ── Name resolver that works for both member & walk-in ── */
   const getBorrowerName = useCallback(
     (record: BorrowRecord): string => {
+      if (record.borrowerType === 'MEMBER' && record.member?.name) {
+        return record.member.name;
+      }
+      if (record.borrowerType === 'WALK_IN' && record.walkInBorrower?.name) {
+        return record.walkInBorrower.name;
+      }
+
       if (record.borrowerType === 'MEMBER' && record.memberId) {
         return members.find((m) => m.id === record.memberId)?.name ?? 'Unknown Member';
       }

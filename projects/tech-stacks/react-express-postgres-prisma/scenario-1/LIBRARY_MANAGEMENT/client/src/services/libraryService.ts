@@ -1,106 +1,159 @@
-import { mockBooks } from '../data/books.mock';
-import { mockMembers } from '../data/members.mock';
-import { mockWalkInBorrowers } from '../data/walkInBorrowers.mock';
-import { mockBorrowRecords } from '../data/borrowRecords.mock';
 import type { Book, BorrowRecord, Member, WalkInBorrower } from '../types';
-import { generateId, getDueDate } from '../utils/helpers';
+import { getDueDate } from '../utils/helpers';
 
-let books: Book[] = [...mockBooks];
-let members: Member[] = [...mockMembers];
-let walkInBorrowers: WalkInBorrower[] = [...mockWalkInBorrowers];
-let borrowRecords: BorrowRecord[] = [...mockBorrowRecords];
+interface ApiResponse<T> {
+  success: boolean;
+  data?: T;
+  error?: string;
+  message?: string;
+}
 
-const delay = (ms: number = 500) => new Promise((res) => setTimeout(res, ms));
+interface BorrowWalkInApiPayload {
+  record: BorrowRecord;
+  walkInBorrower: WalkInBorrower;
+}
+
+const API_BASE_URL =
+  import.meta.env.VITE_API_URL?.replace(/\/$/, '') ??
+  'http://localhost:5000/api';
+
+const toErrorMessage = (body: unknown, fallback: string): string => {
+  if (typeof body === 'object' && body !== null) {
+    const maybeMessage = (body as { message?: unknown }).message;
+    const maybeError = (body as { error?: unknown }).error;
+    if (typeof maybeMessage === 'string' && maybeMessage.length > 0) {
+      return maybeMessage;
+    }
+    if (typeof maybeError === 'string' && maybeError.length > 0) {
+      return maybeError;
+    }
+  }
+  return fallback;
+};
+
+const request = async <T>(
+  path: string,
+  options?: RequestInit,
+): Promise<T> => {
+  const res = await fetch(`${API_BASE_URL}${path}`, {
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options?.headers ?? {}),
+    },
+    ...options,
+  });
+
+  const body = (await res.json().catch(() => ({}))) as ApiResponse<T>;
+
+  if (!res.ok || !body.success) {
+    throw new Error(
+      toErrorMessage(body, `Request failed with status ${res.status}`),
+    );
+  }
+
+  if (typeof body.data === 'undefined') {
+    throw new Error('Malformed API response: missing data payload');
+  }
+
+  return body.data;
+};
+
+const extractWalkInBorrowers = (
+  records: BorrowRecord[],
+): WalkInBorrower[] => {
+  const byId = new Map<string, WalkInBorrower>();
+
+  for (const record of records) {
+    const walkIn = record.walkInBorrower;
+    if (walkIn && !byId.has(walkIn.id)) {
+      byId.set(walkIn.id, walkIn);
+    }
+  }
+
+  return Array.from(byId.values());
+};
 
 export const libraryService = {
   // ── Books ─────────────────────────────────────────────
   async getBooks(): Promise<Book[]> {
-    await delay();
-    return books.map((b) => ({ ...b }));
+    return request<Book[]>('/books');
   },
 
   async getBookById(id: string): Promise<Book | null> {
-    await delay();
-    const book = books.find((b) => b.id === id);
-    return book ? { ...book } : null;
+    try {
+      return await request<Book>(`/books/${id}`);
+    } catch {
+      return null;
+    }
   },
 
   async addBook(
     bookData: Omit<Book, 'id' | 'createdAt' | 'availableCopies'>,
   ): Promise<Book> {
-    await delay();
-    const newBook: Book = {
-      id: generateId(),
-      ...bookData,
-      availableCopies: bookData.totalCopies,
-      createdAt: new Date().toISOString(),
-    };
-    books.push(newBook);
-    return { ...newBook };
+    return request<Book>('/books', {
+      method: 'POST',
+      body: JSON.stringify({
+        ...bookData,
+        availableCopies: bookData.totalCopies,
+      }),
+    });
   },
 
   async updateBook(id: string, data: Partial<Book>): Promise<Book> {
-    await delay();
-    const index = books.findIndex((b) => b.id === id);
-    if (index === -1) throw new Error('Book not found');
-    books[index] = { ...books[index], ...data };
-    return { ...books[index] };
+    return request<Book>(`/books/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(data),
+    });
   },
 
   async archiveBook(id: string): Promise<void> {
-    await delay();
-    books = books.filter((b) => b.id !== id);
+    await request<{ message?: string }>(`/books/${id}`, {
+      method: 'DELETE',
+    });
   },
 
   // ── Members ───────────────────────────────────────────
   async getMembers(): Promise<Member[]> {
-    await delay();
-    return members.map((m) => ({ ...m }));
+    return request<Member[]>('/members');
   },
 
   async getMemberById(id: string): Promise<Member | null> {
-    await delay();
-    const member = members.find((m) => m.id === id);
-    return member ? { ...member } : null;
+    try {
+      return await request<Member>(`/members/${id}`);
+    } catch {
+      return null;
+    }
   },
 
   async addMember(data: Omit<Member, 'id' | 'createdAt'>): Promise<Member> {
-    await delay();
-    if (members.some((m) => m.email === data.email)) {
-      throw new Error('A member with this email already exists');
-    }
-    const newMember: Member = {
-      id: generateId(),
-      ...data,
-      createdAt: new Date().toISOString(),
-    };
-    members.push(newMember);
-    return { ...newMember };
+    return request<Member>('/members', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
   },
 
   // ── Walk-in Borrowers ─────────────────────────────────
   async getWalkInBorrowers(): Promise<WalkInBorrower[]> {
-    await delay();
-    return walkInBorrowers.map((w) => ({ ...w }));
+    const records = await request<BorrowRecord[]>('/borrow-records');
+    return extractWalkInBorrowers(records);
   },
 
   async addWalkInBorrower(
     data: Omit<WalkInBorrower, 'id' | 'createdAt'>,
   ): Promise<WalkInBorrower> {
-    await delay();
-    const newWalkIn: WalkInBorrower = {
-      id: generateId(),
+    // There is no dedicated walk-in endpoint; this method is retained for compatibility.
+    // Walk-in records are persisted through borrow flow.
+    const now = new Date().toISOString();
+    return {
+      id: `temp-${crypto.randomUUID()}`,
       ...data,
-      createdAt: new Date().toISOString(),
+      createdAt: now,
     };
-    walkInBorrowers.push(newWalkIn);
-    return { ...newWalkIn };
   },
 
   async getWalkInBorrowerById(id: string): Promise<WalkInBorrower | null> {
-    await delay(100);
-    const w = walkInBorrowers.find((b) => b.id === id);
-    return w ? { ...w } : null;
+    const walkIns = await libraryService.getWalkInBorrowers();
+    return walkIns.find((w) => w.id === id) ?? null;
   },
 
   // ── Borrowing ─────────────────────────────────────────
@@ -108,85 +161,48 @@ export const libraryService = {
     bookId: string,
     memberId: string,
   ): Promise<BorrowRecord> {
-    await delay();
-    const book = books.find((b) => b.id === bookId);
-    if (!book) throw new Error('Book not found');
-    if (book.availableCopies <= 0) throw new Error('No copies available');
-
-    book.availableCopies -= 1;
     const now = new Date().toISOString();
-    const record: BorrowRecord = {
-      id: generateId(),
-      bookId,
-      borrowerType: 'MEMBER',
-      memberId,
-      walkInBorrowerId: null,
-      borrowedAt: now,
-      dueDate: getDueDate(now),
-      returnedAt: null,
-      status: 'BORROWED',
-    };
-    borrowRecords.push(record);
-    return { ...record };
+    return request<BorrowRecord>('/borrow-records/member', {
+      method: 'POST',
+      body: JSON.stringify({
+        bookId,
+        memberId,
+        dueDate: getDueDate(now),
+      }),
+    });
   },
 
   async borrowBookWalkIn(
     bookId: string,
     walkInData: Omit<WalkInBorrower, 'id' | 'createdAt'>,
   ): Promise<{ record: BorrowRecord; walkIn: WalkInBorrower }> {
-    await delay();
-    const book = books.find((b) => b.id === bookId);
-    if (!book) throw new Error('Book not found');
-    if (book.availableCopies <= 0) throw new Error('No copies available');
-
-    // Create the walk-in borrower record first
-    const walkIn: WalkInBorrower = {
-      id: generateId(),
-      ...walkInData,
-      createdAt: new Date().toISOString(),
-    };
-    walkInBorrowers.push(walkIn);
-
-    book.availableCopies -= 1;
     const now = new Date().toISOString();
-    const record: BorrowRecord = {
-      id: generateId(),
-      bookId,
-      borrowerType: 'WALK_IN',
-      memberId: null,
-      walkInBorrowerId: walkIn.id,
-      borrowedAt: now,
-      dueDate: getDueDate(now),
-      returnedAt: null,
-      status: 'BORROWED',
+    const payload = await request<BorrowWalkInApiPayload>('/borrow-records/walk-in', {
+      method: 'POST',
+      body: JSON.stringify({
+        bookId,
+        dueDate: getDueDate(now),
+        walkInBorrower: walkInData,
+      }),
+    });
+
+    return {
+      record: payload.record,
+      walkIn: payload.walkInBorrower,
     };
-    borrowRecords.push(record);
-    return { record: { ...record }, walkIn: { ...walkIn } };
   },
 
   async returnBook(recordId: string): Promise<BorrowRecord> {
-    await delay();
-    const record = borrowRecords.find((r) => r.id === recordId);
-    if (!record) throw new Error('Record not found');
-
-    const book = books.find((b) => b.id === record.bookId);
-    if (book) book.availableCopies += 1;
-
-    record.returnedAt = new Date().toISOString();
-    record.status = 'RETURNED';
-    return { ...record };
+    return request<BorrowRecord>(`/borrow-records/${recordId}/return`, {
+      method: 'PUT',
+    });
   },
 
   async getAllBorrowRecords(): Promise<BorrowRecord[]> {
-    await delay();
-    return borrowRecords.map((r) => ({ ...r }));
+    return request<BorrowRecord[]>('/borrow-records');
   },
 
   async getOverdueRecords(): Promise<BorrowRecord[]> {
-    await delay();
-    const now = new Date();
-    return borrowRecords
-      .filter((r) => r.status !== 'RETURNED' && new Date(r.dueDate) < now)
-      .map((r) => ({ ...r }));
+    return request<BorrowRecord[]>('/borrow-records/overdue');
   },
 };

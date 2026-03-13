@@ -1,0 +1,9 @@
+{
+	"level": 1,
+	"title": "Setup and Simple UI Fixes",
+	"difficulty": "Easy",
+	"estimatedTime": "30 minutes",
+	"xpReward": 10,
+	"coinReward": 50,
+	"scenario": "The library has onboarded a new developer and needs the system running locally with minor UI tweaks."
+}

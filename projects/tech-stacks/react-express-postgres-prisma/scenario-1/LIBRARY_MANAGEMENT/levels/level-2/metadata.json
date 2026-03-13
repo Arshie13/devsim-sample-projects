@@ -1,0 +1,9 @@
+{
+  "level": 2,
+  "title": "Bug Fixing and Refactoring",
+  "difficulty": "Medium",
+  "estimatedTime": "1 hour",
+  "xpReward": 25,
+  "coinReward": 125,
+  "scenario": "Members report they cannot borrow books even when copies are available."
+}

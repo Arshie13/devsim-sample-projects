@@ -1,0 +1,9 @@
+{
+  "level": 5,
+  "title": "Real Client Issue",
+  "difficulty": "Master",
+  "estimatedTime": "3-4 hours",
+  "xpReward": 75,
+  "coinReward": 375,
+  "scenario": "Some members are marked overdue even after returning books, and reports do not match reality."
+}

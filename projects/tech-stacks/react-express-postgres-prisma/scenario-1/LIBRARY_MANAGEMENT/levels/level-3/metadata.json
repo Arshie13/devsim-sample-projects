@@ -1,0 +1,9 @@
+{
+  "level": 3,
+  "title": "Feature Development",
+  "difficulty": "Hard",
+  "estimatedTime": "2-3 hours",
+  "xpReward": 40,
+  "coinReward": 200,
+  "scenario": "The library wants better visibility into borrowing activity."
+}
