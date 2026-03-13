@@ -73,7 +73,8 @@ export const borrowBookMember = asyncHandler(async (req: Request, res: Response)
     throw new AppError('Book not found', 404);
   }
 
-  if (book.availableCopies <= 0) {
+  // BUG: Uses < 1 instead of <= 0, causing off-by-one error
+  if (book.availableCopies < 1) {
     throw new AppError('No available copies of this book', 400);
   }
 
@@ -140,7 +141,8 @@ export const borrowBookWalkIn = asyncHandler(async (req: Request, res: Response)
     throw new AppError('Book not found', 404);
   }
 
-  if (book.availableCopies <= 0) {
+  // BUG: Uses < 1 instead of <= 0, causing off-by-one error
+  if (book.availableCopies < 1) {
     throw new AppError('No available copies of this book', 400);
   }
 
@@ -207,36 +209,35 @@ export const returnBook = asyncHandler(async (req: Request, res: Response) => {
     throw new AppError('Book already returned', 400);
   }
 
-  // Update record and increment available copies in a transaction
-  const result = await prisma.$transaction(async (tx) => {
-    const updatedRecord = await tx.borrowRecord.update({
-      where: { id },
-      data: {
-        returnedAt: new Date(),
-        status: 'RETURNED',
-      },
-      include: {
-        book: true,
-        member: true,
-        walkInBorrower: true,
-      },
-    });
+  // BUG: Not using transaction - can cause race conditions and negative stock
+  // Update record first
+  const updatedRecord = await prisma.borrowRecord.update({
+    where: { id },
+    data: {
+      returnedAt: new Date(),
+      status: 'RETURNED',
+    },
+    include: {
+      book: true,
+      member: true,
+      walkInBorrower: true,
+    },
+  });
 
-    await tx.book.update({
-      where: { id: record.bookId },
-      data: {
-        availableCopies: {
-          increment: 1,
-        },
+  // Then update book - if this fails, we have inconsistent state
+  // Also no check for concurrent requests causing negative stock
+  await prisma.book.update({
+    where: { id: record.bookId },
+    data: {
+      availableCopies: {
+        increment: 1,
       },
-    });
-
-    return updatedRecord;
+    },
   });
 
   const response: ApiResponse = {
     success: true,
-    data: result,
+    data: updatedRecord,
     message: 'Book returned successfully',
   };
 
@@ -249,6 +250,7 @@ export const returnBook = asyncHandler(async (req: Request, res: Response) => {
  * @access  Private
  */
 export const getOverdueRecords = asyncHandler(async (_req: Request, res: Response) => {
+  // BUG: Not checking returnedAt - returned books incorrectly show as overdue
   const records = await prisma.borrowRecord.findMany({
     where: {
       status: { in: ['BORROWED', 'OVERDUE'] },

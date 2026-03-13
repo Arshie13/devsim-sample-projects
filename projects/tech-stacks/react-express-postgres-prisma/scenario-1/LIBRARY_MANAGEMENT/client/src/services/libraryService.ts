@@ -1,5 +1,6 @@
 import type { Book, BorrowRecord, Member, WalkInBorrower } from '../types';
 import { getDueDate } from '../utils/helpers';
+import { authService } from './authService';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -31,6 +32,11 @@ const toErrorMessage = (body: unknown, fallback: string): string => {
   return fallback;
 };
 
+const getAuthHeaders = (): HeadersInit => {
+  const token = authService.getToken();
+  return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
 const request = async <T>(
   path: string,
   options?: RequestInit,
@@ -38,6 +44,7 @@ const request = async <T>(
   const res = await fetch(`${API_BASE_URL}${path}`, {
     headers: {
       'Content-Type': 'application/json',
+      ...getAuthHeaders(),
       ...(options?.headers ?? {}),
     },
     ...options,
