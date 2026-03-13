@@ -158,6 +158,4 @@ BOOKWISE/
 │ │ ├── middleware/
 │ │ └── index.ts
 │
-├── project.md
-├── levels.md
-└── instructions.md
+├── readme.md
