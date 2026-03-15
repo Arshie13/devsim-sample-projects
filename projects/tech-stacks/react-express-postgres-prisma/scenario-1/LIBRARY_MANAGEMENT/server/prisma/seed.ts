@@ -1,8 +1,13 @@
 /// <reference types="node" />
 import 'dotenv/config';
 import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import pg from 'pg';
+import bcrypt from 'bcryptjs';
 
-const prisma = new PrismaClient();
+const pool = new pg.Pool({ connectionString: process.env.DATABASE_URL });
+const adapter = new PrismaPg(pool as any);
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   console.log('🌱 Starting database seed...');
@@ -12,8 +17,24 @@ async function main() {
   await prisma.walkInBorrower.deleteMany();
   await prisma.member.deleteMany();
   await prisma.book.deleteMany();
+  await prisma.user.deleteMany();
 
   console.log('🧹 Cleared existing data');
+
+  // Seed Users (Librarian only)
+  const hashedPassword = await bcrypt.hash('password123', 10);
+  const users = await Promise.all([
+    prisma.user.create({
+      data: {
+        email: 'admin@bookwise.com',
+        password: hashedPassword,
+        name: 'Admin Librarian',
+        role: 'LIBRARIAN',
+      },
+    }),
+  ]);
+
+  console.log(`✅ Created ${users.length} users`);
 
   // Seed Books
   const books = await Promise.all([

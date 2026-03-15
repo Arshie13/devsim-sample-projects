@@ -12,7 +12,17 @@
     "prisma:studio": "prisma studio",
     "prisma:push": "prisma db push",
     "prisma:reset": "prisma migrate reset",
-    "db:seed": "tsx prisma/seed.ts"
+    "db:seed": "tsx prisma/seed.ts",
+    "test": "vitest",
+    "test:run": "vitest run",
+    "test:ui": "vitest --ui",
+    "test:coverage": "vitest run --coverage",
+    "test:level": "vitest run --reporter=verbose --testPathPattern",
+    "test:task:l2:t1": "vitest run ../tests/server/level-2/task-1/borrow-availability.test.ts",
+    "test:task:l3:t1": "vitest run ../tests/server/level-3/task-1/overdue-records.test.ts",
+    "test:task:l4:t2": "vitest run ../tests/server/level-4/task-2/transaction-safety.test.ts",
+    "test:task:l5:t2": "vitest run ../tests/server/level-5/task-2/overdue-fix.test.ts",
+    "test:tasks": "npm run test:task:l2:t1 && npm run test:task:l3:t1 && npm run test:task:l4:t2 && npm run test:task:l5:t2"
   },
   "keywords": [
     "library",
@@ -24,12 +34,14 @@
   "license": "ISC",
   "description": "Library Management System API - PERN Stack",
   "dependencies": {
+    "@prisma/adapter-pg": "^7.5.0",
     "@prisma/client": "^7.3.0",
     "bcryptjs": "^3.0.3",
     "cors": "^2.8.6",
     "dotenv": "^17.2.4",
     "express": "^5.2.1",
     "jsonwebtoken": "^9.0.3",
+    "pg": "^8.20.0",
     "zod": "^4.3.6"
   },
   "devDependencies": {
@@ -38,9 +50,14 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^25.2.3",
+    "@types/pg": "^8.18.0",
+    "@types/supertest": "^7.2.0",
+    "@vitest/ui": "^4.1.0",
     "prisma": "^7.3.0",
+    "supertest": "^7.2.2",
     "ts-node": "^10.9.2",
     "tsx": "^4.21.0",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
   }
 }

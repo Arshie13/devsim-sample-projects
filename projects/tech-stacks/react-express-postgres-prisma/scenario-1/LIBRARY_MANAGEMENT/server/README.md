@@ -72,6 +72,12 @@ The server will start on `http://localhost:5000`
 
 ## 📚 API Endpoints
 
+### Authentication
+
+- `POST /api/auth/login` - Librarian login
+- `POST /api/auth/logout` - Librarian logout (requires authentication)
+- `GET /api/auth/me` - Get current logged in librarian (requires authentication)
+
 ### Health Check
 
 - `GET /health` - Server health check
@@ -81,28 +87,56 @@ The server will start on `http://localhost:5000`
 - `GET /api/books` - Get all books
 - `GET /api/books/:id` - Get book by ID
 - `GET /api/books/search?q=query` - Search books by title, author, or ISBN
-- `POST /api/books` - Create new book
-- `PUT /api/books/:id` - Update book
-- `DELETE /api/books/:id` - Delete book
+- `POST /api/books` - Create new book (requires authentication)
+- `PUT /api/books/:id` - Update book (requires authentication)
+- `DELETE /api/books/:id` - Delete book (requires authentication)
 
 ### Members
 
-- `GET /api/members` - Get all members
-- `GET /api/members/:id` - Get member by ID (includes borrow history)
-- `POST /api/members` - Create new member
-- `PUT /api/members/:id` - Update member
-- `DELETE /api/members/:id` - Delete member
+- `GET /api/members` - Get all members (requires authentication)
+- `GET /api/members/:id` - Get member by ID (requires authentication)
+- `POST /api/members` - Create new member (requires authentication)
+- `PUT /api/members/:id` - Update member (requires authentication)
+- `DELETE /api/members/:id` - Delete member (requires authentication)
 
 ### Borrow Records
 
-- `GET /api/borrow-records` - Get all borrow records
-- `GET /api/borrow-records/:id` - Get borrow record by ID
-- `GET /api/borrow-records/overdue` - Get overdue records
-- `POST /api/borrow-records/member` - Borrow book for registered member
-- `POST /api/borrow-records/walk-in` - Borrow book for walk-in borrower
-- `PUT /api/borrow-records/:id/return` - Return borrowed book
+- `GET /api/borrow-records` - Get all borrow records (requires authentication)
+- `GET /api/borrow-records/:id` - Get borrow record by ID (requires authentication)
+- `GET /api/borrow-records/overdue` - Get overdue records (requires authentication)
+- `POST /api/borrow-records/member` - Borrow book for registered member (requires authentication)
+- `POST /api/borrow-records/walk-in` - Borrow book for walk-in borrower (requires authentication)
+- `PUT /api/borrow-records/:id/return` - Return borrowed book (requires authentication)
 
 ## 📝 API Request/Response Examples
+
+### Login
+
+**POST** `/api/auth/login`
+
+```json
+{
+  "email": "librarian@library.com",
+  "password": "your-password"
+}
+```
+
+**Response:**
+```json
+{
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
+    "user": {
+      "id": "uuid",
+      "email": "librarian@library.com",
+      "name": "John Librarian",
+      "role": "LIBRARIAN"
+    }
+  },
+  "message": "Login successful"
+}
+```
 
 ### Create Book
 
@@ -208,7 +242,35 @@ No request body required.
 }
 ```
 
+## 🔐 Authentication
+
+This API uses JWT (JSON Web Token) for authentication. All protected endpoints require a valid Bearer token in the Authorization header.
+
+### Getting a Token
+
+1. Login with your librarian credentials at `POST /api/auth/login`
+2. The response will include a JWT token
+3. Include the token in subsequent requests:
+
+```
+Authorization: Bearer <your-token-here>
+```
+
+### User Roles
+
+- **ADMIN** - Full system access
+- **LIBRARIAN** - Manage books, members, and borrow records
+
 ## 🗄️ Database Schema
+
+### User
+- id (UUID)
+- email (unique)
+- password (hashed)
+- name
+- role ('ADMIN' | 'LIBRARIAN')
+- createdAt
+- updatedAt
 
 ### Book
 - id (UUID)
@@ -294,6 +356,8 @@ Status codes:
 - `200` - Success
 - `201` - Created
 - `400` - Bad Request
+- `401` - Unauthorized (invalid or missing token)
+- `403` - Forbidden (insufficient permissions)
 - `404` - Not Found
 - `500` - Internal Server Error
 
@@ -304,10 +368,9 @@ Status codes:
 2. **OVERDUE** - Automatically set when current date > dueDate
 3. **RETURNED** - Set when book is returned
 
-## 🔐 Future Enhancements
 
-- [ ] JWT Authentication
-- [ ] Role-based access control (Admin, Librarian)
+## 🔄 Future Enhancements
+
 - [ ] Email notifications for overdue books
 - [ ] Rate limiting
 - [ ] API documentation with Swagger

@@ -1,0 +1,9 @@
+{
+  "level": 4,
+  "title": "Integration and Edge Cases",
+  "difficulty": "Expert",
+  "estimatedTime": "2-3 hours",
+  "xpReward": 60,
+  "coinReward": 300,
+  "scenario": "Returning books occasionally causes negative available copy counts."
+}
