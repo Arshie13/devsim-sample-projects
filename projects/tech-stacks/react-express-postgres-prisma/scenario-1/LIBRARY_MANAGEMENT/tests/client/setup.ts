@@ -2,33 +2,35 @@
 import '@testing-library/jest-dom';
 import { beforeAll, afterEach, afterAll, vi } from 'vitest';
 
-// Mock window.location
-const mockLocation = {
-  href: 'http://localhost:5173/',
-  pathname: '/',
-  search: '',
-  origin: 'http://localhost:5173',
-};
+if (typeof window !== 'undefined') {
+  // Mock window.location
+  const mockLocation = {
+    href: 'http://localhost:5173/',
+    pathname: '/',
+    search: '',
+    origin: 'http://localhost:5173',
+  };
 
-Object.defineProperty(window, 'location', {
-  value: mockLocation,
-  writable: true,
-});
+  Object.defineProperty(window, 'location', {
+    value: mockLocation,
+    writable: true,
+  });
 
-// Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: vi.fn().mockImplementation((query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: vi.fn(),
-    removeListener: vi.fn(),
-    addEventListener: vi.fn(),
-    removeEventListener: vi.fn(),
-    dispatchEvent: vi.fn(),
-  })),
-});
+  // Mock window.matchMedia
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: vi.fn(),
+      removeListener: vi.fn(),
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+      dispatchEvent: vi.fn(),
+    })),
+  });
+}
 
 // Mock IntersectionObserver
 Object.defineProperty(globalThis, 'IntersectionObserver', {

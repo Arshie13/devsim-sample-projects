@@ -1,6 +1,7 @@
 {
   "level": 2,
-  "title": "Bug Fixing and Refactoring",
+  "title": "Client-Side Exploration",
+  "subtitle": "Investigate Client-Side Borrowing Logic and UI Helpers",
   "difficulty": "Medium",
   "estimatedTime": "1 hour",
   "xpReward": 25,

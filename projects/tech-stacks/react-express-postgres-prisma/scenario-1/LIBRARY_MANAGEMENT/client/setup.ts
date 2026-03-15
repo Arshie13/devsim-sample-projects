@@ -1,32 +1,34 @@
 import '@testing-library/jest-dom';
 
-// Mock window.location
-const mockLocation = {
-  href: 'http://localhost:5173/',
-  pathname: '/',
-  search: '',
-  origin: 'http://localhost:5173',
-};
+if (typeof window !== 'undefined') {
+  // Mock window.location
+  const mockLocation = {
+    href: 'http://localhost:5173/',
+    pathname: '/',
+    search: '',
+    origin: 'http://localhost:5173',
+  };
 
-Object.defineProperty(window, 'location', {
-  value: mockLocation,
-  writable: true,
-});
+  Object.defineProperty(window, 'location', {
+    value: mockLocation,
+    writable: true,
+  });
 
-// Mock window.matchMedia
-Object.defineProperty(window, 'matchMedia', {
-  writable: true,
-  value: (query: string) => ({
-    matches: false,
-    media: query,
-    onchange: null,
-    addListener: () => {},
-    removeListener: () => {},
-    addEventListener: () => {},
-    removeEventListener: () => {},
-    dispatchEvent: () => {},
-  }),
-});
+  // Mock window.matchMedia
+  Object.defineProperty(window, 'matchMedia', {
+    writable: true,
+    value: (query: string) => ({
+      matches: false,
+      media: query,
+      onchange: null,
+      addListener: () => {},
+      removeListener: () => {},
+      addEventListener: () => {},
+      removeEventListener: () => {},
+      dispatchEvent: () => {},
+    }),
+  });
+}
 
 // Mock IntersectionObserver
 global.IntersectionObserver = class IntersectionObserver {

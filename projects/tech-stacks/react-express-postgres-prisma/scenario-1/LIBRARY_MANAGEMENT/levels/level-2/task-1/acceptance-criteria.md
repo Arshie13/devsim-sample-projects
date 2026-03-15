@@ -1,9 +1,11 @@
 # Acceptance Criteria
 
-## AC-1: Correct Availability Condition
-- [ ] Logic in `client/src/pages/BookDetails.tsx` uses `availableCopies <= 0` for unavailable state
-- [ ] Off-by-one behavior is removed
+## AC-1: Availability Helper Contract
+- [ ] A helper is implemented and exported as `isBookAvailable` from `client/src/utils/helpers.ts`
+- [ ] The helper returns `false` when `availableCopies <= 0`
+- [ ] The helper returns `true` when `availableCopies > 0`
 
-## AC-2: Borrow Button Behavior
-- [ ] Borrow button is disabled only when no copies are available
-- [ ] Borrow button is enabled when one or more copies are available
+## AC-2: Borrow Decision Consistency
+- [ ] Borrow-availability decisions remain consistent for mixed copy counts (positive, zero, negative)
+- [ ] Repeated calls with the same input return the same output
+- [ ] Tests validate behavior and contract rather than enforcing one exact implementation style

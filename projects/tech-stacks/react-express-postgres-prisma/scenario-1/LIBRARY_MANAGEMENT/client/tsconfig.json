@@ -2,7 +2,7 @@
   "compilerOptions": {
     "baseUrl": ".",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
-    "types": ["vitest/globals", "@testing-library/jest-dom", "react", "react-dom"],
+    "types": ["vitest/globals", "@testing-library/jest-dom", "react", "react-dom", "node"],
     "paths": {
       "*": ["node_modules/*", "*"]
     }

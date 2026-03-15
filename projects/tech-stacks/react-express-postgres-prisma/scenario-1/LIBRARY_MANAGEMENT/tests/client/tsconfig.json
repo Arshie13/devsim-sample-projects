@@ -2,6 +2,7 @@
   "extends": "../../client/tsconfig.app.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "types": ["vite/client", "vitest/globals", "@testing-library/jest-dom", "node"],
     "paths": {
       "*": ["../../client/node_modules/*", "*"]
     }

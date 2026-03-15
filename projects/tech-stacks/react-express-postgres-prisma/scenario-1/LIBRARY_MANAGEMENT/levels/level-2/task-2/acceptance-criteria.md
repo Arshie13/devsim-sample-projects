@@ -1,12 +1,9 @@
 # Acceptance Criteria
 
-## AC-1: Helper Extraction
-- [ ] Availability logic is moved out of inline page code in `BorrowRecords.tsx`
-- [ ] Helper is implemented in `client/src/utils/helpers.ts`
-- [ ] Helper is exported with function name `isBookAvailable`
-- [ ] Helper accepts available-copy count and returns availability as a boolean
-- [ ] `BorrowRecords.tsx` uses the helper for availability filtering (implementation style can vary)
-- [ ] Function/file-name mismatch is considered a failed submission
+## AC-1: Helper Adoption in Borrow Flow
+- [ ] `BorrowRecords.tsx` uses `isBookAvailable` from `client/src/utils/helpers.ts` for availability filtering
+- [ ] Inline availability checks in `BorrowRecords.tsx` are replaced by helper usage
+- [ ] Availability filtering follows helper output, even when helper logic changes
 - [ ] Validation is outcome-based and allows different coding styles, as long as requirements are met
 
 ## AC-2: Behavior Preservation

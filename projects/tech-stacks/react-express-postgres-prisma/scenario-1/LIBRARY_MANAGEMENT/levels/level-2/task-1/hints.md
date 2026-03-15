@@ -1,10 +1,10 @@
 # Hints
 
-## Hint 1: Reproduce the Bug
-Test with a book that has exactly `1` available copy.
+## Hint 1: Target the Contract
+Expose a single function named `isBookAvailable` from `client/src/utils/helpers.ts`.
 
-## Hint 2: Verify Condition
-Search for `isUnavailable` or similar computed flags in `BookDetails`.
+## Hint 2: Verify the Boundary
+Make sure the boundary at `0` is handled exactly as expected.
 
-## Hint 3: Add Quick Checks
-Use a few values (`0`, `1`, `2`) to confirm behavior before finalizing.
+## Hint 3: Keep It Reusable
+Keep the function focused: copy count in, availability out.

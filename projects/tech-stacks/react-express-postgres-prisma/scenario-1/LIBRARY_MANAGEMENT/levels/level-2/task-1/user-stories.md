@@ -1,11 +1,12 @@
 # User Stories
 
 ## Story 1: Fix Borrow Availability Bug
-As a library member,
-I want to borrow a book whenever copies are available,
-So that I am not blocked by incorrect availability logic.
+As a developer,
+I want a reusable availability helper,
+So that borrow decisions stay correct and consistent.
 
 **Acceptance:**
-- [ ] Books with `availableCopies = 0` cannot be borrowed
-- [ ] Books with `availableCopies >= 1` can be borrowed
-- [ ] Borrow button state matches availability consistently
+- [ ] `isBookAvailable(availableCopies)` is exported from `client/src/utils/helpers.ts`
+- [ ] Inputs with `availableCopies <= 0` return `false`
+- [ ] Inputs with `availableCopies > 0` return `true`
+- [ ] Repeated checks with the same input return consistent output
