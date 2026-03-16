@@ -14,9 +14,7 @@ interface BorrowWalkInApiPayload {
   walkInBorrower: WalkInBorrower;
 }
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL?.replace(/\/$/, '') ??
-  'http://localhost:5000/api';
+const API_BASE_URL = '/api';
 
 const toErrorMessage = (body: unknown, fallback: string): string => {
   if (typeof body === 'object' && body !== null) {
