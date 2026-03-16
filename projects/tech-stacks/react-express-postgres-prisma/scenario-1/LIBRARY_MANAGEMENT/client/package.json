@@ -17,6 +17,8 @@
     "test:task:l1:t2": "vitest run ../tests/client/level-1/task-2/sidebar-branding.test.tsx",
     "test:task:l2:t1": "vitest run ../tests/client/level-2/task-1/borrow-availability.test.ts",
     "test:task:l2:t2": "vitest run ../tests/client/level-2/task-2/helpers.test.ts",
+    "test:task:l4:t1": "vitest run ../tests/client/level-4/task-1/borrow-records.test.ts",
+    "test:task:l4:t2": "vitest run ../tests/client/level-4/task-2/overdue-records.test.ts",
     "test:tasks": "npm run test:task:l1:t1 && npm run test:task:l1:t2 && npm run test:task:l2:t1 && npm run test:task:l2:t2"
   },
   "dependencies": {

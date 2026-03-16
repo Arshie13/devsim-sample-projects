@@ -4,59 +4,6 @@ import { AppError, asyncHandler } from '../middleware/errorHandler.js';
 import type { ApiResponse, BorrowBookMemberInput, BorrowBookWalkInInput } from '../types/index.js';
 
 /**
- * @route   GET /api/borrow-records
- * @desc    Get all borrow records
- * @access  Private
- */
-export const getAllBorrowRecords = asyncHandler(async (_req: Request, res: Response) => {
-  const records = await prisma.borrowRecord.findMany({
-    include: {
-      book: true,
-      member: true,
-      walkInBorrower: true,
-    },
-    orderBy: { borrowedAt: 'desc' },
-  });
-
-  const response: ApiResponse = {
-    success: true,
-    data: records,
-  };
-
-  res.json(response);
-});
-
-/**
- * @route   GET /api/borrow-records/:id
- * @desc    Get single borrow record by ID
- * @access  Private
- */
-export const getBorrowRecordById = asyncHandler(async (req: Request, res: Response) => {
-  const id = typeof req.params.id === 'string' ? req.params.id : req.params.id?.[0];
-  if (!id) throw new AppError('Invalid record ID', 400);
-
-  const record = await prisma.borrowRecord.findUnique({
-    where: { id },
-    include: {
-      book: true,
-      member: true,
-      walkInBorrower: true,
-    },
-  });
-
-  if (!record) {
-    throw new AppError('Borrow record not found', 404);
-  }
-
-  const response: ApiResponse = {
-    success: true,
-    data: record,
-  };
-
-  res.json(response);
-});
-
-/**
  * @route   POST /api/borrow-records/member
  * @desc    Borrow a book for a registered member
  * @access  Private

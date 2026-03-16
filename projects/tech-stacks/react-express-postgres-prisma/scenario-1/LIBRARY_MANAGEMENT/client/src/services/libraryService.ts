@@ -1,6 +1,6 @@
 import type { Book, BorrowRecord, Member, WalkInBorrower } from '../types';
-import { getDueDate } from '../utils/helpers';
-import { authService } from './authService';
+import { getDueDate } from '../utils/helpers.js';
+import { authService } from './authService.js';
 
 interface ApiResponse<T> {
   success: boolean;
@@ -65,21 +65,6 @@ const request = async <T>(
   return body.data;
 };
 
-const extractWalkInBorrowers = (
-  records: BorrowRecord[],
-): WalkInBorrower[] => {
-  const byId = new Map<string, WalkInBorrower>();
-
-  for (const record of records) {
-    const walkIn = record.walkInBorrower;
-    if (walkIn && !byId.has(walkIn.id)) {
-      byId.set(walkIn.id, walkIn);
-    }
-  }
-
-  return Array.from(byId.values());
-};
-
 export const libraryService = {
   // ── Books ─────────────────────────────────────────────
   async getBooks(): Promise<Book[]> {
@@ -141,8 +126,7 @@ export const libraryService = {
 
   // ── Walk-in Borrowers ─────────────────────────────────
   async getWalkInBorrowers(): Promise<WalkInBorrower[]> {
-    const records = await request<BorrowRecord[]>('/borrow-records');
-    return extractWalkInBorrowers(records);
+    throw new Error('Level 4 Task 1: borrow records history endpoint is not implemented yet');
   },
 
   async addWalkInBorrower(
@@ -203,9 +187,5 @@ export const libraryService = {
     return request<BorrowRecord>(`/borrow-records/${recordId}/return`, {
       method: 'PUT',
     });
-  },
-
-  async getAllBorrowRecords(): Promise<BorrowRecord[]> {
-    return request<BorrowRecord[]>('/borrow-records');
   },
 };

@@ -83,16 +83,8 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const fetchBorrowRecords = useCallback(async () => {
-    setLoading(true);
-    setError(null);
-    try {
-      const data = await libraryService.getAllBorrowRecords();
-      setBorrowRecords(data);
-    } catch {
-      setError('Failed to fetch borrow records');
-    } finally {
-      setLoading(false);
-    }
+    setBorrowRecords([]);
+    setError('Level 4 Task 1: borrow records history is not implemented yet');
   }, []);
 
   /* ── Name resolver that works for both member & walk-in ── */

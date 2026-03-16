@@ -5,7 +5,6 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { formatDate } from '../utils/helpers';
 import type { BorrowerType } from '../types';
 
 const walkInSchema = z.object({
@@ -26,17 +25,12 @@ export function BorrowRecords() {
   const {
     books,
     members,
-    borrowRecords,
     loading,
     borrowBookMember,
     borrowBookWalkIn,
-    returnBook,
-    getBorrowerName,
     error,
     clearError,
   } = useLibrary();
-
-  const [statusFilter, setStatusFilter] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Issue form state
@@ -47,17 +41,8 @@ export function BorrowRecords() {
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [issuing, setIssuing] = useState(false);
   const [issueError, setIssueError] = useState<string | null>(null);
-  const [returningId, setReturningId] = useState<string | null>(null);
-
-  const getBookTitle = (id: string) =>
-    books.find((b) => b.id === id)?.title ?? 'Unknown';
 
   const availableBooks = books.filter((b) => b.availableCopies > 0);
-
-  const filteredRecords = borrowRecords.filter((r) => {
-    if (!statusFilter) return true;
-    return r.status === statusFilter;
-  });
 
   const openModal = () => {
     clearError();
@@ -75,7 +60,7 @@ export function BorrowRecords() {
     setFieldErrors((prev) => ({ ...prev, [field]: '' }));
   };
 
-  const handleIssue = async (e: SubmitEvent<HTMLFormElement>) => {
+  const handleIssue = async (e: React.SubmitEvent<HTMLFormElement>) => {
     e.preventDefault();
     if (!selectedBook) {
       setIssueError('Please select a book.');
@@ -126,12 +111,6 @@ export function BorrowRecords() {
     }
   };
 
-  const handleReturn = async (recordId: string) => {
-    setReturningId(recordId);
-    await returnBook(recordId);
-    setReturningId(null);
-  };
-
   if (loading) return <LoadingSpinner message="Loading records..." />;
 
   return (
@@ -140,115 +119,9 @@ export function BorrowRecords() {
         <h1 className="text-2xl font-bold text-gray-900">Borrow / Return</h1>
         <Button onClick={openModal}>+ Issue Book</Button>
       </div>
+       
+       {/* ── Insert Level-4 Codes Below ── */}
 
-      <div className="mb-6">
-        <select
-          value={statusFilter}
-          onChange={(e) => setStatusFilter(e.target.value)}
-          className="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500 bg-white"
-        >
-          <option value="">All Statuses</option>
-          <option value="BORROWED">Borrowed</option>
-          <option value="RETURNED">Returned</option>
-        </select>
-      </div>
-
-      {filteredRecords.length === 0 ? (
-        <p className="text-gray-500 text-center py-12">No records found.</p>
-      ) : (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
-          <table className="w-full">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase">
-                  Book
-                </th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase">
-                  Borrower
-                </th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase">
-                  Type
-                </th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase">
-                  Borrowed
-                </th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase">
-                  Due Date
-                </th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase">
-                  Returned
-                </th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase">
-                  Status
-                </th>
-                <th className="text-left py-3 px-4 text-xs font-medium text-gray-500 uppercase">
-                  Action
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {filteredRecords.map((r) => {
-                return (
-                  <tr
-                    key={r.id}
-                    className="border-t border-gray-100 hover:bg-gray-50"
-                  >
-                    <td className="py-3 px-4 text-sm font-medium text-gray-900">
-                      {getBookTitle(r.bookId)}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-600">
-                      {getBorrowerName(r)}
-                    </td>
-                    <td className="py-3 px-4">
-                      {r.borrowerType === 'MEMBER' ? (
-                        <span className="px-2 py-0.5 text-xs font-medium rounded bg-indigo-100 text-indigo-700">
-                          Member
-                        </span>
-                      ) : (
-                        <span className="px-2 py-0.5 text-xs font-medium rounded bg-amber-100 text-amber-700">
-                          Walk-in
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-600">
-                      {formatDate(r.borrowedAt)}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-600">
-                      {formatDate(r.dueDate)}
-                    </td>
-                    <td className="py-3 px-4 text-sm text-gray-600">
-                      {r.returnedAt ? formatDate(r.returnedAt) : '—'}
-                    </td>
-                    <td className="py-3 px-4">
-                      {r.status === 'RETURNED' ? (
-                        <span className="px-2 py-1 text-xs font-medium rounded bg-gray-100 text-gray-600">
-                          Returned
-                        </span>
-                      ) : (
-                        <span className="px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-700">
-                          Borrowed
-                        </span>
-                      )}
-                    </td>
-                    <td className="py-3 px-4">
-                      {r.status !== 'RETURNED' && (
-                        <Button
-                          variant="secondary"
-                          onClick={() => handleReturn(r.id)}
-                          loading={returningId === r.id}
-                          className="text-xs px-3 py-1"
-                        >
-                          Return
-                        </Button>
-                      )}
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
-      )}
 
       {/* ── Issue Book Modal ── */}
       <Modal

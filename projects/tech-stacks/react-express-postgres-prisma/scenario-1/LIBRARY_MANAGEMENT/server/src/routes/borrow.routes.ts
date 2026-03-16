@@ -1,7 +1,5 @@
 import { Router } from 'express';
 import {
-  getAllBorrowRecords,
-  getBorrowRecordById,
   borrowBookMember,
   borrowBookWalkIn,
   returnBook,
@@ -13,12 +11,6 @@ import {
 } from '../validators/borrow.validator.js';
 
 const router = Router();
-
-// GET /api/borrow-records
-router.get('/', getAllBorrowRecords);
-
-// GET /api/borrow-records/:id
-router.get('/:id', getBorrowRecordById);
 
 // POST /api/borrow-records/member
 router.post('/member', validateRequest(borrowBookMemberSchema), borrowBookMember);
