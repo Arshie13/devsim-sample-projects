@@ -3,6 +3,60 @@ import { prisma } from '../utils/prisma.js';
 import { AppError, asyncHandler } from '../middleware/errorHandler.js';
 import type { ApiResponse, BorrowBookMemberInput, BorrowBookWalkInInput } from '../types/index.js';
 
+
+/**
+ * @route   GET /api/borrow-records
+ * @desc    Get all borrow records
+ * @access  Private
+ */
+export const getAllBorrowRecords = asyncHandler(async (_req: Request, res: Response) => {
+  const records = await prisma.borrowRecord.findMany({
+    include: {
+      book: true,
+      member: true,
+      walkInBorrower: true,
+    },
+    orderBy: { borrowedAt: 'desc' },
+  });
+
+  const response: ApiResponse = {
+    success: true,
+    data: records,
+  };
+
+  res.json(response);
+});
+
+/**
+ * @route   GET /api/borrow-records/:id
+ * @desc    Get single borrow record by ID
+ * @access  Private
+ */
+export const getBorrowRecordById = asyncHandler(async (req: Request, res: Response) => {
+  const id = typeof req.params.id === 'string' ? req.params.id : req.params.id?.[0];
+  if (!id) throw new AppError('Invalid record ID', 400);
+
+  const record = await prisma.borrowRecord.findUnique({
+    where: { id },
+    include: {
+      book: true,
+      member: true,
+      walkInBorrower: true,
+    },
+  });
+
+  if (!record) {
+    throw new AppError('Borrow record not found', 404);
+  }
+
+  const response: ApiResponse = {
+    success: true,
+    data: record,
+  };
+
+  res.json(response);
+});
+
 /**
  * @route   POST /api/borrow-records/member
  * @desc    Borrow a book for a registered member
@@ -187,6 +241,50 @@ export const returnBook = asyncHandler(async (req: Request, res: Response) => {
     success: true,
     data: updatedRecord,
     message: 'Book returned successfully',
+  };
+
+  res.json(response);
+});
+
+/**
+ * @route   GET /api/borrow-records/overdue
+ * @desc    Get all overdue borrow records
+ * @access  Private
+ */
+export const getOverdueRecords = asyncHandler(async (_req: Request, res: Response) => {
+  // BUG: Not checking returnedAt - returned books incorrectly show as overdue
+  const records = await prisma.borrowRecord.findMany({
+    where: {
+      status: { in: ['BORROWED', 'OVERDUE'] },
+      dueDate: {
+        lt: new Date(),
+      },
+    },
+    include: {
+      book: true,
+      member: true,
+      walkInBorrower: true,
+    },
+    orderBy: { dueDate: 'asc' },
+  });
+
+  // Update status to OVERDUE for records that are past due
+  const recordIds = records.map((r: { id: string }) => r.id);
+  if (recordIds.length > 0) {
+    await prisma.borrowRecord.updateMany({
+      where: {
+        id: { in: recordIds },
+        status: 'BORROWED',
+      },
+      data: {
+        status: 'OVERDUE',
+      },
+    });
+  }
+
+  const response: ApiResponse = {
+    success: true,
+    data: records,
   };
 
   res.json(response);

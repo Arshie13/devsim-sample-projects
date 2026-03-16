@@ -20,8 +20,8 @@
     "test:level": "vitest run --reporter=verbose --testPathPattern",
     "test:task:l3:t1": "vitest run ../tests/server/level-3/task-1/return-flow-analysis.test.ts",
     "test:task:l3:t2": "vitest run ../tests/server/level-3/task-2/transaction-safety.test.ts",
-    "test:task:l4:t1": "vitest run ../tests/server/level-4/task-1/borrow-records.test.ts",
-    "test:task:l4:t2": "vitest run ../tests/server/level-4/task-2/overdue-records.test.ts",
+    "test:task:l4:t1": "vitest run ../tests/server/level-4/task-1/reservation-queue.test.ts",
+    "test:task:l4:t2": "vitest run ../tests/server/level-4/task-2/reservation-lifecycle.test.ts",
     "test:task:l5:t2": "vitest run ../tests/server/level-5/task-2/overdue-fix.test.ts",
     "test:tasks": "npm run test:task:l3:t1 && npm run test:task:l4:t2 && npm run test:task:l5:t2"
   },

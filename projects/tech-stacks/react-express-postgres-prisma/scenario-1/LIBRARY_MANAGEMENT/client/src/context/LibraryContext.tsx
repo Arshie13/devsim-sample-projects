@@ -5,10 +5,10 @@ import {
   useEffect,
   useCallback,
   type ReactNode,
-} from 'react';
-import type { Book, BorrowRecord, Member, WalkInBorrower } from '../types';
-import { libraryService } from '../services/libraryService';
-import { generateId, getDueDate } from '../utils/helpers';
+} from "react";
+import type { Book, BorrowRecord, Member, WalkInBorrower } from "../types";
+import { libraryService } from "../services/libraryService";
+import { generateId, getDueDate } from "../utils/helpers";
 
 interface LibraryContextType {
   books: Book[];
@@ -24,15 +24,15 @@ interface LibraryContextType {
   borrowBookMember: (bookId: string, memberId: string) => Promise<boolean>;
   borrowBookWalkIn: (
     bookId: string,
-    walkInData: Omit<WalkInBorrower, 'id' | 'createdAt'>,
+    walkInData: Omit<WalkInBorrower, "id" | "createdAt">,
   ) => Promise<boolean>;
   returnBook: (recordId: string) => Promise<boolean>;
   addBook: (
-    data: Omit<Book, 'id' | 'createdAt' | 'availableCopies'>,
+    data: Omit<Book, "id" | "createdAt" | "availableCopies">,
   ) => Promise<boolean>;
   updateBook: (id: string, data: Partial<Book>) => Promise<boolean>;
   archiveBook: (id: string) => Promise<boolean>;
-  addMember: (data: Omit<Member, 'id' | 'createdAt'>) => Promise<boolean>;
+  addMember: (data: Omit<Member, "id" | "createdAt">) => Promise<boolean>;
   getBorrowerName: (record: BorrowRecord) => string;
   clearError: () => void;
 }
@@ -54,7 +54,7 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
       const data = await libraryService.getBooks();
       setBooks(data);
     } catch {
-      setError('Failed to fetch books');
+      setError("Failed to fetch books");
     } finally {
       setLoading(false);
     }
@@ -67,7 +67,7 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
       const data = await libraryService.getMembers();
       setMembers(data);
     } catch {
-      setError('Failed to fetch members');
+      setError("Failed to fetch members");
     } finally {
       setLoading(false);
     }
@@ -83,30 +83,41 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const fetchBorrowRecords = useCallback(async () => {
-    setBorrowRecords([]);
-    setError('Level 4 Task 1: borrow records history is not implemented yet');
+    setLoading(true);
+    setError(null);
+    try {
+      const data = await libraryService.getAllBorrowRecords();
+      setBorrowRecords(data);
+    } catch {
+      setError("Failed to fetch borrow records");
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
   /* ── Name resolver that works for both member & walk-in ── */
   const getBorrowerName = useCallback(
     (record: BorrowRecord): string => {
-      if (record.borrowerType === 'MEMBER' && record.member?.name) {
+      if (record.borrowerType === "MEMBER" && record.member?.name) {
         return record.member.name;
       }
-      if (record.borrowerType === 'WALK_IN' && record.walkInBorrower?.name) {
+      if (record.borrowerType === "WALK_IN" && record.walkInBorrower?.name) {
         return record.walkInBorrower.name;
       }
 
-      if (record.borrowerType === 'MEMBER' && record.memberId) {
-        return members.find((m) => m.id === record.memberId)?.name ?? 'Unknown Member';
-      }
-      if (record.borrowerType === 'WALK_IN' && record.walkInBorrowerId) {
+      if (record.borrowerType === "MEMBER" && record.memberId) {
         return (
-          walkInBorrowers.find((w) => w.id === record.walkInBorrowerId)?.name ??
-          'Walk-in'
+          members.find((m) => m.id === record.memberId)?.name ??
+          "Unknown Member"
         );
       }
-      return 'Unknown';
+      if (record.borrowerType === "WALK_IN" && record.walkInBorrowerId) {
+        return (
+          walkInBorrowers.find((w) => w.id === record.walkInBorrowerId)?.name ??
+          "Walk-in"
+        );
+      }
+      return "Unknown";
     },
     [members, walkInBorrowers],
   );
@@ -129,13 +140,13 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
     const optimisticRecord: BorrowRecord = {
       id: tempRecordId,
       bookId,
-      borrowerType: 'MEMBER',
+      borrowerType: "MEMBER",
       memberId,
       walkInBorrowerId: null,
       borrowedAt: now,
       dueDate: getDueDate(now),
       returnedAt: null,
-      status: 'BORROWED',
+      status: "BORROWED",
     };
 
     setBooks((prev) =>
@@ -147,7 +158,10 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
 
     try {
       // Sync with service — will return actual record with real ID
-      const actualRecord = await libraryService.borrowBookMember(bookId, memberId);
+      const actualRecord = await libraryService.borrowBookMember(
+        bookId,
+        memberId,
+      );
       // Replace temp record with actual
       setBorrowRecords((prev) =>
         prev.map((r) => (r.id === tempRecordId ? actualRecord : r)),
@@ -157,14 +171,14 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
       // Rollback
       setBooks(prevBooks);
       setBorrowRecords(prevRecords);
-      setError(err instanceof Error ? err.message : 'Failed to issue book');
+      setError(err instanceof Error ? err.message : "Failed to issue book");
       return false;
     }
   };
 
   const borrowBookWalkIn = async (
     bookId: string,
-    walkInData: Omit<WalkInBorrower, 'id' | 'createdAt'>,
+    walkInData: Omit<WalkInBorrower, "id" | "createdAt">,
   ): Promise<boolean> => {
     // Snapshot for rollback
     const prevBooks = books;
@@ -185,13 +199,13 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
     const optimisticRecord: BorrowRecord = {
       id: tempRecordId,
       bookId,
-      borrowerType: 'WALK_IN',
+      borrowerType: "WALK_IN",
       memberId: null,
       walkInBorrowerId: tempWalkInId,
       borrowedAt: now,
       dueDate: getDueDate(now),
       returnedAt: null,
-      status: 'BORROWED',
+      status: "BORROWED",
     };
 
     setBooks((prev) =>
@@ -203,7 +217,10 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
     setBorrowRecords((prev) => [optimisticRecord, ...prev]);
 
     try {
-      const { record, walkIn } = await libraryService.borrowBookWalkIn(bookId, walkInData);
+      const { record, walkIn } = await libraryService.borrowBookWalkIn(
+        bookId,
+        walkInData,
+      );
       // Replace temp entries with actual
       setWalkInBorrowers((prev) =>
         prev.map((w) => (w.id === tempWalkInId ? walkIn : w)),
@@ -217,7 +234,7 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
       setBooks(prevBooks);
       setWalkInBorrowers(prevWalkIns);
       setBorrowRecords(prevRecords);
-      setError(err instanceof Error ? err.message : 'Failed to issue book');
+      setError(err instanceof Error ? err.message : "Failed to issue book");
       return false;
     }
   };
@@ -229,7 +246,7 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
 
     const record = borrowRecords.find((r) => r.id === recordId);
     if (!record) {
-      setError('Record not found');
+      setError("Record not found");
       return false;
     }
 
@@ -237,7 +254,9 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
     const now = new Date().toISOString();
     setBorrowRecords((prev) =>
       prev.map((r) =>
-        r.id === recordId ? { ...r, returnedAt: now, status: 'RETURNED' as const } : r,
+        r.id === recordId
+          ? { ...r, returnedAt: now, status: "RETURNED" as const }
+          : r,
       ),
     );
     setBooks((prev) =>
@@ -258,13 +277,13 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
       // Rollback
       setBooks(prevBooks);
       setBorrowRecords(prevRecords);
-      setError('Failed to return book');
+      setError("Failed to return book");
       return false;
     }
   };
 
   const addBook = async (
-    data: Omit<Book, 'id' | 'createdAt' | 'availableCopies'>,
+    data: Omit<Book, "id" | "createdAt" | "availableCopies">,
   ): Promise<boolean> => {
     const prevBooks = books;
     const tempId = generateId();
@@ -283,7 +302,7 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
       return true;
     } catch {
       setBooks(prevBooks);
-      setError('Failed to add book');
+      setError("Failed to add book");
       return false;
     }
   };
@@ -303,7 +322,7 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
       return true;
     } catch {
       setBooks(prevBooks);
-      setError('Failed to update book');
+      setError("Failed to update book");
       return false;
     }
   };
@@ -319,13 +338,13 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
       return true;
     } catch {
       setBooks(prevBooks);
-      setError('Failed to archive book');
+      setError("Failed to archive book");
       return false;
     }
   };
 
   const addMember = async (
-    data: Omit<Member, 'id' | 'createdAt'>,
+    data: Omit<Member, "id" | "createdAt">,
   ): Promise<boolean> => {
     const prevMembers = members;
     const tempId = generateId();
@@ -339,11 +358,13 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
 
     try {
       const actualMember = await libraryService.addMember(data);
-      setMembers((prev) => prev.map((m) => (m.id === tempId ? actualMember : m)));
+      setMembers((prev) =>
+        prev.map((m) => (m.id === tempId ? actualMember : m)),
+      );
       return true;
     } catch (err) {
       setMembers(prevMembers);
-      setError(err instanceof Error ? err.message : 'Failed to add member');
+      setError(err instanceof Error ? err.message : "Failed to add member");
       return false;
     }
   };
@@ -390,6 +411,6 @@ export function LibraryProvider({ children }: { children: ReactNode }) {
 export function useLibrary() {
   const context = useContext(LibraryContext);
   if (!context)
-    throw new Error('useLibrary must be used within LibraryProvider');
+    throw new Error("useLibrary must be used within LibraryProvider");
   return context;
 }

@@ -1,11 +1,11 @@
 # User Stories
 
-## Story 1: Filter Overdue in Borrow Records
+## Story 1: Fulfill and Manage Reservation Lifecycle
 As a librarian,
-I want a dedicated Overdue filter inside the Borrow Records view,
-So that I can quickly follow up with late borrowers.
+I want reservation fulfillment and cancellation to update queue order automatically,
+So that members always see accurate reservation status and position.
 
 **Acceptance:**
-- [ ] Borrow records page has a separate `Overdue` filter option
-- [ ] Overdue results include borrower name and overdue days
-- [ ] Overdue behavior relies on backend data used by the borrow records flow
+- [ ] Return flow promotes the first queued reservation to `READY_FOR_PICKUP`
+- [ ] Reservation cancellation updates queue positions consistently
+- [ ] Member-facing reservation view reflects `RESERVED`, `READY_FOR_PICKUP`, and `CANCELLED`

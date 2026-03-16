@@ -1,28 +1,28 @@
 # Acceptance Criteria
 
-## AC-1: History Endpoint Contract
-- [ ] `GET /api/borrow-records` returns HTTP `200` with `{ success: true, data: BorrowRecord[] }`
-- [ ] Each row includes: `id`, `bookId`, `borrowerType`, `status`, `borrowedAt`, `dueDate`, `returnedAt`
-- [ ] Each row includes related display data: `book.title` and borrower identity (`member.name` or `walkInBorrower.name`)
+## AC-1: Reservation Create Contract
+- [ ] `POST /api/reservations` returns HTTP `201` with `{ success: true, data: Reservation }` for valid requests
+- [ ] Request body includes `bookId` and `memberId`
+- [ ] Reservation create is allowed only when target book has `availableCopies === 0`
+- [ ] Duplicate active reservation for the same member and book returns HTTP `400`
 - [ ] Required implementation names are exact and case-sensitive:
-	- `getAllBorrowRecords` in `client/src/services/libraryService.ts`
-	- `getAllBorrowRecords` in `server/src/controllers/borrow.controller.ts`
-	- Route path remains `/api/borrow-records` in `server/src/routes/borrow.routes.ts`
+  - `createReservation` in `server/src/controllers/reservation.controller.ts`
+  - `createReservation` in `client/src/services/libraryService.ts`
+  - Route path is `/api/reservations` in `server/src/routes/reservation.routes.ts`
 
-## AC-2: Status Filtering Contract
-- [ ] `GET /api/borrow-records?status=BORROWED` returns only rows with status `BORROWED`
-- [ ] `GET /api/borrow-records?status=RETURNED` returns only rows with status `RETURNED`
-- [ ] `GET /api/borrow-records` (or `status=ALL`) returns both active and returned history rows
-- [ ] Invalid `status` query values return HTTP `400`
+## AC-2: Reservation Queue Read Contract
+- [ ] `GET /api/reservations?bookId=<id>` returns HTTP `200` with `{ success: true, data: ReservationQueueRow[] }`
+- [ ] Each queue row includes `id`, `bookId`, `memberId`, `queuePosition`, `status`, `createdAt`
+- [ ] Each queue row includes display-ready relation data: `member.name` and `book.title`
+- [ ] Queue response is ordered by `queuePosition` ascending
 
-## AC-3: Borrow Records Filter Output
-- [ ] `client/src/pages/BorrowRecords.tsx` renders filter options for `All Statuses`, `Borrowed`, and `Returned`
-- [ ] Selecting `Borrowed` shows only `BORROWED` rows
-- [ ] Selecting `Returned` shows only `RETURNED` rows
-- [ ] When filtered results are empty, UI displays `No records found.`
-- [ ] Borrow Records page calls `getAllBorrowRecords(...)` from `client/src/services/libraryService.ts` (exact name and casing)
+## AC-3: Client Reserve Entry Point
+- [ ] `client/src/pages/Books.tsx` renders `Reserve Book` only when `availableCopies` is `0`
+- [ ] Borrow action stays primary when `availableCopies` is greater than `0`
+- [ ] Reserve action triggers `createReservation(...)` from `client/src/services/libraryService.ts`
+- [ ] Reservation errors (book available, duplicate reservation, invalid member) are shown in UI
 
-## AC-4: Row Status/Action Output
-- [ ] Status cells render distinct labels for `Borrowed` and `Returned`
-- [ ] Return action is shown only for rows with status `BORROWED`
-- [ ] Rows stay ordered by most recent `borrowedAt` first
+## AC-4: Queue Position and Success Output
+- [ ] After successful reservation, UI confirms queue position (for example: `You are #3 in line.`)
+- [ ] Queue length and position display are based on backend response, not hard-coded client math
+- [ ] Empty queue state for a book displays `No active reservations.`
