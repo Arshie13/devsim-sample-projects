@@ -1,5 +1,5 @@
 /**
- * Level 3 Task 1: Overdue Books View
+ * Level 4 Task 2: Overdue Books Filter
  * Tests for the overdue records API endpoint
  * 
  * Acceptance Criteria:
@@ -76,7 +76,7 @@ function filterOverdueRecordsFixed(records: BorrowRecord[]): BorrowRecord[] {
   });
 }
 
-describe('Level 3 Task 1: Overdue Records Logic', () => {
+describe('Level 4 Task 2: Overdue Records Logic', () => {
   
   const mockOverdueRecord: BorrowRecord = {
     id: 'record-1',
@@ -227,7 +227,7 @@ describe('Level 3 Task 1: Overdue Records Logic', () => {
 /**
  * HIDDEN TESTS - Additional edge cases
  */
-describe('Level 3 Task 1: Hidden Edge Case Tests', () => {
+describe('Level 4 Task 2: Hidden Edge Case Tests', () => {
   it('should handle records returned exactly on due date', () => {
     const dueDate = new Date('2024-01-15');
     const returnedAt = new Date('2024-01-15');

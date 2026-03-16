@@ -1,9 +1,9 @@
 # Acceptance Criteria
 
-## AC-1: History Endpoint/Data
-- [ ] Backend can return full borrow history per member
-- [ ] Response includes dates and status needed for display
+## AC-1: Atomic Operations
+- [ ] Return flow updates (`BorrowRecord` + `Book.availableCopies`) run in one Prisma transaction
+- [ ] If one write fails, no partial state is persisted
 
-## AC-2: Dashboard Rendering
-- [ ] Member dashboard renders complete history list
-- [ ] Empty state is shown when no history exists
+## AC-2: Concurrency Protection
+- [ ] Concurrent borrow requests never reduce `availableCopies` below zero
+- [ ] Only valid borrow/return outcomes are committed under concurrent access

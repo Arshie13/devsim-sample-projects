@@ -1,11 +1,11 @@
 # User Stories
 
-## Story 1: Enforce Transaction Safety
-As a platform engineer,
-I want borrow and return updates to run atomically,
-So that concurrent requests cannot corrupt inventory counts.
+## Story 1: Filter Overdue in Borrow Records
+As a librarian,
+I want to filter overdue books inside the Borrow Records view,
+So that I can quickly follow up with late borrowers.
 
 **Acceptance:**
-- [ ] Borrow and return operations are wrapped in transactions
-- [ ] Concurrent operations do not create negative stock
-- [ ] Failure in one step rolls back the whole operation
+- [ ] Borrow records page supports an overdue filter
+- [ ] Overdue results include borrower name and overdue days
+- [ ] Overdue behavior relies on backend data used by the borrow records flow

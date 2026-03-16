@@ -208,8 +208,4 @@ export const libraryService = {
   async getAllBorrowRecords(): Promise<BorrowRecord[]> {
     return request<BorrowRecord[]>('/borrow-records');
   },
-
-  async getOverdueRecords(): Promise<BorrowRecord[]> {
-    return request<BorrowRecord[]>('/borrow-records/overdue');
-  },
 };

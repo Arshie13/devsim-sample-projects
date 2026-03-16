@@ -5,7 +5,6 @@ import {
   borrowBookMember,
   borrowBookWalkIn,
   returnBook,
-  getOverdueRecords,
 } from '../controllers/borrow.controller.js';
 import { validateRequest } from '../middleware/validateRequest.js';
 import {
@@ -14,9 +13,6 @@ import {
 } from '../validators/borrow.validator.js';
 
 const router = Router();
-
-// GET /api/borrow-records/overdue
-router.get('/overdue', getOverdueRecords);
 
 // GET /api/borrow-records
 router.get('/', getAllBorrowRecords);

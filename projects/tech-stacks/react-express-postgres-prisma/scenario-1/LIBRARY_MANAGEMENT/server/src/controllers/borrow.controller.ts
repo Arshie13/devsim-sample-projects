@@ -205,7 +205,8 @@ export const returnBook = asyncHandler(async (req: Request, res: Response) => {
     throw new AppError('Borrow record not found', 404);
   }
 
-  if (record.status === 'RETURNED') {
+
+  if (record.status === 'RETURNED' && !record.returnedAt) {
     throw new AppError('Book already returned', 400);
   }
 
@@ -239,50 +240,6 @@ export const returnBook = asyncHandler(async (req: Request, res: Response) => {
     success: true,
     data: updatedRecord,
     message: 'Book returned successfully',
-  };
-
-  res.json(response);
-});
-
-/**
- * @route   GET /api/borrow-records/overdue
- * @desc    Get all overdue borrow records
- * @access  Private
- */
-export const getOverdueRecords = asyncHandler(async (_req: Request, res: Response) => {
-  // BUG: Not checking returnedAt - returned books incorrectly show as overdue
-  const records = await prisma.borrowRecord.findMany({
-    where: {
-      status: { in: ['BORROWED', 'OVERDUE'] },
-      dueDate: {
-        lt: new Date(),
-      },
-    },
-    include: {
-      book: true,
-      member: true,
-      walkInBorrower: true,
-    },
-    orderBy: { dueDate: 'asc' },
-  });
-
-  // Update status to OVERDUE for records that are past due
-  const recordIds = records.map((r: { id: string }) => r.id);
-  if (recordIds.length > 0) {
-    await prisma.borrowRecord.updateMany({
-      where: {
-        id: { in: recordIds },
-        status: 'BORROWED',
-      },
-      data: {
-        status: 'OVERDUE',
-      },
-    });
-  }
-
-  const response: ApiResponse = {
-    success: true,
-    data: records,
   };
 
   res.json(response);

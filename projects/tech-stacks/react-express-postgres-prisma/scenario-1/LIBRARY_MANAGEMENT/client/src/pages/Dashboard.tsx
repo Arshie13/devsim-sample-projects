@@ -1,7 +1,7 @@
 import { useLibrary } from '../context/LibraryContext';
 import { Card } from '../components/ui/Card';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { isOverdue, formatDate, getDaysOverdue } from '../utils/helpers';
+import { formatDate } from '../utils/helpers';
 
 export function Dashboard() {
   const { books, borrowRecords, loading, getBorrowerName } = useLibrary();
@@ -9,9 +9,7 @@ export function Dashboard() {
   if (loading) return <LoadingSpinner message="Loading dashboard..." />;
 
   const activeRecords = borrowRecords.filter((r) => r.status !== 'RETURNED');
-  const overdueRecords = activeRecords.filter((r) =>
-    isOverdue(r.dueDate, r.returnedAt),
-  );
+  const returnedRecords = borrowRecords.filter((r) => r.status === 'RETURNED');
   const totalAvailable = books.reduce((sum, b) => sum + b.availableCopies, 0);
 
   const getBookTitle = (id: string) =>
@@ -38,10 +36,8 @@ export function Dashboard() {
           </p>
         </Card>
         <Card>
-          <p className="text-sm text-gray-500">Overdue</p>
-          <p className="text-3xl font-bold text-red-600">
-            {overdueRecords.length}
-          </p>
+          <p className="text-sm text-gray-500">Returned</p>
+          <p className="text-3xl font-bold text-gray-700">{returnedRecords.length}</p>
         </Card>
       </div>
 
@@ -80,7 +76,6 @@ export function Dashboard() {
               </thead>
               <tbody>
                 {activeRecords.map((r) => {
-                  const overdue = isOverdue(r.dueDate, r.returnedAt);
                   return (
                     <tr
                       key={r.id}
@@ -107,15 +102,9 @@ export function Dashboard() {
                         {formatDate(r.dueDate)}
                       </td>
                       <td className="py-3 px-4">
-                        {overdue ? (
-                          <span className="px-2 py-1 text-xs font-medium rounded bg-red-100 text-red-700">
-                            Overdue ({getDaysOverdue(r.dueDate)}d)
-                          </span>
-                        ) : (
-                          <span className="px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-700">
-                            Borrowed
-                          </span>
-                        )}
+                        <span className="px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-700">
+                          Borrowed
+                        </span>
                       </td>
                     </tr>
                   );

@@ -1,11 +1,11 @@
 # User Stories
 
-## Story 1: Member Borrow History
-As a library member,
-I want to see my complete borrowing history,
-So that I can track what I borrowed and returned.
+## Story 1: Enforce Transaction Safety
+As a backend engineer,
+I want the borrow and return flows in `server/src/controllers/borrow.controller.ts` to run atomically,
+So that concurrent requests cannot corrupt `availableCopies` and partial writes are never persisted.
 
 **Acceptance:**
-- [ ] Member dashboard shows full borrow history
-- [ ] History includes returned and active records
-- [ ] Records are sorted in a user-friendly order
+- [ ] Borrow and return operations are wrapped in transactions
+- [ ] Concurrent operations do not create negative stock
+- [ ] Failure in one step rolls back the whole operation

@@ -19,6 +19,7 @@
     "test:task:client:l2:t2": "cd client && npm run test:task:l2:t2",
     "test:tasks:client": "concurrently \"npm:test:task:client:l1:t1\" \"npm:test:task:client:l1:t2\" \"npm:test:task:client:l2:t1\" \"npm:test:task:client:l2:t2\"",
     "test:task:server:l3:t1": "cd server && npm run test:task:l3:t1",
+    "test:task:server:l3:t2": "cd server && npm run test:task:l3:t2",
     "test:task:server:l4:t2": "cd server && npm run test:task:l4:t2",
     "test:task:server:l5:t2": "cd server && npm run test:task:l5:t2",
     "test:ui": "concurrently \"npm:test:server:ui\" \"npm:test:client:ui\"",

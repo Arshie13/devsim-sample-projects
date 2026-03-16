@@ -1,9 +1,10 @@
 {
   "level": 4,
-  "title": "Integration and Edge Cases",
-  "difficulty": "Expert",
+  "title": "Starting my Full-Stack Journey",
+  "subtitle": "Implement borrow history and overdue filtering across client and server.",
+  "difficulty": "Hard",
   "estimatedTime": "2-3 hours",
-  "xpReward": 60,
-  "coinReward": 300,
-  "scenario": "Returning books occasionally causes negative available copy counts."
+  "xpReward": 40,
+  "coinReward": 200,
+  "scenario": "The library wants better visibility into borrowing activity."
 }

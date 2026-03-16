@@ -1,9 +1,9 @@
 # Acceptance Criteria
 
-## AC-1: Frontend Overdue Page
-- [ ] `client/src/pages/admin/Overdue.tsx` displays overdue items
-- [ ] Each row shows book details, member name, and days overdue
+## AC-1: Root Cause Analysis
+- [ ] A reproducible case for negative stock is documented
+- [ ] Problematic backend logic path is identified with evidence
 
-## AC-2: Backend Data Support
-- [ ] `server/src/routes/borrow.ts` exposes data needed by overdue view
-- [ ] Response includes only currently overdue records
+## AC-2: Backend Verification
+- [ ] Backend controller/service flow is validated
+- [ ] Prisma query sequence is validated

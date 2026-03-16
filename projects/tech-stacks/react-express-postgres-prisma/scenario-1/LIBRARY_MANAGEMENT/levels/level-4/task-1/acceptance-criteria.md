@@ -1,10 +1,9 @@
 # Acceptance Criteria
 
-## AC-1: Root Cause Analysis
-- [ ] A reproducible case for negative stock is documented
-- [ ] Problematic logic path is identified with evidence
+## AC-1: History Endpoint/Data
+- [ ] Backend can return full borrow history records needed by the borrow records view
+- [ ] Response includes dates and status fields needed for display
 
-## AC-2: Cross-Layer Verification
-- [ ] Frontend request payload is validated
-- [ ] Backend controller/service flow is validated
-- [ ] Prisma query sequence is validated
+## AC-2: Borrow Records Rendering
+- [ ] Borrow records page renders complete history list
+- [ ] Empty state is shown when no history exists

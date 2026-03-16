@@ -1,11 +1,11 @@
 # User Stories
 
-## Story 1: Diagnose Return Flow
-As a backend developer,
-I want to trace return flow across frontend and backend,
-So that I can identify why stock goes negative.
+## Story 1: View Complete Borrow Records
+As a librarian,
+I want to see the complete borrowing history in Borrow Records,
+So that I can track which books are active or already returned.
 
 **Acceptance:**
-- [ ] Frontend return request path is verified
-- [ ] Backend return logic is traced end to end
-- [ ] Prisma updates causing incorrect counts are identified
+- [ ] Borrow records view shows full history
+- [ ] History includes returned and active records
+- [ ] Records are sorted in a user-friendly order

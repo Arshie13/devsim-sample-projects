@@ -5,7 +5,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { formatDate, isOverdue, getDaysOverdue } from '../utils/helpers';
+import { formatDate } from '../utils/helpers';
 import type { BorrowerType } from '../types';
 
 const walkInSchema = z.object({
@@ -56,9 +56,6 @@ export function BorrowRecords() {
 
   const filteredRecords = borrowRecords.filter((r) => {
     if (!statusFilter) return true;
-    if (statusFilter === 'OVERDUE') {
-      return r.status !== 'RETURNED' && isOverdue(r.dueDate, r.returnedAt);
-    }
     return r.status === statusFilter;
   });
 
@@ -153,7 +150,6 @@ export function BorrowRecords() {
           <option value="">All Statuses</option>
           <option value="BORROWED">Borrowed</option>
           <option value="RETURNED">Returned</option>
-          <option value="OVERDUE">Overdue</option>
         </select>
       </div>
 
@@ -192,8 +188,6 @@ export function BorrowRecords() {
             </thead>
             <tbody>
               {filteredRecords.map((r) => {
-                const overdue =
-                  r.status !== 'RETURNED' && isOverdue(r.dueDate, r.returnedAt);
                 return (
                   <tr
                     key={r.id}
@@ -229,10 +223,6 @@ export function BorrowRecords() {
                       {r.status === 'RETURNED' ? (
                         <span className="px-2 py-1 text-xs font-medium rounded bg-gray-100 text-gray-600">
                           Returned
-                        </span>
-                      ) : overdue ? (
-                        <span className="px-2 py-1 text-xs font-medium rounded bg-red-100 text-red-700">
-                          Overdue ({getDaysOverdue(r.dueDate)}d)
                         </span>
                       ) : (
                         <span className="px-2 py-1 text-xs font-medium rounded bg-blue-100 text-blue-700">
