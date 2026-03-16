@@ -6,7 +6,15 @@
 
 **Developer Role:** Junior Full Stack Developer at a software consultancy.
 
-**Goal:** Build a full-featured web-based Library Management System to manage books, members, and borrowing workflows.
+**Goal:** Build a full-featured web-based Library Management System for librarians to manage books, members, and borrowing workflows.
+
+---
+
+## Demo Credentials
+
+| Role       | Email                  | Password     |
+| ---------- | ---------------------- | ------------ |
+| Librarian  | admin@bookwise.com     | password123  |
 
 ---
 
@@ -26,34 +34,28 @@
 
 ## Features
 
-### 📚 Public Catalog
-- **Homepage:** Library intro, featured books, announcements.
+### 📚 Library Catalog
 - **Catalog Page:** Browse books with search and filters (title, author, genre).
 - **Book Details:** Description, author info, availability status, shelf location.
 
-### 👤 Member Authentication
-- Member registration and login.
+### 🔐 Librarian Authentication
+- Librarian login only.
 - JWT-based session management.
-- Role-based access (MEMBER / LIBRARIAN / ADMIN).
+- Role-based access (LIBRARIAN).
 
 ### 🔄 Borrowing System
-- Borrow available books.
+- Borrow available books for members.
 - Return borrowed books.
 - Automatic due date calculation.
 - Late return detection.
 
-### 📖 Member Dashboard
-- View currently borrowed books.
-- See due dates and overdue warnings.
-- Borrowing history.
-
 ### 🛠️ Librarian Panel (Protected)
 - **Books:** Add, edit, archive books.
 - **Members:** View and manage member accounts.
-- **Borrow Records:** Approve borrows, process returns.
+- **Borrow Records:** Process borrows, process returns.
 - **Availability:** Track copies and stock levels.
 
-### 📊 Reports (Admin)
+### 📊 Reports
 - Most borrowed books.
 - Overdue books report.
 - Active members statistics.
@@ -62,14 +64,14 @@
 
 ## Data Models
 
-### User
+### User (Librarian)
 | Field      | Type     | Notes                    |
 | ---------- | -------- | ------------------------ |
 | id         | String   | UUID                     |
 | email      | String   | Unique                   |
 | password   | String   | Hashed                   |
 | name       | String   |                          |
-| role       | Enum     | MEMBER, LIBRARIAN, ADMIN |
+| role       | Enum     | LIBRARIAN                |
 | createdAt  | DateTime |                          |
 
 ### Book
@@ -103,7 +105,6 @@
 ### Auth
 | Method | Endpoint              | Description           | Access |
 | ------ | --------------------- | --------------------- | ------ |
-| POST   | /api/auth/register    | Register member       | Public |
 | POST   | /api/auth/login       | Login                 | Public |
 | GET    | /api/auth/me          | Get current user      | Auth   |
 
@@ -119,10 +120,17 @@
 ### Borrowing
 | Method | Endpoint                     | Description            | Access |
 | ------ | ---------------------------- | ---------------------- | ------ |
-| POST   | /api/borrow                  | Borrow a book          | Member |
-| PATCH  | /api/borrow/:id/return       | Return a book          | Auth   |
-| GET    | /api/borrow/my               | My borrow records     | Member |
+| POST   | /api/borrow                  | Borrow a book          | Librarian |
+| PATCH  | /api/borrow/:id/return       | Return a book          | Librarian |
 | GET    | /api/borrow                  | All borrow records     | Librarian |
+
+### Members
+| Method | Endpoint              | Description            | Access |
+| ------ | --------------------- | ---------------------- | ------ |
+| GET    | /api/members          | List members           | Librarian |
+| POST   | /api/members          | Create member          | Librarian |
+| GET    | /api/members/:id      | Member details         | Librarian |
+| PUT    | /api/members/:id      | Update member          | Librarian |
 
 ---
 
@@ -150,6 +158,4 @@ BOOKWISE/
 │ │ ├── middleware/
 │ │ └── index.ts
 │
-├── project.md
-├── levels.md
-└── instructions.md
+├── readme.md

@@ -47,6 +47,9 @@ export interface BorrowRecord {
   dueDate: string;
   returnedAt: string | null;
   status: BorrowStatus;
+  book?: Book;
+  member?: Member | null;
+  walkInBorrower?: WalkInBorrower | null;
 }
 
 export const GENRES = [

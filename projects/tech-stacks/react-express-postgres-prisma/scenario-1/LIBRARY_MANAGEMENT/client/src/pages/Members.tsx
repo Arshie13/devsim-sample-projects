@@ -5,7 +5,6 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { CameraCapture } from '../components/ui/CameraCapture';
 import { formatDate } from '../utils/helpers';
 
 const memberSchema = z.object({
@@ -28,7 +27,6 @@ export function Members() {
   const [search, setSearch] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [formData, setFormData] = useState(emptyForm);
-  const [idPhoto, setIdPhoto] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
 
@@ -41,7 +39,6 @@ export function Members() {
 
   const openModal = () => {
     setFormData(emptyForm);
-    setIdPhoto(null);
     setFieldErrors({});
     setIsModalOpen(true);
   };
@@ -70,12 +67,11 @@ export function Members() {
       email: parsed.data.email,
       phone: parsed.data.phone,
       idNumber: parsed.data.idNumber,
-      idPhoto,
+      idPhoto: '',
     });
     setSubmitting(false);
     if (success) {
       setFormData(emptyForm);
-      setIdPhoto(null);
       setIsModalOpen(false);
     }
   };
@@ -187,13 +183,6 @@ export function Members() {
             onChange={(e) => handleChange('idNumber', e.currentTarget.value)}
             error={fieldErrors.idNumber}
             placeholder="e.g. DL-1234-5678 or SSS-12-345678"
-          />
-
-          {/* Camera Capture for ID photo */}
-          <CameraCapture
-            onCapture={(dataUrl) => setIdPhoto(dataUrl)}
-            capturedImage={idPhoto}
-            onClear={() => setIdPhoto(null)}
           />
 
           <div className="flex gap-3 mt-2">

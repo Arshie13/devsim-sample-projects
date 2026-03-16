@@ -5,7 +5,6 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Modal } from '../components/ui/Modal';
 import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { CameraCapture } from '../components/ui/CameraCapture';
 import { formatDate, isOverdue, getDaysOverdue } from '../utils/helpers';
 import type { BorrowerType } from '../types';
 
@@ -45,7 +44,6 @@ export function BorrowRecords() {
   const [selectedBook, setSelectedBook] = useState('');
   const [selectedMember, setSelectedMember] = useState('');
   const [walkInForm, setWalkInForm] = useState(emptyWalkInForm);
-  const [idPhoto, setIdPhoto] = useState<string | null>(null);
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({});
   const [issuing, setIssuing] = useState(false);
   const [issueError, setIssueError] = useState<string | null>(null);
@@ -72,7 +70,6 @@ export function BorrowRecords() {
     setSelectedBook('');
     setSelectedMember('');
     setWalkInForm(emptyWalkInForm);
-    setIdPhoto(null);
     setIsModalOpen(true);
   };
 
@@ -120,7 +117,7 @@ export function BorrowRecords() {
         email: walkInForm.email,
         phone: walkInForm.phone,
         idNumber: walkInForm.idNumber,
-        idPhoto,
+        idPhoto: '',
       });
     }
 
@@ -394,13 +391,6 @@ export function BorrowRecords() {
                 onChange={(e) => handleWalkInChange('idNumber', e.target.value)}
                 error={fieldErrors.idNumber}
                 placeholder="e.g. DL-1234-5678 or SSS-12-345678"
-              />
-
-              {/* Camera Capture for ID photo */}
-              <CameraCapture
-                onCapture={(dataUrl) => setIdPhoto(dataUrl)}
-                capturedImage={idPhoto}
-                onClear={() => setIdPhoto(null)}
               />
             </div>
           )}

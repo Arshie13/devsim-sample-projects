@@ -1,0 +1,38 @@
+{
+  "name": "library-management",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Library Management System - Full Stack Test Runner",
+  "scripts": {
+    "test": "concurrently \"npm:test:server\" \"npm:test:client\"",
+    "test:server": "cd server && npm run test:run",
+    "test:client": "cd client && npm run test:run",
+    "test:server:coverage": "cd server && npm run test:coverage",
+    "test:client:coverage": "cd client && npm run test:coverage",
+    "test:all": "concurrently \"npm:test:server:coverage\" \"npm:test:client:coverage\"",
+    "test:level": "npm run test:level:server && npm run test:level:client",
+    "test:level:server": "cd server && npm run test:level",
+    "test:level:client": "cd client && npm run test:level",
+    "test:task:client:l1:t1": "cd client && npm run test:task:l1:t1",
+    "test:task:client:l1:t2": "cd client && npm run test:task:l1:t2",
+    "test:task:client:l2:t1": "cd client && npm run test:task:l2:t1",
+    "test:task:client:l2:t2": "cd client && npm run test:task:l2:t2",
+    "test:tasks:client": "concurrently \"npm:test:task:client:l1:t1\" \"npm:test:task:client:l1:t2\" \"npm:test:task:client:l2:t1\" \"npm:test:task:client:l2:t2\"",
+    "test:task:server:l3:t1": "cd server && npm run test:task:l3:t1",
+    "test:task:server:l4:t2": "cd server && npm run test:task:l4:t2",
+    "test:task:server:l5:t2": "cd server && npm run test:task:l5:t2",
+    "test:ui": "concurrently \"npm:test:server:ui\" \"npm:test:client:ui\"",
+    "test:tasks:server": "concurrently \"npm:test:task:server:l3:t1\" \"npm:test:task:server:l4:t2\" \"npm:test:task:server:l5:t2\"",
+    "test:tasks:all": "concurrently \"npm:test:task:client:l1:t1\" \"npm:test:task:client:l1:t2\" \"npm:test:task:client:l2:t1\" \"npm:test:task:client:l2:t2\" \"npm:test:task:server:l3:t1\" \"npm:test:task:server:l4:t2\" \"npm:test:task:server:l5:t2\"",
+    "test:server:ui": "cd server && npm run test:ui",
+    "test:client:ui": "cd client && npm run test:ui",
+    "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev"
+  },
+  "devDependencies": {
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "concurrently": "^8.2.2"
+  }
+}
