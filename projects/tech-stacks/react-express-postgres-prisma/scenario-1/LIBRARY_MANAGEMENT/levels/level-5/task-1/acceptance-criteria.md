@@ -1,9 +1,9 @@
 # Acceptance Criteria
 
-## AC-1: Analysis Coverage
-- [ ] Overdue status calculations are documented and tested
-- [ ] Date and timezone assumptions are explicitly verified
+## AC-1: Overdue Output Correctness
+- [ ] `/api/borrow-records/overdue` excludes any record with `returnedAt != null` regardless of status value
+- [ ] `/api/borrow-records/overdue` includes past-due unreturned records
 
-## AC-2: Issue Reproduction
-- [ ] At least one real discrepancy case is reproducible before fix
-- [ ] Reproduction steps are clear and repeatable
+## AC-2: Production Edge Reliability
+- [ ] A stale-status discrepancy case is reproducible and covered by tests
+- [ ] A UTC midnight boundary case is covered by deterministic test data

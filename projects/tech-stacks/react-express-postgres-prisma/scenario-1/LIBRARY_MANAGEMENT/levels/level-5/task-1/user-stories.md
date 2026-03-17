@@ -1,11 +1,11 @@
 # User Stories
 
-## Story 1: Investigate Overdue Discrepancies
-As a support engineer,
-I want to investigate overdue status logic deeply,
-So that false overdue flags can be eliminated.
+## Story 1: Stabilize Overdue Report Classification
+As a developer,
+I want the overdue report to classify records by source-of-truth fields,
+So that client-visible overdue output remains correct even with stale status data.
 
 **Acceptance:**
-- [ ] Timezone handling is reviewed
-- [ ] Returned date comparisons are validated
-- [ ] Status update flow is verified
+- [ ] Returned records are excluded even when status is stale
+- [ ] Past-due unreturned records are included in overdue output
+- [ ] UTC boundary behavior is validated with deterministic test data

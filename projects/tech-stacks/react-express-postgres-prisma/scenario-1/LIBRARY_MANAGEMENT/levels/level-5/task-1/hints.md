@@ -1,10 +1,10 @@
 # Hints
 
-## Hint 1: Compare UTC vs Local Time
-Normalize timestamps before overdue comparisons.
+## Hint 1: Trust Source-of-Truth Fields
+Use `returnedAt` and `dueDate` as primary decision fields instead of relying on status alone.
 
-## Hint 2: Audit Status Transitions
-Trace when records move between borrowed, returned, and overdue states.
+## Hint 2: Guard Against Stale Status
+Returned records may still carry `BORROWED` or `OVERDUE`; overdue output should still stay correct.
 
-## Hint 3: Use Realistic Test Data
-Create records around midnight boundaries to catch timezone issues.
+## Hint 3: Use Deterministic UTC Fixtures
+Use fixed UTC timestamps around midnight to make boundary behavior reproducible.
