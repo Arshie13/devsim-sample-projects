@@ -1,6 +1,6 @@
-import type { Book, BorrowRecord, Member, WalkInBorrower } from '../types';
-import { getDueDate } from '../utils/helpers';
-import { authService } from './authService';
+import type { Book, BorrowRecord, Member, WalkInBorrower } from "../types";
+import { getDueDate } from "../utils/helpers.js";
+import { authService } from "./authService.js";
 
 interface ApiResponse<T> {
   success: boolean;
@@ -14,16 +14,16 @@ interface BorrowWalkInApiPayload {
   walkInBorrower: WalkInBorrower;
 }
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = "/api";
 
 const toErrorMessage = (body: unknown, fallback: string): string => {
-  if (typeof body === 'object' && body !== null) {
+  if (typeof body === "object" && body !== null) {
     const maybeMessage = (body as { message?: unknown }).message;
     const maybeError = (body as { error?: unknown }).error;
-    if (typeof maybeMessage === 'string' && maybeMessage.length > 0) {
+    if (typeof maybeMessage === "string" && maybeMessage.length > 0) {
       return maybeMessage;
     }
-    if (typeof maybeError === 'string' && maybeError.length > 0) {
+    if (typeof maybeError === "string" && maybeError.length > 0) {
       return maybeError;
     }
   }
@@ -35,13 +35,10 @@ const getAuthHeaders = (): HeadersInit => {
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
-const request = async <T>(
-  path: string,
-  options?: RequestInit,
-): Promise<T> => {
+const request = async <T>(path: string, options?: RequestInit): Promise<T> => {
   const res = await fetch(`${API_BASE_URL}${path}`, {
     headers: {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...getAuthHeaders(),
       ...(options?.headers ?? {}),
     },
@@ -56,16 +53,14 @@ const request = async <T>(
     );
   }
 
-  if (typeof body.data === 'undefined') {
-    throw new Error('Malformed API response: missing data payload');
+  if (typeof body.data === "undefined") {
+    throw new Error("Malformed API response: missing data payload");
   }
 
   return body.data;
 };
 
-const extractWalkInBorrowers = (
-  records: BorrowRecord[],
-): WalkInBorrower[] => {
+const extractWalkInBorrowers = (records: BorrowRecord[]): WalkInBorrower[] => {
   const byId = new Map<string, WalkInBorrower>();
 
   for (const record of records) {
@@ -81,7 +76,7 @@ const extractWalkInBorrowers = (
 export const libraryService = {
   // ── Books ─────────────────────────────────────────────
   async getBooks(): Promise<Book[]> {
-    return request<Book[]>('/books');
+    return request<Book[]>("/books");
   },
 
   async getBookById(id: string): Promise<Book | null> {
@@ -93,10 +88,10 @@ export const libraryService = {
   },
 
   async addBook(
-    bookData: Omit<Book, 'id' | 'createdAt' | 'availableCopies'>,
+    bookData: Omit<Book, "id" | "createdAt" | "availableCopies">,
   ): Promise<Book> {
-    return request<Book>('/books', {
-      method: 'POST',
+    return request<Book>("/books", {
+      method: "POST",
       body: JSON.stringify({
         ...bookData,
         availableCopies: bookData.totalCopies,
@@ -106,20 +101,20 @@ export const libraryService = {
 
   async updateBook(id: string, data: Partial<Book>): Promise<Book> {
     return request<Book>(`/books/${id}`, {
-      method: 'PUT',
+      method: "PUT",
       body: JSON.stringify(data),
     });
   },
 
   async archiveBook(id: string): Promise<void> {
     await request<{ message?: string }>(`/books/${id}`, {
-      method: 'DELETE',
+      method: "DELETE",
     });
   },
 
   // ── Members ───────────────────────────────────────────
   async getMembers(): Promise<Member[]> {
-    return request<Member[]>('/members');
+    return request<Member[]>("/members");
   },
 
   async getMemberById(id: string): Promise<Member | null> {
@@ -130,21 +125,21 @@ export const libraryService = {
     }
   },
 
-  async addMember(data: Omit<Member, 'id' | 'createdAt'>): Promise<Member> {
-    return request<Member>('/members', {
-      method: 'POST',
+  async addMember(data: Omit<Member, "id" | "createdAt">): Promise<Member> {
+    return request<Member>("/members", {
+      method: "POST",
       body: JSON.stringify(data),
     });
   },
 
   // ── Walk-in Borrowers ─────────────────────────────────
   async getWalkInBorrowers(): Promise<WalkInBorrower[]> {
-    const records = await request<BorrowRecord[]>('/borrow-records');
+    const records = await request<BorrowRecord[]>("/borrow-records");
     return extractWalkInBorrowers(records);
   },
 
   async addWalkInBorrower(
-    data: Omit<WalkInBorrower, 'id' | 'createdAt'>,
+    data: Omit<WalkInBorrower, "id" | "createdAt">,
   ): Promise<WalkInBorrower> {
     // There is no dedicated walk-in endpoint; this method is retained for compatibility.
     // Walk-in records are persisted through borrow flow.
@@ -167,8 +162,8 @@ export const libraryService = {
     memberId: string,
   ): Promise<BorrowRecord> {
     const now = new Date().toISOString();
-    return request<BorrowRecord>('/borrow-records/member', {
-      method: 'POST',
+    return request<BorrowRecord>("/borrow-records/member", {
+      method: "POST",
       body: JSON.stringify({
         bookId,
         memberId,
@@ -179,17 +174,20 @@ export const libraryService = {
 
   async borrowBookWalkIn(
     bookId: string,
-    walkInData: Omit<WalkInBorrower, 'id' | 'createdAt'>,
+    walkInData: Omit<WalkInBorrower, "id" | "createdAt">,
   ): Promise<{ record: BorrowRecord; walkIn: WalkInBorrower }> {
     const now = new Date().toISOString();
-    const payload = await request<BorrowWalkInApiPayload>('/borrow-records/walk-in', {
-      method: 'POST',
-      body: JSON.stringify({
-        bookId,
-        dueDate: getDueDate(now),
-        walkInBorrower: walkInData,
-      }),
-    });
+    const payload = await request<BorrowWalkInApiPayload>(
+      "/borrow-records/walk-in",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          bookId,
+          dueDate: getDueDate(now),
+          walkInBorrower: walkInData,
+        }),
+      },
+    );
 
     return {
       record: payload.record,
@@ -199,15 +197,15 @@ export const libraryService = {
 
   async returnBook(recordId: string): Promise<BorrowRecord> {
     return request<BorrowRecord>(`/borrow-records/${recordId}/return`, {
-      method: 'PUT',
+      method: "PUT",
     });
   },
 
   async getAllBorrowRecords(): Promise<BorrowRecord[]> {
-    return request<BorrowRecord[]>('/borrow-records');
+    return request<BorrowRecord[]>("/borrow-records");
   },
 
   async getOverdueRecords(): Promise<BorrowRecord[]> {
-    return request<BorrowRecord[]>('/borrow-records/overdue');
+    return request<BorrowRecord[]>("/borrow-records/overdue");
   },
 };

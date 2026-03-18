@@ -1,9 +1,10 @@
 {
   "level": 4,
-  "title": "Integration and Edge Cases",
+  "title": "Starting my Full-Stack Journey",
+  "subtitle": "Implement Reservation Queue and Lifecycle Management",
   "difficulty": "Expert",
-  "estimatedTime": "2-3 hours",
+  "estimatedTime": "3-5 hours",
   "xpReward": 60,
   "coinReward": 300,
-  "scenario": "Returning books occasionally causes negative available copy counts."
+  "scenario": "The Library is implementing a reservation system for popular books. Users can reserve a book if all copies are currently borrowed, and they will be notified when the book becomes available."
 }

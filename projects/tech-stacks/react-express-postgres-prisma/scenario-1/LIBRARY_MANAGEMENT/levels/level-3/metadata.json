@@ -1,9 +1,10 @@
 {
   "level": 3,
-  "title": "Feature Development",
+  "title": "Debugging and Stabilizing the Backend",
+  "subtitle": "Trace return-flow issues and enforce transactional consistency.",
   "difficulty": "Hard",
   "estimatedTime": "2-3 hours",
   "xpReward": 40,
   "coinReward": 200,
-  "scenario": "The library wants better visibility into borrowing activity."
+  "scenario": "Returning books occasionally causes negative available copy counts."
 }

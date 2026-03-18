@@ -156,50 +156,135 @@ async function main() {
 
   // Seed Borrow Records
   const borrowRecords = await Promise.all([
-    // Member borrow
+    // --- ORIGINAL RECORDS ---
+
+    // [1] Active borrow — Member, due in 14 days
     prisma.borrowRecord.create({
       data: {
         bookId: books[0]!.id,
         memberId: members[0]!.id,
         borrowerType: 'MEMBER',
         borrowedAt: new Date(),
-        dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+        dueDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000),
         status: 'BORROWED',
       },
     }),
-    // Walk-in borrow
+
+    // [2] Active borrow — Walk-in, due in 7 days
     prisma.borrowRecord.create({
       data: {
         bookId: books[1]!.id,
         walkInBorrowerId: walkInBorrowers[0]!.id,
         borrowerType: 'WALK_IN',
         borrowedAt: new Date(),
-        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days from now
+        dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
         status: 'BORROWED',
       },
     }),
-    // Returned record
+
+    // [3] Returned on time — Member (Jane), borrowed 20 days ago, returned 5 days ago
     prisma.borrowRecord.create({
       data: {
         bookId: books[2]!.id,
         memberId: members[1]!.id,
         borrowerType: 'MEMBER',
-        borrowedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000), // 20 days ago
-        dueDate: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000), // 6 days ago
-        returnedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+        borrowedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+        dueDate: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000),
+        returnedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000),
         status: 'RETURNED',
+      },
+    }),
+
+    // --- NEW RECORDS ---
+
+    // [4] Overdue — Member (Bob), borrowed 30 days ago, was due 16 days ago, not yet returned
+    prisma.borrowRecord.create({
+      data: {
+        bookId: books[3]!.id,
+        memberId: members[2]!.id,
+        borrowerType: 'MEMBER',
+        borrowedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+        dueDate: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000),
+        status: 'OVERDUE',
+      },
+    }),
+
+    // [5] Overdue — Walk-in (Charlie), borrowed 25 days ago, was due 11 days ago, not yet returned
+    prisma.borrowRecord.create({
+      data: {
+        bookId: books[4]!.id,
+        walkInBorrowerId: walkInBorrowers[1]!.id,
+        borrowerType: 'WALK_IN',
+        borrowedAt: new Date(Date.now() - 25 * 24 * 60 * 60 * 1000),
+        dueDate: new Date(Date.now() - 11 * 24 * 60 * 60 * 1000),
+        status: 'OVERDUE',
+      },
+    }),
+
+    // [6] Returned late — Member (John), borrowed 40 days ago, due 26 days ago, returned 20 days ago
+    prisma.borrowRecord.create({
+      data: {
+        bookId: books[1]!.id,
+        memberId: members[0]!.id,
+        borrowerType: 'MEMBER',
+        borrowedAt: new Date(Date.now() - 40 * 24 * 60 * 60 * 1000),
+        dueDate: new Date(Date.now() - 26 * 24 * 60 * 60 * 1000),
+        returnedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000),
+        status: 'RETURNED',
+      },
+    }),
+
+    // [7] Returned on time — Walk-in (Alice), borrowed 10 days ago, due in 4 days, returned yesterday
+    prisma.borrowRecord.create({
+      data: {
+        bookId: books[2]!.id,
+        walkInBorrowerId: walkInBorrowers[0]!.id,
+        borrowerType: 'WALK_IN',
+        borrowedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+        dueDate: new Date(Date.now() + 4 * 24 * 60 * 60 * 1000),
+        returnedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000),
+        status: 'RETURNED',
+      },
+    }),
+
+    // [8] Active borrow — Member (Jane), borrowed 3 days ago, due in 11 days
+    prisma.borrowRecord.create({
+      data: {
+        bookId: books[4]!.id,
+        memberId: members[1]!.id,
+        borrowerType: 'MEMBER',
+        borrowedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+        dueDate: new Date(Date.now() + 11 * 24 * 60 * 60 * 1000),
+        status: 'BORROWED',
       },
     }),
   ]);
 
-  // Update book available copies
+  // Update book available copies to reflect active/overdue borrows
+  // books[0] — 1 active borrow (record 1)
   await prisma.book.update({
     where: { id: books[0]!.id },
     data: { availableCopies: 4 },
   });
+  // books[1] — 1 active borrow (record 2); record 6 was returned
   await prisma.book.update({
     where: { id: books[1]!.id },
     data: { availableCopies: 2 },
+  });
+  // books[2] — records 3 and 7 both returned, no active borrows
+  await prisma.book.update({
+    where: { id: books[2]!.id },
+    data: { availableCopies: 4 },
+  });
+  // books[3] — 1 overdue borrow (record 4)
+  await prisma.book.update({
+    where: { id: books[3]!.id },
+    data: { availableCopies: 1 },
+  });
+  // books[4] — 1 overdue (record 5) + 1 active (record 8)
+  await prisma.book.update({
+    where: { id: books[4]!.id },
+    data: { availableCopies: 1 },
   });
 
   console.log(`✅ Created ${borrowRecords.length} borrow records`);

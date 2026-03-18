@@ -1,11 +1,11 @@
 # User Stories
 
-## Story 1: Enforce Transaction Safety
-As a platform engineer,
-I want borrow and return updates to run atomically,
-So that concurrent requests cannot corrupt inventory counts.
+## Story 1: Fulfill and Manage Reservation Lifecycle
+As a librarian,
+I want reservation fulfillment and cancellation to update queue order automatically,
+So that members always see accurate reservation status and position.
 
 **Acceptance:**
-- [ ] Borrow and return operations are wrapped in transactions
-- [ ] Concurrent operations do not create negative stock
-- [ ] Failure in one step rolls back the whole operation
+- [ ] Return flow promotes the first queued reservation to `READY_FOR_PICKUP`
+- [ ] Reservation cancellation updates queue positions consistently
+- [ ] Member-facing reservation view reflects `RESERVED`, `READY_FOR_PICKUP`, and `CANCELLED`

@@ -1,8 +1,14 @@
 import { beforeAll, afterAll, afterEach, vi } from 'vitest';
+import { config as loadEnv } from 'dotenv';
+import { fileURLToPath } from 'node:url';
+
+// Prefer scenario-local server credentials for integration tests.
+loadEnv({ path: fileURLToPath(new URL('../../server/.env', import.meta.url)) });
 
 // Setup test environment variables
 process.env.NODE_ENV = 'test';
-process.env.DATABASE_URL = process.env.DATABASE_URL || 'postgresql://test:test@localhost:5432/library_test';
+process.env.DATABASE_URL =
+  process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/library_management?schema=public';
 process.env.JWT_SECRET = process.env.JWT_SECRET || 'test-secret-key';
 process.env.PORT = '5001';
 

@@ -1,12 +1,15 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
     "lib": ["ES2022", "DOM", "DOM.Iterable"],
     "types": ["vitest/globals", "@testing-library/jest-dom", "react", "react-dom", "node"],
     "paths": {
       "*": ["node_modules/*", "*"]
     }
   },
-  "include": ["src", "../tests/client"]
+  "include": ["src", "../tests/client", "vite-env.d.ts"]
 }
 

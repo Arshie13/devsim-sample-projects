@@ -1,7 +1,7 @@
 # User Stories
 
 ## Story 1: Deliver Permanent Fix and Documentation
-As a maintainer,
+As a developer,
 I want to fix overdue mismatches and document the root cause,
 So that the client can trust overdue reports.
 

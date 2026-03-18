@@ -4,7 +4,6 @@ import { Dashboard } from './pages/Dashboard';
 import { Books } from './pages/Books';
 import { Members } from './pages/Members';
 import { BorrowRecords } from './pages/BorrowRecords';
-import { Overdue } from './pages/Overdue';
 import { Login } from './pages/Login';
 import { useAuth } from './context/AuthContext';
 
@@ -37,7 +36,6 @@ function App() {
         <Route path="/books" element={<Books />} />
         <Route path="/members" element={<Members />} />
         <Route path="/borrow" element={<BorrowRecords />} />
-        <Route path="/overdue" element={<Overdue />} />
       </Route>
     </Routes>
   );

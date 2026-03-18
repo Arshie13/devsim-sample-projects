@@ -6,7 +6,6 @@ const navItems = [
   { to: '/books', label: 'Books', icon: '📚' },
   { to: '/members', label: 'Members', icon: '👥' },
   { to: '/borrow', label: 'Borrow / Return', icon: '🔄' },
-  { to: '/overdue', label: 'Overdue', icon: '⚠️' },
 ];
 
 export function Sidebar() {

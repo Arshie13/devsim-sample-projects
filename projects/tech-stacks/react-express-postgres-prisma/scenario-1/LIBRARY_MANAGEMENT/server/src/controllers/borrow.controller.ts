@@ -3,6 +3,7 @@ import { prisma } from '../utils/prisma.js';
 import { AppError, asyncHandler } from '../middleware/errorHandler.js';
 import type { ApiResponse, BorrowBookMemberInput, BorrowBookWalkInInput } from '../types/index.js';
 
+
 /**
  * @route   GET /api/borrow-records
  * @desc    Get all borrow records
@@ -205,7 +206,8 @@ export const returnBook = asyncHandler(async (req: Request, res: Response) => {
     throw new AppError('Borrow record not found', 404);
   }
 
-  if (record.status === 'RETURNED') {
+
+  if (record.status === 'RETURNED' && !record.returnedAt) {
     throw new AppError('Book already returned', 400);
   }
 

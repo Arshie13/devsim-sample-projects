@@ -1,11 +1,11 @@
 # User Stories
 
-## Story 1: View Overdue Books
-As a librarian,
-I want an overdue books view with key details,
-So that I can follow up with members and recover late items.
+## Story 1: Diagnose Return Flow
+As a backend developer,
+I want to trace the return flow in the server,
+So that I can identify why available copy counts can become invalid.
 
 **Acceptance:**
-- [ ] Overdue books list is visible in an admin page
-- [ ] Member name and days overdue are displayed
-- [ ] Data comes from backend route updates
+- [ ] Backend return logic is traced end to end
+- [ ] Prisma updates causing incorrect counts are identified
+- [ ] Findings are documented with a reproducible case

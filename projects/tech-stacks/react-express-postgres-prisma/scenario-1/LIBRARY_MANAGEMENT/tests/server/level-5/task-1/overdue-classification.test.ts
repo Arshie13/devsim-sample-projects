@@ -1,23 +1,23 @@
 /**
- * Level 5 Task 2: Overdue Status Fix
+ * Level 5 Task 1: Stabilize Overdue Report Classification
  *
  * Output-oriented integration tests:
- * - Hit real Express routes
- * - Use real Prisma client and database records
- * - Assert API output and source-record consistency
+ * - Uses real Express route handlers
+ * - Uses real Prisma and database records
+ * - Validates endpoint output against production drift scenarios
  *
  * Acceptance Criteria Coverage:
- * - AC-1: Incorrect overdue markings are resolved
- * - AC-1: Returned items are no longer listed overdue
- * - AC-2: Overdue reports match source borrowing and return records
- * - AC-2: Spot checks confirm data consistency
+ * - AC-1: Exclude any returned record regardless of status value
+ * - AC-1: Include past-due unreturned records
+ * - AC-2: Reproduce stale-status discrepancy with deterministic fixtures
+ * - AC-2: Validate UTC midnight boundary behavior
  */
 
 // @ts-expect-error Resolved from server package dependencies at runtime.
 import express from 'express';
 // @ts-expect-error Resolved from server package dependencies at runtime.
 import request from 'supertest';
-import { afterAll, afterEach, beforeAll, describe, expect, it } from 'vitest';
+import { afterAll, afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import { randomUUID } from 'node:crypto';
 import borrowRoutes from '../../../../server/src/routes/borrow.routes.js';
 import { errorHandler } from '../../../../server/src/middleware/errorHandler.js';
@@ -39,12 +39,12 @@ const createBook = async (title: string) => {
     data: {
       id,
       title,
-      author: 'Integration Author',
+      author: 'Task 1 Author',
       genre: 'Testing',
-      description: 'Level 5 overdue fixture',
+      description: 'Overdue classification fixture book',
       isbn: `isbn-${id}`,
-      totalCopies: 3,
-      availableCopies: 1,
+      totalCopies: 5,
+      availableCopies: 3,
     },
   });
   createdBookIds.push(book.id);
@@ -91,12 +91,15 @@ const createBorrowRecord = async (input: {
   return record;
 };
 
-describe('Level 5 Task 2: Overdue Status Fix (Integration)', () => {
+describe('Level 5 Task 1: Overdue Classification Stability (Integration)', () => {
   beforeAll(async () => {
     await prisma.$connect();
   });
 
   afterEach(async () => {
+    // Restore real timers if fake timers were used in the test
+    vi.useRealTimers();
+
     // Only delete records created during this test — seed data is preserved
     await prisma.$transaction([
       prisma.borrowRecord.deleteMany({
@@ -120,27 +123,35 @@ describe('Level 5 Task 2: Overdue Status Fix (Integration)', () => {
     await prisma.$disconnect();
   });
 
-  it('AC-1: excludes returned items from overdue output', async () => {
-    const book = await createBook('Book A');
-    const member = await createMember('Member A');
+  it('AC-1: excludes returned records even when status is stale', async () => {
+    const book = await createBook('Task1 Book A');
+    const member = await createMember('Task1 Member A');
 
-    const returnedButStaleOverdueStatus = await createBorrowRecord({
+    const returnedButBorrowed = await createBorrowRecord({
+      bookId: book.id,
+      memberId: member.id,
+      borrowedAt: new Date('2025-01-01T00:00:00.000Z'),
+      dueDate: new Date('2025-01-10T00:00:00.000Z'),
+      returnedAt: new Date('2025-01-11T00:00:00.000Z'),
+      status: 'BORROWED',
+    });
+
+    const returnedButOverdue = await createBorrowRecord({
       bookId: book.id,
       memberId: member.id,
       borrowedAt: new Date('2025-01-01T00:00:00.000Z'),
       dueDate: new Date('2025-01-10T00:00:00.000Z'),
       returnedAt: new Date('2025-01-12T00:00:00.000Z'),
-      // Simulates real data drift where status was not updated after return.
       status: 'OVERDUE',
     });
 
-    const overdueUnreturned = await createBorrowRecord({
+    const realOverdue = await createBorrowRecord({
       bookId: book.id,
       memberId: member.id,
       borrowedAt: new Date('2025-01-01T00:00:00.000Z'),
       dueDate: new Date('2025-01-10T00:00:00.000Z'),
       returnedAt: null,
-      status: 'OVERDUE',
+      status: 'BORROWED',
     });
 
     const response = await request(app).get('/api/borrow-records/overdue');
@@ -148,75 +159,55 @@ describe('Level 5 Task 2: Overdue Status Fix (Integration)', () => {
     expect(response.status).toBe(200);
     expect(response.body.success).toBe(true);
 
-    const resultIds = (response.body.data as Array<{ id: string }>).map((r) => r.id);
+    const ids = (response.body.data as Array<{ id: string }>).map((row) => row.id);
 
-    expect(resultIds).toContain(overdueUnreturned.id);
-    expect(resultIds).not.toContain(returnedButStaleOverdueStatus.id);
+    expect(ids).toContain(realOverdue.id);
+    expect(ids).not.toContain(returnedButBorrowed.id);
+    expect(ids).not.toContain(returnedButOverdue.id);
   });
 
-  it('AC-2: overdue report matches source borrow/return records', async () => {
-    const book = await createBook('Book B');
-    const member = await createMember('Member B');
+  it('AC-2: classifies UTC midnight boundary records deterministically', async () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2025-03-02T00:00:01.000Z'));
 
-    const shouldBecomeOverdue = await createBorrowRecord({
+    const book = await createBook('Task1 Book B');
+    const member = await createMember('Task1 Member B');
+
+    const overdueByBoundary = await createBorrowRecord({
       bookId: book.id,
       memberId: member.id,
-      borrowedAt: new Date('2025-02-01T00:00:00.000Z'),
-      dueDate: new Date('2025-02-10T00:00:00.000Z'),
+      borrowedAt: new Date('2025-03-01T00:00:00.000Z'),
+      dueDate: new Date('2025-03-01T23:59:59.000Z'),
       returnedAt: null,
       status: 'BORROWED',
     });
 
-    const alreadyReturned = await createBorrowRecord({
+    const notYetDue = await createBorrowRecord({
       bookId: book.id,
       memberId: member.id,
-      borrowedAt: new Date('2025-02-01T00:00:00.000Z'),
-      dueDate: new Date('2025-02-10T00:00:00.000Z'),
-      returnedAt: new Date('2025-02-11T00:00:00.000Z'),
-      status: 'RETURNED',
-    });
-
-    const returnedButStaleBorrowedStatus = await createBorrowRecord({
-      bookId: book.id,
-      memberId: member.id,
-      borrowedAt: new Date('2025-02-01T00:00:00.000Z'),
-      dueDate: new Date('2025-02-10T00:00:00.000Z'),
-      returnedAt: new Date('2025-02-11T00:00:00.000Z'),
+      borrowedAt: new Date('2025-03-01T00:00:00.000Z'),
+      dueDate: new Date('2025-03-02T00:00:05.000Z'),
+      returnedAt: null,
       status: 'BORROWED',
     });
 
-    const activeNotDue = await createBorrowRecord({
+    const returnedAtBoundary = await createBorrowRecord({
       bookId: book.id,
       memberId: member.id,
-      borrowedAt: new Date(),
-      dueDate: new Date(Date.now() + 5 * 24 * 60 * 60 * 1000),
-      returnedAt: null,
+      borrowedAt: new Date('2025-03-01T00:00:00.000Z'),
+      dueDate: new Date('2025-03-01T23:59:59.000Z'),
+      returnedAt: new Date('2025-03-02T00:00:00.000Z'),
       status: 'BORROWED',
     });
 
     const response = await request(app).get('/api/borrow-records/overdue');
 
     expect(response.status).toBe(200);
-    expect(response.body.success).toBe(true);
 
-    const rows = response.body.data as Array<{ id: string }>;
-    const resultIds = rows.map((r) => r.id);
+    const ids = (response.body.data as Array<{ id: string }>).map((row) => row.id);
 
-    expect(resultIds).toContain(shouldBecomeOverdue.id);
-    expect(resultIds).not.toContain(alreadyReturned.id);
-    expect(resultIds).not.toContain(returnedButStaleBorrowedStatus.id);
-    expect(resultIds).not.toContain(activeNotDue.id);
-
-    const refreshedShouldBecomeOverdue = await prisma.borrowRecord.findUnique({
-      where: { id: shouldBecomeOverdue.id },
-    });
-
-    const refreshedReturned = await prisma.borrowRecord.findUnique({
-      where: { id: alreadyReturned.id },
-    });
-
-    expect(refreshedShouldBecomeOverdue?.status).toBe('OVERDUE');
-    expect(refreshedReturned?.status).toBe('RETURNED');
-    expect(refreshedReturned?.returnedAt).not.toBeNull();
+    expect(ids).toContain(overdueByBoundary.id);
+    expect(ids).not.toContain(notYetDue.id);
+    expect(ids).not.toContain(returnedAtBoundary.id);
   });
 });

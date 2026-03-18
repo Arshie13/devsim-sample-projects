@@ -1,28 +1,29 @@
-import { useLibrary } from '../context/LibraryContext';
-import { Card } from '../components/ui/Card';
-import { LoadingSpinner } from '../components/ui/LoadingSpinner';
-import { isOverdue, formatDate, getDaysOverdue } from '../utils/helpers';
+import { useLibrary } from "../context/LibraryContext";
+import { Card } from "../components/ui/Card";
+import { LoadingSpinner } from "../components/ui/LoadingSpinner";
+import { formatDate, isOverdue, getDaysOverdue } from "../utils/helpers";
 
 export function Dashboard() {
   const { books, borrowRecords, loading, getBorrowerName } = useLibrary();
 
   if (loading) return <LoadingSpinner message="Loading dashboard..." />;
 
-  const activeRecords = borrowRecords.filter((r) => r.status !== 'RETURNED');
+  const activeRecords = borrowRecords.filter((r) => r.status !== "RETURNED");
   const overdueRecords = activeRecords.filter((r) =>
     isOverdue(r.dueDate, r.returnedAt),
   );
+  const returnedRecords = borrowRecords.filter((r) => r.status === "RETURNED");
   const totalAvailable = books.reduce((sum, b) => sum + b.availableCopies, 0);
 
   const getBookTitle = (id: string) =>
-    books.find((b) => b.id === id)?.title ?? 'Unknown';
+    books.find((b) => b.id === id)?.title ?? "Unknown";
 
   return (
     <div>
       <h1 className="text-2xl font-bold text-gray-900 mb-6">Dashboard</h1>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <Card>
           <p className="text-sm text-gray-500">Total Books</p>
           <p className="text-3xl font-bold text-indigo-600">{books.length}</p>
@@ -35,6 +36,12 @@ export function Dashboard() {
           <p className="text-sm text-gray-500">Active Borrows</p>
           <p className="text-3xl font-bold text-blue-600">
             {activeRecords.length}
+          </p>
+        </Card>
+        <Card>
+          <p className="text-sm text-gray-500">Returned</p>
+          <p className="text-3xl font-bold text-gray-700">
+            {returnedRecords.length}
           </p>
         </Card>
         <Card>
@@ -52,9 +59,7 @@ export function Dashboard() {
         </h2>
         {activeRecords.length === 0 ? (
           <Card>
-            <p className="text-gray-500 text-center py-2">
-              No active borrows.
-            </p>
+            <p className="text-gray-500 text-center py-2">No active borrows.</p>
           </Card>
         ) : (
           <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
@@ -93,7 +98,7 @@ export function Dashboard() {
                         {getBorrowerName(r)}
                       </td>
                       <td className="py-3 px-4">
-                        {r.borrowerType === 'MEMBER' ? (
+                        {r.borrowerType === "MEMBER" ? (
                           <span className="px-2 py-0.5 text-xs font-medium rounded bg-indigo-100 text-indigo-700">
                             Member
                           </span>

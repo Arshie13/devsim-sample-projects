@@ -51,6 +51,7 @@ npm run test:coverage
 - `server/level-2/task-1/` - Borrow availability logic tests
 - `server/level-3/task-1/` - Overdue records API tests
 - `server/level-4/task-2/` - Transaction safety tests
+- `server/level-5/task-1/` - Overdue classification stability tests
 - `server/level-5/task-2/` - Overdue fix tests
 
 ## Notes
