@@ -55,11 +55,11 @@ describe('Level 4 Task 1: Reservation Queue Foundation Client Contracts', () => 
     });
   });
 
-  describe('Edge Cases', () => {
-    it('should include duplicate reservation feedback text in output', async () => {
-      const serviceCode = await readLibraryService();
+describe('Edge Cases', () => {
+  it('should include duplicate reservation error handling in Books page UI', async () => {
+    const pageCode = await readBooksPage();
 
-      expect(serviceCode).toMatch(/already reserved|duplicate reservation|already has an active reservation/i);
-    });
+    expect(pageCode).toMatch(/already reserved|duplicate reservation|already has an active reservation/i);
   });
+});
 });
