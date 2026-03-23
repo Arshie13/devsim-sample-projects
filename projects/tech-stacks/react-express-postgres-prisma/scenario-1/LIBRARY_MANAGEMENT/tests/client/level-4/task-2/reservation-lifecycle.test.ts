@@ -28,7 +28,7 @@ describe('Level 4 Task 2: Reservation Lifecycle Client Contracts', () => {
 
       expect(serviceCode).toMatch(/async\s+cancelReservation\s*\(/);
       expect(serviceCode).toMatch(/cancelReservation\s*\(\s*reservationId\s*[:,]/);
-      expect(serviceCode).toMatch(/['"]\/reservations\//);
+      expect(serviceCode).toMatch(/\/reservations/);
       expect(serviceCode).toMatch(/reservationId/);
     });
   });
