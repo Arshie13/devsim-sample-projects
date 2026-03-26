@@ -22,13 +22,7 @@ export default defineConfig({
     watch: {
       usePolling: true,
     },
-    allowedHosts: [
-      'localhost',
-      '127.0.0.1',
-      '.ngrok-free.app',
-      '.ngrok.io',
-      '.localhost'
-    ],
+    allowedHosts: true,
   },
   test: {
     include: ['../tests/client/**/*.test.tsx', '../tests/client/**/*.test.ts'],
