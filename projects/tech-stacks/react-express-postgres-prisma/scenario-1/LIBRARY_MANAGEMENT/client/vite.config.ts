@@ -10,7 +10,7 @@ export default defineConfig({
     dedupe: ['react', 'react-dom'],
   },
   server: {
-    port: 3000,
+    port: Number(process.env.VITE_PORT ?? process.env.PORT ?? 5173),
     proxy: {
       '/api': {
         target: 'http://localhost:5000',
