@@ -139,47 +139,57 @@ const waitForHttp = async (
 describe('Level 1 Task 1: Environment Setup', () => {
 
   // -------------------------------------------------------------------------
-  // Test 1 — Client & server dependencies
+  // Test 1 — Root dependencies precondition
   // -------------------------------------------------------------------------
-  it(
-    'should install client and server dependencies successfully',
-    () => {
-      // RUN — execute npm install in both packages
-      const client = runCommand(npmCmd, ['install'], clientRoot);
-      const server = runCommand(npmCmd, ['install'], serverRoot);
+  it('should have root dependencies already installed', () => {
+    expect(
+      fs.existsSync(join(projectRoot, 'node_modules')),
+      'Root node_modules missing. Run "npm install" in project root first.',
+    ).toBe(true);
 
-      // CHECK exit codes
-      expect(
-        client.status,
-        `Client "npm install" failed.\n\nSTDERR:\n${client.stderr}`,
-      ).toBe(0);
-
-      expect(
-        server.status,
-        `Server "npm install" failed.\n\nSTDERR:\n${server.stderr}`,
-      ).toBe(0);
-
-      // CHECK key dependency artifacts as a secondary signal
-      expect(
-        fs.existsSync(join(clientRoot, 'node_modules', 'react')),
-        'react not found in client/node_modules after install',
-      ).toBe(true);
-
-      expect(
-        fs.existsSync(join(serverRoot, 'node_modules', 'express')),
-        'express not found in server/node_modules after install',
-      ).toBe(true);
-
-      expect(
-        fs.existsSync(join(serverRoot, 'node_modules', '@prisma', 'client')),
-        '@prisma/client not found in server/node_modules after install',
-      ).toBe(true);
-    },
-    180_000, // generous timeout — first install may pull from the network
-  );
+    expect(
+      fs.existsSync(join(projectRoot, 'node_modules', 'concurrently')),
+      'Root dependency "concurrently" missing. Run "npm install" in project root first.',
+    ).toBe(true);
+  });
 
   // -------------------------------------------------------------------------
-  // Test 2 — Database connectivity
+  // Test 2 — Client dependencies precondition
+  // -------------------------------------------------------------------------
+  it('should have client dependencies already installed', () => {
+    expect(
+      fs.existsSync(join(clientRoot, 'node_modules')),
+      'Client node_modules missing. Run "npm install" in client first.',
+    ).toBe(true);
+
+    expect(
+      fs.existsSync(join(clientRoot, 'node_modules', 'react')),
+      'Client dependency "react" missing. Run "npm install" in client first.',
+    ).toBe(true);
+  });
+
+  // -------------------------------------------------------------------------
+  // Test 3 — Server dependencies precondition
+  // -------------------------------------------------------------------------
+  it('should have server dependencies already installed', () => {
+    expect(
+      fs.existsSync(join(serverRoot, 'node_modules')),
+      'Server node_modules missing. Run "npm install" in server first.',
+    ).toBe(true);
+
+    expect(
+      fs.existsSync(join(serverRoot, 'node_modules', 'express')),
+      'Server dependency "express" missing. Run "npm install" in server first.',
+    ).toBe(true);
+
+    expect(
+      fs.existsSync(join(serverRoot, 'node_modules', '@prisma', 'client')),
+      'Server dependency "@prisma/client" missing. Run "npm install" in server first.',
+    ).toBe(true);
+  });
+
+  // -------------------------------------------------------------------------
+  // Test 4 — Database connectivity
   // -------------------------------------------------------------------------
   it(
     'should connect to the database successfully',
@@ -218,7 +228,7 @@ describe('Level 1 Task 1: Environment Setup', () => {
   );
 
   // -------------------------------------------------------------------------
-  // Test 3 — Prisma migrations
+  // Test 5 — Prisma migrations
   // -------------------------------------------------------------------------
   it(
     'should apply database migrations without errors',
@@ -266,7 +276,7 @@ describe('Level 1 Task 1: Environment Setup', () => {
   );
 
   // -------------------------------------------------------------------------
-  // Test 4 — Backend health endpoint
+  // Test 6 — Backend health endpoint
   // -------------------------------------------------------------------------
   it(
     'should start the backend server and respond on the /health endpoint',
@@ -306,7 +316,7 @@ describe('Level 1 Task 1: Environment Setup', () => {
   );
 
   // -------------------------------------------------------------------------
-  // Test 5 — Frontend dev server
+  // Test 7 — Frontend dev server
   // -------------------------------------------------------------------------
   it(
     'should start the client dev server and serve the application',
