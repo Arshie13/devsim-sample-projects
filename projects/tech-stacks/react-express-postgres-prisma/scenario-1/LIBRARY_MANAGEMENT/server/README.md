@@ -25,28 +25,13 @@ Backend API for the Library Management System built with the PERN stack (Postgre
 npm install
 ```
 
-### 2. Configure Environment Variables
-
-Copy `.env.example` to `.env` and update with your database credentials:
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env`:
-```env
-PORT=5000
-NODE_ENV=development
-DATABASE_URL="postgresql://username:password@localhost:5432/library_management?schema=public"
-```
-
-### 3. Generate Prisma Client
+### 2 Generate Prisma Client
 
 ```bash
 npm run prisma:generate
 ```
 
-### 4. Run Database Migrations
+### 3. Run Database Migrations
 
 ```bash
 npm run prisma:migrate
@@ -54,7 +39,7 @@ npm run prisma:migrate
 
 This will create all necessary tables in your database.
 
-### 5. Seed Database (Optional)
+### 4. Seed Database (Optional)
 
 ```bash
 npm run db:seed
@@ -62,7 +47,7 @@ npm run db:seed
 
 This will populate the database with sample data for testing.
 
-### 6. Start Development Server
+### 5. Start Development Server
 
 ```bash
 npm run dev
