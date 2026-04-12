@@ -1,0 +1,22 @@
+services:
+  mongodb:
+    image: mongo:latest
+    container_name: study_planner_mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo_data:/data/db
+      - ./init.js:/docker-entrypoint-initdb.d/init.js:ro
+    command: --replSet rs0 --bind_ip_all
+    environment:
+      MONGO_INITDB_DATABASE: study_planner
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 10s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  mongo_data:

@@ -1,0 +1,40 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+// Subject model - represents a subject/course like Math, CS, etc.
+model Subject {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  name        String
+  description String?
+  color       String   @default("#3B82F6") // Hex color for UI display
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  tasks Task[]
+
+  @@map("subjects")
+}
+
+// Task model - represents a task under a subject
+model Task {
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
+  title       String
+  description String?
+  completed   Boolean   @default(false)
+  deadline    DateTime?
+  progress    Int       @default(0) // 0-100 percentage
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  subjectId   String    @db.ObjectId
+  subject     Subject   @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+  @@map("tasks")
+  @@index([subjectId])
+}
