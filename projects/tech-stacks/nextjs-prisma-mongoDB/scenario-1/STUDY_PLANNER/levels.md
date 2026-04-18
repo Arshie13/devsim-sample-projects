@@ -85,15 +85,20 @@ StudyPlanner needs to support multiple users. Implement authentication and user-
 - Add login/register pages
 - Protect API routes with authentication
 
-#### Task 3.2: Implement User Data Isolation
-- Add userId to Subject and Task models
-- Update all API routes to filter by current user
-- Update seed script to create sample users
-- Migrate existing data to first user
+#### Task 3.2: Add Calendar View
+- Create a calendar view showing tasks by deadline date
+- Support month/week/day views
+- Click on a date to view tasks due that day
+- Add new task directly from a date cell
+- Show task indicators (dots) on dates with tasks
+- Color-code tasks by subject or priority
 
 ### Success Criteria
 - [ ] Users can register and login securely
 - [ ] Data is properly isolated between users
+- [ ] Calendar view displays tasks by deadline
+- [ ] Month/week/day views work correctly
+- [ ] Tasks can be added from calendar date cells
 
 ---
 
@@ -111,7 +116,7 @@ Students need reminders for upcoming deadlines. Implement notification system an
 - Add notification preferences to User model
 - Create API endpoint for sending deadline reminders
 - Implement email notifications for upcoming deadlines (1 day, 3 days, 1 week)
-- Add browser notifications for real-time alerts
+- Create cron job to check and send reminders automatically
 
 #### Task 4.2: Add Notification History
 - Create Notification model (userId, type, message, read status, createdAt)

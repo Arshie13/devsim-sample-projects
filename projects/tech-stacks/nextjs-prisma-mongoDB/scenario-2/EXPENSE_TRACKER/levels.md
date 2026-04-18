@@ -46,20 +46,24 @@ The Expense Tracker team wants users to be able to create and manage their own e
 
 ### Tasks
 
-#### Task 2.1: Add Category CRUD Operations
-Implement full CRUD for categories:
-- Create new categories
-- View all categories
-- Edit category names
-- Delete categories (with confirmation)
+#### Task 2.1: Add Category Color and Icon Customization
+Add visual customization options for categories:
+- Add color picker for each category
+- Add icon selection from predefined icon set
+- Display color and icon on expense list and summary
+- Persist preferences in localStorage
 
-#### Task 2.2: Update Expense Form to Use Dynamic Categories
-Modify the add expense form to load categories dynamically from the database instead of using hardcoded options.
+#### Task 2.2: Implement Category Management UI
+Build a category management interface:
+- Display all categories in a grid/list view
+- Add inline editing for category names
+- Add delete button with confirmation modal
+- Show expense count per category
 
 ### Success Criteria
-- [ ] Users can create, edit, and delete categories
-- [ ] Expense form uses dynamic categories from database
-- [ ] Categories are properly associated with expenses
+- [ ] Categories display custom colors and icons
+- [ ] Color picker and icon selector work correctly
+- [ ] Category management UI allows editing and deleting
 
 ---
 
@@ -77,15 +81,16 @@ Users want to see insights into their spending. Add monthly summary showing tota
 Create an API endpoint that aggregates expenses by category for the current month.
 
 #### Task 3.2: Display Monthly Summary and Total Expenses on Homepage
-Add a summary section on the homepage showing:
+Add a summary section on the homepage showing (using mock data):
 - Total spent this month
 - Breakdown by category with amounts and percentages
 - Visual representation (progress bars or simple charts)
 - Overall total expenses indicator
 
 ### Success Criteria
-- [ ] Monthly summary API returns correct aggregated data
-- [ ] Homepage displays spending summary with visual elements and total expenses indicator
+- [ ] Monthly summary displays using mock data
+- [ ] Visual elements (progress bars, charts) render correctly
+- [ ] Total expenses indicator shows accurate totals
 
 ---
 
@@ -115,26 +120,32 @@ Implement search by description (case-insensitive partial match).
 
 ---
 
-## 🎮 Level 5: Advanced Features & Optimizations
+## 🎮 Level 5: Advanced UX Features
 **Difficulty: ⭐⭐⭐⭐ Expert**
 **Estimated Time: 2-3 hours**
 **Points: 40**
 
 ### Scenario
-Add advanced features to make the Expense Tracker more robust and user-friendly.
+Add advanced UX features to make the Expense Tracker more powerful and user-friendly.
 
 ### Tasks
 
-#### Task 5.1: Add Expense Editing & Deletion
-Implement edit and delete functionality for expenses:
-- Edit expense details
-- Delete expenses with confirmation
-- Update summary after modifications
+#### Task 5.1: Add Keyboard Shortcuts
+Implement keyboard navigation:
+- Press 'E' to edit selected expense
+- Press 'D' to delete selected expense
+- Press 'N' to add new expense
+- Press '/' to focus search
+- Press '?' to show keyboard help
 
-#### Task 5.2: Add Data Export
-Implement CSV export of expenses with filtering options.
+#### Task 5.2: Add Undo Functionality
+Implement undo for actions:
+- Undo last delete action
+- Undo last edit action
+- Show undo toast notification
+- Keep history in memory
 
 ### Success Criteria
-- [ ] Expenses can be edited and deleted
-- [ ] CSV export works with applied filters
-- [ ] UI updates correctly after expense modifications
+- [ ] All keyboard shortcuts work
+- [ ] Undo restores previous state
+- [ ] Help modal shows shortcuts
