@@ -6,7 +6,7 @@ import { errorHandler } from "./middleware/errorHandler.js";
 import { connectDatabase, disconnectDatabase } from "./utils/prisma.js";
 
 const app = express();
-const port = Number(process.env.PORT ?? 4000);
+const port = Number(process.env.PORT ?? 5000);
 const clientOrigin = process.env.CLIENT_ORIGIN ?? "http://localhost:5173";
 
 app.use(cors({ origin: clientOrigin }));
