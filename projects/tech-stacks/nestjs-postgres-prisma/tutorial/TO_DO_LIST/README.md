@@ -1,0 +1,93 @@
+# To-Do List - NestJS Tutorial Sample
+
+## Project Overview
+
+**Goal:** Build a minimal to-do list REST API using the NestJS + PostgreSQL + Prisma stack.
+
+This sample is intentionally surface-level and includes only essential backend functionality. There is no frontend — all interaction happens through API endpoints.
+
+## Tech Stack
+
+- PostgreSQL + Prisma ORM
+- NestJS + TypeScript
+
+## Features
+
+- List all todo items
+- Create a todo item
+- Toggle todo completion
+- Delete a todo item
+- Start with seeded demo todos
+
+## Folder Structure
+
+```text
+TO_DO_LIST/
+├── prisma/
+│   ├── schema.prisma
+│   └── seed.ts
+├── src/
+│   ├── app.module.ts
+│   ├── main.ts
+│   ├── common/
+│   │   └── filters/
+│   │       └── http-exception.filter.ts
+│   ├── prisma/
+│   │   ├── prisma.module.ts
+│   │   └── prisma.service.ts
+│   └── todos/
+│       ├── dto/
+│       │   └── create-todo.dto.ts
+│       ├── todos.controller.ts
+│       ├── todos.module.ts
+│       └── todos.service.ts
+├── .env.example
+├── nest-cli.json
+├── package.json
+├── tsconfig.build.json
+└── tsconfig.json
+```
+
+## Quick Start
+
+1. Install dependencies:
+
+```bash
+npm install
+```
+
+2. Create environment file:
+
+```bash
+cp .env.example .env
+```
+
+3. Run Prisma migration:
+
+```bash
+npm run prisma:migrate
+```
+
+4. Seed starter todos:
+
+```bash
+npm run db:seed
+```
+
+5. Start the server:
+
+```bash
+npm run dev
+```
+
+## API Endpoints
+
+- `GET /api/todos` - list all todos
+- `POST /api/todos` - create a todo
+- `PATCH /api/todos/:id/toggle` - toggle completion
+- `DELETE /api/todos/:id` - delete a todo
+
+## Prisma Notes
+
+- `DATABASE_URL` is read from the `.env` file.
+- The schema datasource block intentionally omits `url`, matching the Prisma 5 setup with environment variable injection.
