@@ -5,7 +5,7 @@
 
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import { formatDate, isOverdue } from '@/lib/dateUtils'
+import { formatDate, isOverdue } from '../../../src/lib/dateUtils'
 
 describe('Level 5 - Task 5.2: Utilities & Documentation', () => {
   describe('Date Utilities', () => {

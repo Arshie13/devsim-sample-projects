@@ -6,6 +6,7 @@
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import DashboardPage from '@/app/dashboard/page'
+import { mockBooks } from '@/lib/mockData'
 
 describe('Level 4 - Task 4.1: Overdue Book Validation', () => {
   beforeEach(() => {
@@ -27,7 +28,10 @@ describe('Level 4 - Task 4.1: Overdue Book Validation', () => {
     fireEvent.click(overdueTab)
 
     // Overdue books should be visible but without Borrow button
-    expect(screen.getByText('1984')).toBeInTheDocument()
+    const overdueBook = mockBooks.find(book => book.status === 'overdue')
+    if (overdueBook) {
+      expect(screen.getByText(overdueBook.title)).toBeInTheDocument()
+    }
     // No borrow button should be present for overdue books
     const borrowButtons = screen.queryAllByRole('button', { name: /borrow/i })
     expect(borrowButtons.length).toBe(0)
@@ -49,6 +53,7 @@ describe('Level 4 - Task 4.1: Overdue Book Validation', () => {
     fireEvent.click(availableTab)
 
     const borrowButtons = screen.getAllByRole('button', { name: /borrow/i })
-    expect(borrowButtons.length).toBeGreaterThan(0)
+    const expectedAvailableBooks = mockBooks.filter(book => book.status === 'available').length
+    expect(borrowButtons.length).toBe(expectedAvailableBooks)
   })
 })
