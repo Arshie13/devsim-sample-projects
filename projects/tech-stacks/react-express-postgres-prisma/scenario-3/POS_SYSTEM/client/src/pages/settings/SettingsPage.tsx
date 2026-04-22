@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import { Save, Store, DollarSign, CreditCard, Banknote, Receipt } from 'lucide-react';
-import { Card, CardHeader, Button, Input } from '../../components/ui';
+import { useEffect, useState } from 'react';
+import { Save, Store, DollarSign, CreditCard, Banknote, Receipt, Tag } from 'lucide-react';
+import { Card, CardHeader, Button, Input, Badge } from '../../components/ui';
+import { promoService, PromoSummary } from '../../services/promoService';
 
 // Demo settings
 const initialSettings = {
@@ -18,9 +19,32 @@ export default function SettingsPage() {
   const [settings, setSettings] = useState(initialSettings);
   const [isSaving, setIsSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [promos, setPromos] = useState<PromoSummary[]>([]);
+  const [promosLoading, setPromosLoading] = useState(false);
+  const [promosError, setPromosError] = useState<string | null>(null);
 
   // Demo user is admin
   const isAdmin = true;
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    let cancelled = false;
+    (async () => {
+      setPromosLoading(true);
+      setPromosError(null);
+      try {
+        const data = await promoService.listPromos();
+        if (!cancelled) setPromos(data);
+      } catch {
+        if (!cancelled) setPromosError('Failed to load promo codes');
+      } finally {
+        if (!cancelled) setPromosLoading(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
+  }, [isAdmin]);
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -191,6 +215,59 @@ export default function SettingsPage() {
               This message will appear at the bottom of receipts
             </p>
           </div>
+        </Card>
+
+        {/* Promo Codes (Admin) */}
+        <Card>
+          <CardHeader
+            title="Promo Codes"
+            description="Active promotions and remaining usage"
+          />
+          <div className="flex items-center gap-2 mb-4">
+            <Tag className="w-5 h-5 text-primary-600" />
+            <span className="font-medium">Promo Usage</span>
+          </div>
+          {promosLoading && <p className="text-sm text-gray-500">Loading promo codes...</p>}
+          {promosError && <p className="text-sm text-red-600">{promosError}</p>}
+          {!promosLoading && !promosError && promos.length === 0 && (
+            <p className="text-sm text-gray-500">No promo codes configured.</p>
+          )}
+          {!promosLoading && promos.length > 0 && (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="text-left text-gray-500 border-b">
+                    <th className="py-2 pr-4">Code</th>
+                    <th className="py-2 pr-4">Discount</th>
+                    <th className="py-2 pr-4">Remaining Uses</th>
+                    <th className="py-2 pr-4">Expires</th>
+                    <th className="py-2 pr-4">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {promos.map((promo) => (
+                    <tr key={promo.id} className="border-b last:border-0">
+                      <td className="py-2 pr-4 font-mono">{promo.code}</td>
+                      <td className="py-2 pr-4">{promo.discountPercent}%</td>
+                      <td className="py-2 pr-4">
+                        {promo.remainingUses} / {promo.maxUses}
+                      </td>
+                      <td className="py-2 pr-4">
+                        {new Date(promo.expiresAt).toLocaleDateString()}
+                      </td>
+                      <td className="py-2 pr-4">
+                        {promo.isActive ? (
+                          <Badge variant="success">Active</Badge>
+                        ) : (
+                          <Badge variant="default">Inactive</Badge>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </Card>
 
         {/* Save Button */}

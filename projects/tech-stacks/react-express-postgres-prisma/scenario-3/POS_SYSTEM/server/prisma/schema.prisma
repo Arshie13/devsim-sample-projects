@@ -58,12 +58,33 @@ model Order {
   discount      Decimal       @default(0) @db.Decimal(10, 2)
   total         Decimal       @db.Decimal(10, 2)
   paymentMethod PaymentMethod
+  status        OrderStatus   @default(COMPLETED)
+  voidedAt      DateTime?
+  promoCodeId   Int?
+  promoCode     PromoCode?    @relation(fields: [promoCodeId], references: [id])
   createdAt     DateTime      @default(now())
 }
 
 enum PaymentMethod {
   CASH
   CARD
+}
+
+enum OrderStatus {
+  COMPLETED
+  VOIDED
+}
+
+model PromoCode {
+  id              Int      @id @default(autoincrement())
+  code            String   @unique
+  discountPercent Int
+  maxUses         Int
+  usedCount       Int      @default(0)
+  expiresAt       DateTime
+  isActive        Boolean  @default(true)
+  orders          Order[]
+  createdAt       DateTime @default(now())
 }
 
 model OrderItem {

@@ -32,9 +32,9 @@ const serverRoot =
 
 // Host/port are also overridable for Docker networking
 const SERVER_HOST = process.env.DEVSIM_SERVER_HOST ?? '127.0.0.1';
-const SERVER_PORT = process.env.DEVSIM_SERVER_PORT ?? '5052';
+const SERVER_PORT = process.env.DEVSIM_SERVER_PORT ?? '5053';
 const CLIENT_HOST = process.env.DEVSIM_CLIENT_HOST ?? '127.0.0.1';
-const CLIENT_PORT = process.env.DEVSIM_CLIENT_PORT ?? '5174';
+const CLIENT_PORT = process.env.DEVSIM_CLIENT_PORT ?? '5175';
 
 const npmCmd = process.platform === 'win32' ? 'npm.cmd' : 'npm';
 const npxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
@@ -208,7 +208,7 @@ describe('Level 1 Task 1: Environment Setup', () => {
        */
       const result = runCommand(
         npxCmd,
-        ['tsx', 'scripts/db-check.ts'],
+        ['ts-node', 'scripts/db-check.ts'],
         serverRoot,
         30_000,
       );

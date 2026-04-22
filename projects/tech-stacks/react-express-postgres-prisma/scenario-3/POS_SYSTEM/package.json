@@ -1,13 +1,35 @@
 {
-  "name": "pos-system",
+  "name": "ippo-pos-system",
+  "version": "1.0.0",
   "private": true,
+  "description": "IPPO POS System — DevSim PERN challenge (scenario-3)",
   "workspaces": ["client", "server"],
   "scripts": {
     "dev": "concurrently \"npm run dev --workspace=server\" \"npm run dev --workspace=client\"",
     "build": "npm run build --workspaces",
-    "lint": "npm run lint --workspaces"
+    "lint": "npm run lint --workspaces",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:tasks:l1": "vitest run tests/client/level-1",
+    "test:tasks:l2": "vitest run tests/client/level-2",
+    "test:tasks:l3": "vitest run tests/server/level-3",
+    "test:tasks:l4": "vitest run tests/client/level-4 tests/server/level-4",
+    "test:tasks:l5": "vitest run tests/server/level-5",
+    "test:task:l1:t1": "vitest run tests/client/level-1/task-1",
+    "test:task:l1:t2": "vitest run tests/client/level-1/task-2",
+    "test:task:l2:t1": "vitest run tests/client/level-2/task-1",
+    "test:task:l2:t2": "vitest run tests/client/level-2/task-2",
+    "test:task:l3:t1": "vitest run tests/server/level-3/task-1",
+    "test:task:l3:t2": "vitest run tests/server/level-3/task-2",
+    "test:task:l4:t1": "vitest run tests/client/level-4/task-1 tests/server/level-4/task-1",
+    "test:task:l4:t2": "vitest run tests/client/level-4/task-2 tests/server/level-4/task-2",
+    "test:task:l5:t1": "vitest run tests/server/level-5/task-1",
+    "test:task:l5:t2": "vitest run tests/server/level-5/task-2"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "@types/node": "^20.10.0",
+    "concurrently": "^8.2.2",
+    "typescript": "^5.4.0",
+    "vitest": "^2.0.0"
   }
 }
