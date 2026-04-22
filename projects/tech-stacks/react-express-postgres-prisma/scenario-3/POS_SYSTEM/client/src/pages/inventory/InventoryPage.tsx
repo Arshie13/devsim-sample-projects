@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Package, AlertTriangle } from 'lucide-react';
 import { Card, CardHeader, Button, Input, Badge, Modal } from '../../components/ui';
 import { Product } from '../../types';
+import { getStockLevel } from '../../utils/formatters';
 
 // Demo products with inventory for testing without backend
 const demoProducts: Product[] = [
@@ -28,10 +29,16 @@ export default function InventoryPage() {
   const isAdmin = true;
 
   const lowStockProducts = products.filter(
-    (p) => p.inventory && p.inventory.quantity <= p.inventory.lowStock
+    (p) =>
+      p.inventory &&
+      getStockLevel(p.inventory.quantity, p.inventory.lowStock) === 'LOW_STOCK'
   );
 
-  const outOfStockProducts = products.filter((p) => p.inventory?.quantity === 0);
+  const outOfStockProducts = products.filter(
+    (p) =>
+      p.inventory &&
+      getStockLevel(p.inventory.quantity, p.inventory.lowStock) === 'OUT_OF_STOCK'
+  );
 
   const filteredProducts = showLowStockOnly ? lowStockProducts : products;
 
@@ -171,8 +178,9 @@ export default function InventoryPage() {
               {filteredProducts.map((product) => {
                 const quantity = product.inventory?.quantity ?? 0;
                 const lowStock = product.inventory?.lowStock ?? 0;
-                const isLow = quantity <= lowStock && quantity > 0;
-                const isOut = quantity === 0;
+                const level = getStockLevel(quantity, lowStock);
+                const isLow = level === 'LOW_STOCK';
+                const isOut = level === 'OUT_OF_STOCK';
 
                 return (
                   <tr key={product.id} className="hover:bg-gray-50">

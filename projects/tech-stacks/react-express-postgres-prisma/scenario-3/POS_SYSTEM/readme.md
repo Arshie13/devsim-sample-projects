@@ -33,3 +33,23 @@ Use this as the feature checklist for the starter code:
 8) Settings
 - Store profile (name, address, tax rate)
 - Payment method toggles
+
+## Challenge Levels
+
+This project is the host for a 5-level / 10-task DevSim challenge. See [plan.md](./plan.md) for the full level design and acceptance criteria. Tests are wired per task under `tests/{client,server}/level-N/task-M/`.
+
+Run a single level:
+
+```
+npm run test:tasks:l1   # environment + sidebar brand
+npm run test:tasks:l2   # getStockLevel + POS/Inventory refactor
+npm run test:tasks:l3   # void flow + oversell-safe checkout
+npm run test:tasks:l4   # PromoCode full-stack feature
+npm run test:tasks:l5   # revenue bug + postmortem
+```
+
+Run a single task:
+
+```
+npm run test:task:l3:t2   # atomic void + updateMany gte guard
+```

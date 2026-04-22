@@ -8,6 +8,7 @@ import categoryRoutes from './routes/categories';
 import orderRoutes from './routes/orders';
 import inventoryRoutes from './routes/inventory';
 import settingsRoutes from './routes/settings';
+import promoRoutes from './routes/promos';
 import { errorHandler } from './middleware/errorHandler';
 
 dotenv.config();
@@ -26,6 +27,7 @@ app.use('/api/categories', categoryRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/inventory', inventoryRoutes);
 app.use('/api/settings', settingsRoutes);
+app.use('/api/promos', promoRoutes);
 
 // Health check
 app.get('/api/health', (req, res) => {

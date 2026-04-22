@@ -174,6 +174,30 @@ router.post('/', authenticate, async (req: AuthRequest, res: Response, next) => 
   }
 });
 
+// GET /api/orders/stats - Revenue statistics (Admin only)
+// L5 BUG: query does not filter out cancelled orders — revenue is inflated
+router.get('/stats', authenticate, requireAdmin, async (_req: AuthRequest, res: Response, next) => {
+  try {
+    const orders = await prisma.order.findMany({
+      where: {
+        // TODO (L5): Replace with cancelledAt-based filter to exclude cancelled orders.
+        // Current implementation counts ALL orders including cancelled ones.
+      },
+      select: { total: true, status: true },
+    });
+
+    const revenue = orders.reduce((sum, order) => sum + order.total, 0);
+    const orderCount = orders.length;
+
+    res.json({
+      success: true,
+      data: { revenue, orderCount },
+    });
+  } catch (error) {
+    next(error);
+  }
+});
+
 // PATCH /api/orders/:id/status - Update order status (Admin only)
 router.patch('/:id/status', authenticate, requireAdmin, async (req: AuthRequest, res: Response, next) => {
   try {
