@@ -1,5 +1,5 @@
 import 'dotenv/config';
-import prisma  from '../src/lib/prisma.js';
+import prisma  from '../src/lib/prisma';
 
 const run = async () => {
   try {
