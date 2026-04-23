@@ -93,6 +93,11 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 /**
  * Poll a URL until it responds with the expected status code, or until the
  * attempt budget is exhausted.  Returns true when healthy.
+ *
+ * HTTP is attempted FIRST each iteration so that an already-occupied port
+ * (e.g. a zombie from a prior test run, or a running dev session) still lets
+ * the test pass.  Process-exit is only used as a fast-bail when HTTP also
+ * failed on that same iteration.
  */
 const waitForHttp = async (
   url: string,
@@ -107,12 +112,6 @@ const waitForHttp = async (
   let lastError = '';
 
   for (let i = 0; i < maxAttempts; i++) {
-    // Bail early if the spawned process already exited
-    if (proc && proc.exitCode !== null) {
-      lastError = `Process exited prematurely with code ${proc.exitCode}`;
-      break;
-    }
-
     try {
       const res = await httpGet(url);
       if (
@@ -126,10 +125,33 @@ const waitForHttp = async (
       lastError = String(err);
     }
 
+    // Bail early only after HTTP failed AND the spawned process has already exited
+    if (proc && proc.exitCode !== null) {
+      lastError = `Process exited prematurely with code ${proc.exitCode}`;
+      break;
+    }
+
     await sleep(intervalMs);
   }
 
   return { healthy: false, lastError };
+};
+
+/**
+ * Kill a spawned process and its entire child tree.
+ * On Windows, SIGTERM does not propagate to grandchildren spawned via shell,
+ * so we use taskkill /T /F to kill the whole tree.
+ */
+const killProcess = (proc: ChildProcess) => {
+  if (proc.exitCode !== null) return;
+  if (process.platform === 'win32' && proc.pid) {
+    spawnSync('taskkill', ['/T', '/F', '/PID', String(proc.pid)], {
+      shell: true,
+      windowsHide: true,
+    });
+  } else {
+    proc.kill('SIGTERM');
+  }
 };
 
 // ---------------------------------------------------------------------------
@@ -208,7 +230,7 @@ describe('Level 1 Task 1: Environment Setup', () => {
        */
       const result = runCommand(
         npxCmd,
-        ['ts-node', 'scripts/db-check.ts'],
+        ['tsx', 'scripts/db-check.ts'],
         serverRoot,
         30_000,
       );
@@ -307,9 +329,7 @@ describe('Level 1 Task 1: Environment Setup', () => {
           `Backend did not become healthy at ${url}.\nLast HTTP error: ${lastError}\n\nServer logs:\n${logs}`,
         ).toBe(true);
       } finally {
-        if (serverProcess && serverProcess.exitCode === null) {
-          serverProcess.kill('SIGTERM');
-        }
+        if (serverProcess) killProcess(serverProcess);
       }
     },
     30_000,
@@ -329,7 +349,7 @@ describe('Level 1 Task 1: Environment Setup', () => {
           cwd: clientRoot,
           env: {
             ...safeEnv,
-            PORT: CLIENT_PORT,       // CRA
+            PORT: CLIENT_PORT,  // CRA
             VITE_PORT: CLIENT_PORT,  // Vite (set in vite.config if needed)
           },
           stdio: ['ignore', 'pipe', 'pipe'],
@@ -354,9 +374,7 @@ describe('Level 1 Task 1: Environment Setup', () => {
           `Client dev server did not become healthy at ${url}.\nLast HTTP error: ${lastError}\n\nClient logs:\n${logs}`,
         ).toBe(true);
       } finally {
-        if (clientProcess && clientProcess.exitCode === null) {
-          clientProcess.kill('SIGTERM');
-        }
+        if (clientProcess) killProcess(clientProcess);
       }
     },
     30_000,
