@@ -4,7 +4,8 @@ import react from '@vitejs/plugin-react'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-   server: {
+  server: {
+    host: '127.0.0.1',
     port: Number(process.env.VITE_PORT ?? process.env.PORT ?? 5173),
     proxy: {
       '/api': {
@@ -12,5 +13,12 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
+    hmr: {
+      overlay: true,
+    },
+    watch: {
+      usePolling: true,
+    },
+    allowedHosts: true,
   },
 })
