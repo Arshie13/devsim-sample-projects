@@ -19,7 +19,7 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }))
 
-// Mock localStorage
+// Mock localStorage (only in browser environment)
 const localStorageMock = (() => {
   let store: Record<string, string> = {}
 
@@ -37,9 +37,13 @@ const localStorageMock = (() => {
   }
 })()
 
-Object.defineProperty(window, 'localStorage', {
-  value: localStorageMock,
-})
+// Only define localStorage if window is available (jsdom environment)
+if (typeof window !== 'undefined') {
+  Object.defineProperty(window, 'localStorage', {
+    value: localStorageMock,
+    configurable: true,
+  })
+}
 
 // Mock next/link
 vi.mock('next/link', () => ({
@@ -50,6 +54,8 @@ vi.mock('next/link', () => ({
 
 // Reset mocks before each test
 beforeEach(() => {
-  localStorage.clear()
+  if (typeof localStorage !== 'undefined') {
+    localStorage.clear()
+  }
   vi.clearAllMocks()
 })

@@ -37,7 +37,7 @@ The library has onboarded a new developer (you!) and needs the system running lo
    - File: [`src/app/signup/page.tsx`](src/app/signup/page.tsx:1)
 
 2. Update the library name in the dashboard header to:
-   **"BookWise Public Library"**
+   **"BookStop Public Library"**
    - File: [`src/app/dashboard/page.tsx`](src/app/dashboard/page.tsx:66)
 
 3. Change the page title to "BookWise Library System"
