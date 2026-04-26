@@ -21,10 +21,12 @@ describe('Level 1 - Task 1.2: UI Text Updates', () => {
     it('should not display "Sign Up" text', () => {
       render(<LoginPage />)
       // The page should not have "Sign Up" as a button or link text
-      const signUpElements = screen.queryAllByText(/sign up/i)
-      // If there are any, they should be in context like "Sign up for an account" not as a button
+      // Check for "Sign Up" as a button
       const signUpButtons = screen.queryAllByRole('button', { name: /sign up/i })
       expect(signUpButtons.length).toBe(0)
+      // Check for "Sign Up" as a link (anchor tag)
+      const signUpLinks = screen.queryAllByRole('link', { name: /sign up/i })
+      expect(signUpLinks.length).toBe(0)
     })
   })
 
