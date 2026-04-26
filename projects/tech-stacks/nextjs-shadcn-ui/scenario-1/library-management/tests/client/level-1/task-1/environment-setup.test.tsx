@@ -20,7 +20,7 @@ import fs from 'fs';
 // these without touching the test file.
 // ---------------------------------------------------------------------------
 const projectRoot =
-  process.env.DEVSIM_PROJECT_ROOT ?? resolve(process.cwd(), '..');
+  process.env.DEVSIM_PROJECT_ROOT ?? '/workspace';
 const clientRoot =
   process.env.DEVSIM_CLIENT_ROOT ?? join(projectRoot, 'client');
 
