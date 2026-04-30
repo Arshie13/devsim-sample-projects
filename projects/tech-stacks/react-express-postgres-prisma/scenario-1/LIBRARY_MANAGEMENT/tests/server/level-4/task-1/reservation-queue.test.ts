@@ -37,17 +37,18 @@ const buildApp = async () => {
 const clearReservationTableIfExists = async () => {
   try {
     const rows = await prisma.$queryRawUnsafe<Array<{ exists: string | null }>>(
-      "SELECT to_regclass('public.\"Reservation\"') AS exists",
+      "SELECT to_regclass('public.\"reservations\"') AS exists", // ← fixed: lowercase table name
     );
     if (rows?.[0]?.exists) {
-      await prisma.$executeRawUnsafe('DELETE FROM "Reservation"');
+      await prisma.$executeRawUnsafe('DELETE FROM "reservations"'); // ← fixed: lowercase table name
     }
   } catch {
     // Ignore when table does not exist yet.
   }
 };
 
-const createBook = async (overrides?: Partial<{ title: string }>) => {
+// ← fixed: defaults availableCopies to 0 so reservations are allowed
+const createBook = async (overrides?: Partial<{ title: string; availableCopies: number }>) => {
   const id = randomUUID();
   return prisma.book.create({
     data: {
@@ -58,7 +59,7 @@ const createBook = async (overrides?: Partial<{ title: string }>) => {
       description: 'Borrow records fixture',
       isbn: `isbn-${id}`,
       totalCopies: 5,
-      availableCopies: 3,
+      availableCopies: overrides?.availableCopies ?? 0, // ← fixed: was hardcoded 3
     },
   });
 };
@@ -99,6 +100,7 @@ describe('Level 4 Task 1: Reservation Queue Foundation Server Integration', () =
   describe('AC-1: Reservation Create Contract', () => {
     it('should create reservation for unavailable books and reject duplicate active reservation', async () => {
       const app = await buildApp();
+      // Book has availableCopies: 0 by default — reservation is allowed
       const book = await createBook({ title: 'Queue Create Book' });
       const member = await createMember({ name: 'Queue Member One' });
 
@@ -123,6 +125,7 @@ describe('Level 4 Task 1: Reservation Queue Foundation Server Integration', () =
   describe('AC-2: Reservation Queue Read Contract', () => {
     it('should return queue rows with member and book display data ordered by queue position', async () => {
       const app = await buildApp();
+      // Book has availableCopies: 0 by default — both reservations are allowed
       const book = await createBook({ title: 'Queue Read Book' });
       const firstMember = await createMember({ name: 'Queue First Member' });
       const secondMember = await createMember({ name: 'Queue Second Member' });
@@ -172,7 +175,8 @@ describe('Level 4 Task 1: Reservation Queue Foundation Server Integration', () =
 
     it('should return empty queue output for a valid book with no reservations', async () => {
       const app = await buildApp();
-      const book = await createBook({ title: 'No Queue Yet' });
+      // Book can have copies available here — we just want an empty queue
+      const book = await createBook({ title: 'No Queue Yet', availableCopies: 3 });
       const response = await request(app).get(`/api/reservations?bookId=${book.id}`);
       expect(response.status).toBe(200);
       expect(response.body.success).toBe(true);
