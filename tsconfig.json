@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "target": "ES2017",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "types": ["vitest/globals", "node"],
+    "paths": {
+      "@/*": ["./projects/tech-stacks/nextjs-shadcn-ui/scenario-1/library-management/client/src/*"]
+    }
+  },
+  "include": [
+    "projects/tech-stacks/nextjs-shadcn-ui/scenario-1/library-management/client/next-env.d.ts",
+    "projects/tech-stacks/nextjs-shadcn-ui/scenario-1/library-management/client/**/*.ts",
+    "projects/tech-stacks/nextjs-shadcn-ui/scenario-1/library-management/client/**/*.tsx",
+    "projects/tech-stacks/nextjs-shadcn-ui/scenario-1/library-management/client/.next/types/**/*.ts",
+    "projects/tech-stacks/nextjs-shadcn-ui/scenario-1/library-management/client/.next/dev/types/**/*.ts",
+    "projects/tech-stacks/nextjs-shadcn-ui/scenario-1/library-management/client/**/*.mts",
+    "projects/tech-stacks/nextjs-shadcn-ui/scenario-1/library-management/tests/**/*.ts",
+    "projects/tech-stacks/nextjs-shadcn-ui/scenario-1/library-management/tests/**/*.tsx"
+  ],
+  "exclude": ["node_modules"]
+}

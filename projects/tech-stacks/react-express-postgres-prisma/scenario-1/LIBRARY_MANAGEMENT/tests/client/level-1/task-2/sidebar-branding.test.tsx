@@ -23,13 +23,12 @@ const renderSidebar = () =>
   render(
     <MemoryRouter>
       <AuthProvider>
-      <Sidebar />
+        <Sidebar />
       </AuthProvider>
     </MemoryRouter>
   );
 
 describe('Level 1 Task 2: Header Branding', () => {
-
   describe('Subtitle Validation', () => {
     it('should render the correct subtitle in the sidebar', () => {
       renderSidebar();
@@ -49,5 +48,4 @@ describe('Level 1 Task 2: Header Branding', () => {
       expect(subtitleEl).toBeVisible();
     });
   });
-
 });

@@ -2,17 +2,19 @@ import { useState } from 'react';
 import { ShoppingCart, Plus, Minus, Trash2, CreditCard, Banknote } from 'lucide-react';
 import { Card, CardHeader, Button, Input, Badge, Modal } from '../../components/ui';
 import { Product, CartItem, PaymentMethod } from '../../types';
+import { getStockLevel } from '../../utils/formatters';
+import { promoService, PromoValidationResponse } from '../../services/promoService';
 
 // Demo products for testing without backend
 const demoProducts: Product[] = [
-  { id: 1, name: 'Espresso', price: 3.50, sku: 'ESP001', active: true, categoryId: 1, category: { id: 1, name: 'Coffee' }, createdAt: '' },
-  { id: 2, name: 'Cappuccino', price: 4.50, sku: 'CAP001', active: true, categoryId: 1, category: { id: 1, name: 'Coffee' }, createdAt: '' },
-  { id: 3, name: 'Latte', price: 4.00, sku: 'LAT001', active: true, categoryId: 1, category: { id: 1, name: 'Coffee' }, createdAt: '' },
-  { id: 4, name: 'Mocha', price: 5.00, sku: 'MOC001', active: true, categoryId: 1, category: { id: 1, name: 'Coffee' }, createdAt: '' },
-  { id: 5, name: 'Croissant', price: 3.00, sku: 'CRO001', active: true, categoryId: 2, category: { id: 2, name: 'Pastries' }, createdAt: '' },
-  { id: 6, name: 'Muffin', price: 2.50, sku: 'MUF001', active: true, categoryId: 2, category: { id: 2, name: 'Pastries' }, createdAt: '' },
-  { id: 7, name: 'Sandwich', price: 7.50, sku: 'SAN001', active: true, categoryId: 3, category: { id: 3, name: 'Food' }, createdAt: '' },
-  { id: 8, name: 'Salad', price: 8.00, sku: 'SAL001', active: true, categoryId: 3, category: { id: 3, name: 'Food' }, createdAt: '' },
+  { id: 1, name: 'Espresso', price: 3.50, sku: 'ESP001', active: true, categoryId: 1, category: { id: 1, name: 'Coffee' }, inventory: { id: 1, productId: 1, quantity: 50, lowStock: 10 }, createdAt: '' },
+  { id: 2, name: 'Cappuccino', price: 4.50, sku: 'CAP001', active: true, categoryId: 1, category: { id: 1, name: 'Coffee' }, inventory: { id: 2, productId: 2, quantity: 45, lowStock: 10 }, createdAt: '' },
+  { id: 3, name: 'Latte', price: 4.00, sku: 'LAT001', active: true, categoryId: 1, category: { id: 1, name: 'Coffee' }, inventory: { id: 3, productId: 3, quantity: 8, lowStock: 10 }, createdAt: '' },
+  { id: 4, name: 'Mocha', price: 5.00, sku: 'MOC001', active: true, categoryId: 1, category: { id: 1, name: 'Coffee' }, inventory: { id: 4, productId: 4, quantity: 0, lowStock: 10 }, createdAt: '' },
+  { id: 5, name: 'Croissant', price: 3.00, sku: 'CRO001', active: true, categoryId: 2, category: { id: 2, name: 'Pastries' }, inventory: { id: 5, productId: 5, quantity: 25, lowStock: 5 }, createdAt: '' },
+  { id: 6, name: 'Muffin', price: 2.50, sku: 'MUF001', active: true, categoryId: 2, category: { id: 2, name: 'Pastries' }, inventory: { id: 6, productId: 6, quantity: 30, lowStock: 5 }, createdAt: '' },
+  { id: 7, name: 'Sandwich', price: 7.50, sku: 'SAN001', active: true, categoryId: 3, category: { id: 3, name: 'Food' }, inventory: { id: 7, productId: 7, quantity: 3, lowStock: 5 }, createdAt: '' },
+  { id: 8, name: 'Salad', price: 8.00, sku: 'SAL001', active: true, categoryId: 3, category: { id: 3, name: 'Food' }, inventory: { id: 8, productId: 8, quantity: 12, lowStock: 5 }, createdAt: '' },
 ];
 
 // Demo tax rate
@@ -26,6 +28,10 @@ export default function POSPage() {
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
   const [orderComplete, setOrderComplete] = useState(false);
+  const [hideOutOfStock, setHideOutOfStock] = useState(false);
+  const [promoCode, setPromoCode] = useState('');
+  const [promoResult, setPromoResult] = useState<PromoValidationResponse | null>(null);
+  const [isApplyingPromo, setIsApplyingPromo] = useState(false);
 
   // Get unique categories
   const categories = Array.from(
@@ -36,13 +42,37 @@ export default function POSPage() {
   const filteredProducts = products.filter((product) => {
     const matchesSearch = product.name.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesCategory = selectedCategory ? product.categoryId === selectedCategory : true;
-    return matchesSearch && matchesCategory;
+    const stockLevel = product.inventory
+      ? getStockLevel(product.inventory.quantity, product.inventory.lowStock)
+      : 'IN_STOCK';
+    const passesStockFilter = hideOutOfStock ? stockLevel !== 'OUT_OF_STOCK' : true;
+    return matchesSearch && matchesCategory && passesStockFilter;
   });
 
   // Cart calculations
   const subtotal = cart.reduce((sum, item) => sum + item.product.price * item.quantity, 0);
-  const tax = subtotal * TAX_RATE;
-  const total = subtotal + tax;
+  const discountPercent =
+    promoResult && promoResult.success ? promoResult.data.discountPercent : 0;
+  const discountAmount = subtotal * (discountPercent / 100);
+  const subtotalAfterDiscount = subtotal - discountAmount;
+  const tax = subtotalAfterDiscount * TAX_RATE;
+  const total = subtotalAfterDiscount + tax;
+
+  const handleApplyPromo = async () => {
+    if (!promoCode.trim()) return;
+    setIsApplyingPromo(true);
+    try {
+      const result = await promoService.validatePromo(promoCode.trim(), subtotal);
+      setPromoResult(result);
+    } finally {
+      setIsApplyingPromo(false);
+    }
+  };
+
+  const handleRemovePromo = () => {
+    setPromoCode('');
+    setPromoResult(null);
+  };
 
   const addToCart = (product: Product) => {
     setCart((prev) => {
@@ -103,6 +133,7 @@ export default function POSPage() {
     clearCart();
     setOrderComplete(false);
     setIsCheckoutOpen(false);
+    handleRemovePromo();
   };
 
   return (
@@ -141,29 +172,45 @@ export default function POSPage() {
               </Button>
             ))}
           </div>
+          <label className="flex items-center gap-2 text-sm ml-auto">
+            <input
+              type="checkbox"
+              checked={hideOutOfStock}
+              onChange={(e) => setHideOutOfStock(e.target.checked)}
+              className="rounded border-gray-300 text-primary-600 focus:ring-primary-500"
+            />
+            Hide out-of-stock items
+          </label>
         </div>
 
         {/* Products Grid */}
         <div className="flex-1 overflow-auto">
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            {filteredProducts.map((product) => (
-              <button
-                key={product.id}
-                onClick={() => addToCart(product)}
-                className="p-4 bg-white rounded-lg border hover:border-primary-500 hover:shadow-md transition-all text-left"
-              >
-                <div className="w-full h-20 bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
-                  <span className="text-3xl">☕</span>
-                </div>
-                <h3 className="font-medium text-gray-900 truncate">{product.name}</h3>
-                <p className="text-primary-600 font-bold">${product.price.toFixed(2)}</p>
-                <div className="mt-2">
-                  <Badge variant="default">
-                    {product.category?.name}
-                  </Badge>
-                </div>
-              </button>
-            ))}
+            {filteredProducts.map((product) => {
+              const level = product.inventory
+                ? getStockLevel(product.inventory.quantity, product.inventory.lowStock)
+                : 'IN_STOCK';
+              const isOut = level === 'OUT_OF_STOCK';
+              return (
+                <button
+                  key={product.id}
+                  onClick={() => !isOut && addToCart(product)}
+                  disabled={isOut}
+                  className="p-4 bg-white rounded-lg border hover:border-primary-500 hover:shadow-md transition-all text-left disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  <div className="w-full h-20 bg-gray-100 rounded-lg mb-3 flex items-center justify-center">
+                    <span className="text-3xl">☕</span>
+                  </div>
+                  <h3 className="font-medium text-gray-900 truncate">{product.name}</h3>
+                  <p className="text-primary-600 font-bold">${product.price.toFixed(2)}</p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <Badge variant="default">{product.category?.name}</Badge>
+                    {level === 'OUT_OF_STOCK' && <Badge variant="danger">Out of Stock</Badge>}
+                    {level === 'LOW_STOCK' && <Badge variant="warning">Low Stock</Badge>}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -236,6 +283,12 @@ export default function POSPage() {
             <span className="text-gray-500">Subtotal</span>
             <span>${subtotal.toFixed(2)}</span>
           </div>
+          {promoResult && promoResult.success && (
+            <div className="flex justify-between text-sm text-green-600">
+              <span>Discount ({discountPercent}%)</span>
+              <span>-${discountAmount.toFixed(2)}</span>
+            </div>
+          )}
           <div className="flex justify-between text-sm">
             <span className="text-gray-500">Tax ({(TAX_RATE * 100).toFixed(1)}%)</span>
             <span>${tax.toFixed(2)}</span>
@@ -277,11 +330,60 @@ export default function POSPage() {
           </div>
         ) : (
           <div className="space-y-4">
-            <div className="p-4 bg-gray-50 rounded-lg">
-              <div className="flex justify-between text-lg font-bold">
+            <div className="p-4 bg-gray-50 rounded-lg space-y-1">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Subtotal</span>
+                <span>${subtotal.toFixed(2)}</span>
+              </div>
+              {promoResult && promoResult.success && (
+                <div className="flex justify-between text-sm text-green-600">
+                  <span>Promo ({discountPercent}%)</span>
+                  <span>-${discountAmount.toFixed(2)}</span>
+                </div>
+              )}
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Tax</span>
+                <span>${tax.toFixed(2)}</span>
+              </div>
+              <div className="flex justify-between text-lg font-bold pt-2 border-t">
                 <span>Total Due</span>
                 <span>${total.toFixed(2)}</span>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-700">Promo Code</label>
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Enter promo code"
+                  value={promoCode}
+                  onChange={(e) => setPromoCode(e.target.value.toUpperCase())}
+                  disabled={isApplyingPromo || (promoResult?.success ?? false)}
+                  className="flex-1"
+                />
+                {promoResult?.success ? (
+                  <Button variant="secondary" onClick={handleRemovePromo}>
+                    Remove
+                  </Button>
+                ) : (
+                  <Button
+                    variant="secondary"
+                    onClick={handleApplyPromo}
+                    isLoading={isApplyingPromo}
+                    disabled={!promoCode.trim()}
+                  >
+                    Apply
+                  </Button>
+                )}
+              </div>
+              {promoResult?.success && (
+                <p className="text-sm text-green-600">
+                  Promo applied: {discountPercent}% off
+                </p>
+              )}
+              {promoResult && !promoResult.success && (
+                <p className="text-sm text-red-600">{promoResult.message}</p>
+              )}
             </div>
 
             <p className="text-sm text-gray-500">Select payment method:</p>

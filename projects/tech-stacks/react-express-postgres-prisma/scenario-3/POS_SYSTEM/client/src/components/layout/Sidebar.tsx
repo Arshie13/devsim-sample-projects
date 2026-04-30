@@ -35,7 +35,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="p-6 border-b border-gray-800">
         <h1 className="text-xl font-bold">POS System</h1>
-        <p className="text-sm text-gray-400">IPPO Solutions</p>
+        <p className="text-sm text-gray-400">Manage Sales with Ease</p>
       </div>
 
       {/* Navigation */}
