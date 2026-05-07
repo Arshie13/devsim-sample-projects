@@ -1,0 +1,36 @@
+{
+  "name": "recipe-nest",
+  "private": true,
+  "version": "0.1.0",
+  "description": "RecipeNest — social recipe-sharing platform (MERN scenario for DevSim)",
+  "scripts": {
+    "dev": "concurrently \"npm:dev:server\" \"npm:dev:client\"",
+    "dev:server": "cd server && npm run dev",
+    "dev:client": "cd client && npm run dev",
+    "install:all": "npm install && cd client && npm install && cd ../server && npm install",
+    "db:seed": "cd server && npm run db:seed",
+    "test": "concurrently \"npm:test:server\" \"npm:test:client\"",
+    "test:server": "cd server && npm run test:run",
+    "test:client": "cd client && npm run test:run",
+    "test:tasks:l1": "npm run test:task:client:l1:t1 && npm run test:task:client:l1:t2",
+    "test:tasks:l2": "npm run test:task:client:l2:t1 && npm run test:task:client:l2:t2",
+    "test:tasks:l3": "npm run test:task:server:l3:t1 && npm run test:task:server:l3:t2",
+    "test:tasks:l4": "npm run test:task:server:l4:t1 && npm run test:task:server:l4:t2 && npm run test:task:client:l4:t1 && npm run test:task:client:l4:t2",
+    "test:tasks:l5": "npm run test:task:server:l5:t1 && npm run test:task:server:l5:t2",
+    "test:task:client:l1:t1": "cd client && npm run test:task:l1:t1",
+    "test:task:client:l1:t2": "cd client && npm run test:task:l1:t2",
+    "test:task:client:l2:t1": "cd client && npm run test:task:l2:t1",
+    "test:task:client:l2:t2": "cd client && npm run test:task:l2:t2",
+    "test:task:client:l4:t1": "cd client && npm run test:task:l4:t1",
+    "test:task:client:l4:t2": "cd client && npm run test:task:l4:t2",
+    "test:task:server:l3:t1": "cd server && npm run test:task:l3:t1",
+    "test:task:server:l3:t2": "cd server && npm run test:task:l3:t2",
+    "test:task:server:l4:t1": "cd server && npm run test:task:l4:t1",
+    "test:task:server:l4:t2": "cd server && npm run test:task:l4:t2",
+    "test:task:server:l5:t1": "cd server && npm run test:task:l5:t1",
+    "test:task:server:l5:t2": "cd server && npm run test:task:l5:t2"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
+}
