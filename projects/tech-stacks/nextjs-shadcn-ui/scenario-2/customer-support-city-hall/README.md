@@ -1,36 +1,53 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# City Hall Customer Support
 
-## Getting Started
+Full-stack scaffolding for a Next.js + shadcn/ui customer support portal used in the City Hall scenario.
 
-First, run the development server:
+## Structure
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+```
+customer-support-city-hall/
+├── package.json     # Root orchestrator (concurrently runs client + server tests)
+├── client/          # Next.js application
+│   ├── levels.md    # Challenge spec
+│   ├── src/         # App code (app router, components, lib)
+│   └── ...
+├── server/          # Stub – this scenario is client-only
+└── tests/           # Test suite (level-1..5/task-1..2)
+    ├── README.md
+    ├── QUICKSTART.md
+    ├── SUMMARY.md
+    ├── TEST_STRUCTURE.md
+    ├── utils/render-utils.tsx
+    └── client/
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Quick start
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm install
+cd client && npm install && cd ..
+npm run dev:client       # http://localhost:3000
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Running tests
 
-## Learn More
+```bash
+npm run test:run                  # client + server in parallel
+cd client && npm run test:task:l1:t1   # single task
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Routes
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `/` – Citizen vs. agent landing
+- `/support` – Citizen AI chat + agent connection
+- `/support/history` – (Level 3) Past complaint history
+- `/agent/login` – Agent login (admin / admin123)
+- `/agent` – Agent dashboard (conversations, messages, customer details)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Demo credentials
 
-## Deploy on Vercel
+| Role          | Username | Password |
+| ------------- | -------- | -------- |
+| Support Agent | admin    | admin123 |
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+See [`client/levels.md`](client/levels.md) for the full challenge spec, and [`tests/README.md`](tests/README.md) for the test suite overview.
