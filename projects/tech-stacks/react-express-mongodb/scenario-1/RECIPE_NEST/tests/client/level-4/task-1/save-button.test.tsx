@@ -1,16 +1,5 @@
 import { describe, it, expect } from "vitest";
 
-// L4-T1 client test: students must create
-// `client/src/components/recipe/SaveButton.tsx` and export a default or
-// named `SaveButton` component that:
-//   - accepts props { recipeId: string; initialSaved?: boolean; initialSavedCount?: number }
-//   - renders a <button> with role="button"
-//   - has an accessible label (aria-label) reflecting the saved state
-//   - toggles its aria-pressed state when clicked
-//
-// We assert behaviour via dynamic import so a missing file fails the test
-// with a clear message rather than at module load time.
-
 describe("Level 4 — Task 1: SaveButton component", () => {
   it("exports a SaveButton component", async () => {
     const mod = await import(

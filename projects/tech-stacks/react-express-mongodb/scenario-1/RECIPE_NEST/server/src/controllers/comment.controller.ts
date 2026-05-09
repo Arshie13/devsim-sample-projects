@@ -20,13 +20,6 @@ export async function listComments(req: Request, res: Response, next: NextFuncti
   }
 }
 
-// L5-T1 (related) BUG (intentional): non-atomic counter update.
-// The recipe document is loaded, its commentCount is mutated in JS memory,
-// and then `recipe.save()` writes it back. Two concurrent comment posts can
-// read the same commentCount value and lose an update.
-//
-// A correct fix uses an atomic operator on the Recipe document, e.g.:
-//   await Recipe.updateOne({ _id: id }, { $inc: { commentCount: 1 } });
 export async function postComment(req: Request, res: Response, next: NextFunction) {
   try {
     if (!req.user) throw new HttpError(401, "Authentication required");
@@ -42,7 +35,6 @@ export async function postComment(req: Request, res: Response, next: NextFunctio
       body: req.body.body,
     });
 
-    // Non-atomic — read-modify-write. Lost updates are possible under concurrency.
     recipe.commentCount = (recipe.commentCount ?? 0) + 1;
     await recipe.save();
 

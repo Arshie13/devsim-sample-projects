@@ -8,13 +8,6 @@ interface Props {
   recipe: Recipe;
 }
 
-// L2-T1 BUG (intentional): the card is NOT wrapped in a <Link>.
-// Students must wrap the card in <Link to={`/recipes/${recipe._id}`}>
-// so clicking it navigates to the recipe detail page.
-//
-// Tests in tests/client/level-2/task-1 verify:
-//   - the card has an <a> (or role="link") pointing to /recipes/<id>
-//   - clicking the card navigates to the correct URL
 export function RecipeCard({ recipe }: Props) {
   return (
     <article data-testid="recipe-card">

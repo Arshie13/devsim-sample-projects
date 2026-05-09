@@ -24,12 +24,3 @@ export const recipeIdParamSchema = z.object({
   id: z.string().regex(/^[a-f\d]{24}$/i, "Invalid recipe id"),
 });
 
-// L3-T2 BUG (intentional): trendingQuerySchema is missing.
-// Students should add a Zod schema validating an optional `limit` query parameter
-// (1..50, default 10) and wire it into the /trending route via validateRequest.
-//
-// Example fix:
-//
-// export const trendingQuerySchema = z.object({
-//   limit: z.coerce.number().int().min(1).max(50).default(10),
-// });

@@ -5,9 +5,6 @@ import { RecipeCard } from "./RecipeCard";
 import { SearchBar } from "./SearchBar";
 import { LoadingSpinner } from "../ui/LoadingSpinner";
 
-// L2-T2 NOTE: this component currently renders the SearchBar but does NOT pass
-// it value/onChange props, and does NOT use filterRecipes() to derive the
-// rendered list. Students must wire those together in Level 2 task 2.
 export function RecipeFeed() {
   const [recipes, setRecipes] = useState<Recipe[] | null>(null);
   const [error, setError] = useState<string | null>(null);
