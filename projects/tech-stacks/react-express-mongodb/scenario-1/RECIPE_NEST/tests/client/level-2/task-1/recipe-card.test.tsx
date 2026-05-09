@@ -1,10 +1,11 @@
 import { describe, it, expect } from "vitest";
 import { render, screen } from "@testing-library/react";
+import { MemoryRouter } from "react-router-dom";
 import { RecipeCard } from "../../../../client/src/components/recipe/RecipeCard";
 import type { Recipe } from "../../../../client/src/types/recipe";
 
 const recipe: Recipe = {
-  _id: "rec_lemon_tart",
+  _id: "69ff39bc45fbc158714ef8a0",
   slug: "lemon-tart",
   title: "Lemon Tart",
   description: "Bright and zesty.",
@@ -23,44 +24,37 @@ const recipe: Recipe = {
   updatedAt: new Date().toISOString(),
 };
 
-describe("Level 2 — Task 1: RecipeCard renders required fields", () => {
-  it("renders the title in an <h3>", () => {
-    render(<RecipeCard recipe={recipe} />);
-    expect(screen.getByRole("heading", { level: 3, name: /lemon tart/i })).toBeInTheDocument();
+function renderCard() {
+  return render(
+    <MemoryRouter>
+      <RecipeCard recipe={recipe} />
+    </MemoryRouter>,
+  );
+}
+
+describe("Level 2 — Task 1: RecipeCard navigates to recipe detail", () => {
+  it("card contains a link pointing to /recipes/<id>", () => {
+    renderCard();
+    const link = screen.getByRole("link");
+    expect(link).toHaveAttribute("href", `/recipes/${recipe._id}`);
   });
 
-  it("renders the author handle prefixed with @", () => {
-    render(<RecipeCard recipe={recipe} />);
-    expect(screen.getByText(/@chefa/)).toBeInTheDocument();
+  it("the link wraps the card title so the whole card is the click target", () => {
+    renderCard();
+    const link = screen.getByRole("link");
+    expect(link).toContainElement(screen.getByRole("heading", { level: 3 }));
   });
 
-  it("renders the cover image with alt equal to the recipe title", () => {
-    render(<RecipeCard recipe={recipe} />);
-    const img = screen.getByRole("img");
-    expect(img).toHaveAttribute("alt", recipe.title);
-  });
-
-  it("renders one tag chip per tag", () => {
-    render(<RecipeCard recipe={recipe} />);
-    const chips = screen.getAllByTestId("tag-chip");
-    expect(chips).toHaveLength(recipe.tags.length);
-  });
-
-  it("renders the avg rating to one decimal", () => {
-    render(<RecipeCard recipe={recipe} />);
-    expect(screen.getByTestId("avg-rating").textContent).toContain("4.6");
-  });
-
-  it("renders the saved count parseable as a number equal to recipe.savedCount", () => {
-    render(<RecipeCard recipe={recipe} />);
-    const text = screen.getByTestId("saved-count").textContent ?? "";
-    const num = Number(text.replace(/[^\d]/g, ""));
-    expect(num).toBe(recipe.savedCount);
-  });
-
-  it("renders without crashing when tags is empty", () => {
-    const empty: Recipe = { ...recipe, tags: [] };
-    render(<RecipeCard recipe={empty} />);
-    expect(screen.queryAllByTestId("tag-chip")).toHaveLength(0);
+  it("link href changes when a different recipe id is used", () => {
+    const other: Recipe = { ...recipe, _id: "aabbcc112233445566778899" };
+    render(
+      <MemoryRouter>
+        <RecipeCard recipe={other} />
+      </MemoryRouter>,
+    );
+    expect(screen.getByRole("link")).toHaveAttribute(
+      "href",
+      "/recipes/aabbcc112233445566778899",
+    );
   });
 });
