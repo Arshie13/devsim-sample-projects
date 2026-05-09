@@ -16,5 +16,5 @@ interface Props {
 //
 // Tests in tests/client/level-2/task-1 verify all of the above.
 export function RecipeCard({ recipe }: Props) {
-  return <div>TODO RecipeCard ({recipe.title})</div>;
+  return <div>({recipe.title})</div>;
 }

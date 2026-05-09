@@ -15,17 +15,47 @@ RECIPE_NEST/
 
 - Node.js 20+
 - npm 10+
-- A running MongoDB instance (local install or Docker — `docker run -d -p 27017:27017 --name recipe-mongo mongo:7`)
+- A running MongoDB instance
+
+**Option A — Local MongoDB install:** Install from https://www.mongodb.com/try/download/community and start `mongod`.
+
+**Option B — Docker (recommended for quick start):**
+```bash
+docker run -d -p 27017:27017 --name recipe-mongo mongo:7
+```
 
 ## Setup
 
-| Step | Command | Where |
-|---|---|---|
-| 1 | `npm install` | `RECIPE_NEST/` (root) |
-| 2 | `npm install` | `RECIPE_NEST/client/` |
-| 3 | `npm install` | `RECIPE_NEST/server/` |
-| 4 | `cp .env.example .env` then set `MONGO_URI` | `RECIPE_NEST/server/` |
-| 5 | `npm run db:seed` | `RECIPE_NEST/server/` |
+Run these commands in order:
+
+```bash
+# 1. Install root workspace dependencies  (from RECIPE_NEST/)
+npm install
+
+# 2. Install client dependencies
+cd client
+npm install
+cd ..
+
+# 3. Install server dependencies
+cd server
+npm install
+
+# 4. Seed the database — run this from inside server/
+npm run db:seed
+cd ..
+```
+
+> **Note:** A `.env` file is already included in `server/` with default values for local development (`MONGO_URI=mongodb://localhost:27017/recipenest`). You do not need to create or edit it — just make sure MongoDB is running before running the seed.
+
+The `db:seed` script lives in `server/package.json` and must be run from the `server/` directory:
+```
+server/
+  src/
+    seed/
+      seed.ts   ← this is what npm run db:seed executes
+  package.json  ← "db:seed": "tsx src/seed/seed.ts"
+```
 
 ## Running the App
 
@@ -38,6 +68,37 @@ npm run dev
 This starts the Express API on port `4000` and the Vite dev server on port `5173`.
 
 Open http://localhost:5173 in your browser.
+
+## Seeded Accounts
+
+After running `npm run db:seed`, the following accounts are available to sign in with immediately:
+
+| Username | Email | Password |
+|---|---|---|
+| `chefa` | `alex@recipenest.dev` | `password123` |
+| `beat` | `bea@recipenest.dev` | `password123` |
+| `carlosm` | `carlos@recipenest.dev` | `password123` |
+| `danip` | `dani@recipenest.dev` | `password123` |
+| `elio` | `eli@recipenest.dev` | `password123` |
+| `fatk` | `fatima@recipenest.dev` | `password123` |
+| `gusl` | `gus@recipenest.dev` | `password123` |
+| `hanab` | `hana@recipenest.dev` | `password123` |
+
+The seed also creates 12 recipes, 10 comments, and 10 saved-recipe relationships between these accounts so the app has real content to browse immediately.
+
+### How MongoDB seeding works
+
+Unlike relational databases (PostgreSQL, MySQL), MongoDB has no migration files or schema history. There is no `CREATE TABLE` or `ALTER TABLE` — Mongoose schemas exist only in your Node.js code. "Seeding" simply means running a script that connects to MongoDB and inserts documents using your Mongoose models, the same way your API routes insert them.
+
+The seed script at `server/src/seed/seed.ts`:
+1. Connects to MongoDB via `MONGO_URI` from `.env`
+2. Clears any existing documents from User, Recipe, Comment, Save, and Rating collections
+3. Creates 8 users with hashed passwords
+4. Creates 12 recipes belonging to those users
+5. Creates comments and saves linking users to recipes
+6. Disconnects
+
+You can re-run `npm run db:seed` at any time to reset the database to a clean known state.
 
 ## Running Tests
 
