@@ -14,9 +14,9 @@ import React from 'react'
 import { join, resolve } from 'path'
 import fs from 'fs'
 
-const projectRoot = process.env.DEVSIM_PROJECT_ROOT ?? resolve(__dirname, '../../../..')
-const useLocalStoragePath = join(projectRoot, 'src', 'hooks', 'useLocalStorage.ts')
-const notesPagePath = join(projectRoot, 'src', 'app', 'dashboard', 'notes', 'page.tsx')
+const clientRoot = process.env.DEVSIM_CLIENT_ROOT ?? resolve(__dirname, '../../../../client')
+const useLocalStoragePath = join(clientRoot, 'src', 'hooks', 'useLocalStorage.ts')
+const notesPagePath = join(clientRoot, 'src', 'app', 'dashboard', 'notes', 'page.tsx')
 
 describe('Level 4 - Task 4.2: useLocalStorage Hook', () => {
   it('should exist at src/hooks/useLocalStorage.ts', () => {
