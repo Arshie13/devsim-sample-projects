@@ -11,10 +11,10 @@ import { describe, it, expect } from 'vitest'
 import { join, resolve } from 'path'
 import fs from 'fs'
 
-const projectRoot = process.env.DEVSIM_PROJECT_ROOT ?? resolve(__dirname, '../../../..')
-const dateUtilsPath = join(projectRoot, 'src', 'lib', 'dateUtils.ts')
-const feesPagePath = join(projectRoot, 'src', 'app', 'dashboard', 'fees', 'page.tsx')
-const readmePath = join(projectRoot, 'README.md')
+const clientRoot = process.env.DEVSIM_CLIENT_ROOT ?? resolve(__dirname, '../../../../client')
+const dateUtilsPath = join(clientRoot, 'src', 'lib', 'dateUtils.ts')
+const feesPagePath = join(clientRoot, 'src', 'app', 'dashboard', 'fees', 'page.tsx')
+const readmePath = join(clientRoot, 'README.md')
 
 const ONE_DAY = 24 * 60 * 60_000
 

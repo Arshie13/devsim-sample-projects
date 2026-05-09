@@ -12,13 +12,13 @@ import { render, screen } from '@testing-library/react'
 import { join, resolve } from 'path'
 import fs from 'fs'
 
-const projectRoot = process.env.DEVSIM_PROJECT_ROOT ?? resolve(__dirname, '../../../..')
-const componentsDir = join(projectRoot, 'src', 'components')
+const clientRoot = process.env.DEVSIM_CLIENT_ROOT ?? resolve(__dirname, '../../../../client')
+const componentsDir = join(clientRoot, 'src', 'components')
 const statCardPath = join(componentsDir, 'StatCard.tsx')
-const feesPagePath = join(projectRoot, 'src', 'app', 'dashboard', 'fees', 'page.tsx')
-const dashboardPagePath = join(projectRoot, 'src', 'app', 'dashboard', 'page.tsx')
-const schedulePagePath = join(projectRoot, 'src', 'app', 'dashboard', 'schedule', 'page.tsx')
-const standingPagePath = join(projectRoot, 'src', 'app', 'dashboard', 'standing', 'page.tsx')
+const feesPagePath = join(clientRoot, 'src', 'app', 'dashboard', 'fees', 'page.tsx')
+const dashboardPagePath = join(clientRoot, 'src', 'app', 'dashboard', 'page.tsx')
+const schedulePagePath = join(clientRoot, 'src', 'app', 'dashboard', 'schedule', 'page.tsx')
+const standingPagePath = join(clientRoot, 'src', 'app', 'dashboard', 'standing', 'page.tsx')
 
 describe('Level 2 - Task 2.2: StatCard Component', () => {
   it('should export a StatCard component from src/components/StatCard.tsx', () => {

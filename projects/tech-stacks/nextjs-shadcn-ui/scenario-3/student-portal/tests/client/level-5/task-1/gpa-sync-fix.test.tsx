@@ -11,11 +11,11 @@ import { render, screen } from '@testing-library/react'
 import { join, resolve } from 'path'
 import fs from 'fs'
 
-const projectRoot = process.env.DEVSIM_PROJECT_ROOT ?? resolve(__dirname, '../../../..')
-const mockDataPath = join(projectRoot, 'src', 'lib', 'mockData.ts')
-const standingPagePath = join(projectRoot, 'src', 'app', 'dashboard', 'standing', 'page.tsx')
-const dashboardPagePath = join(projectRoot, 'src', 'app', 'dashboard', 'page.tsx')
-const gradesPagePath = join(projectRoot, 'src', 'app', 'dashboard', 'grades', 'page.tsx')
+const clientRoot = process.env.DEVSIM_CLIENT_ROOT ?? resolve(__dirname, '../../../../client')
+const mockDataPath = join(clientRoot, 'src', 'lib', 'mockData.ts')
+const standingPagePath = join(clientRoot, 'src', 'app', 'dashboard', 'standing', 'page.tsx')
+const dashboardPagePath = join(clientRoot, 'src', 'app', 'dashboard', 'page.tsx')
+const gradesPagePath = join(clientRoot, 'src', 'app', 'dashboard', 'grades', 'page.tsx')
 
 const GRADE_POINTS: Record<string, number> = {
   A: 4.0, 'A-': 3.7, 'B+': 3.3, B: 3.0, 'B-': 2.7,
