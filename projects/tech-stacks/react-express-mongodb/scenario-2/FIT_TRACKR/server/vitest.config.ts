@@ -10,10 +10,5 @@ export default defineConfig({
     testTimeout: 30000,
     hookTimeout: 30000,
     teardownTimeout: 10000,
-    server: {
-      deps: {
-        external: [/node_modules/],
-      },
-    },
   },
 });

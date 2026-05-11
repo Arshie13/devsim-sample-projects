@@ -4,7 +4,7 @@ import { MongoMemoryServer } from "mongodb-memory-server";
 
 // Required env vars for the server's env loader. Set BEFORE app modules import.
 process.env.JWT_SECRET = process.env.JWT_SECRET ?? "test-secret-change-me";
-process.env.PORT = process.env.PORT ?? "0";
+process.env.PORT = process.env.PORT ?? "4001";
 
 let mongoServer: MongoMemoryServer | null = null;
 
