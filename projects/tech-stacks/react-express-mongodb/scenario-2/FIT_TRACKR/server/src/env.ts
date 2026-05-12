@@ -8,6 +8,6 @@ function required(key: string): string {
 
 export const env = {
   MONGO_URI: process.env.MONGO_URI ?? "mongodb://127.0.0.1:27017/fittrackr",
-  PORT: Number(process.env.PORT ?? 4000),
+  PORT: Number(process.env.PORT ?? 5000),
   JWT_SECRET: required("JWT_SECRET"),
 };

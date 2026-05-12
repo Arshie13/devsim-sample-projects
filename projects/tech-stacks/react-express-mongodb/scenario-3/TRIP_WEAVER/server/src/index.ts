@@ -3,10 +3,13 @@ import { connectDB } from "./db.js";
 import { env } from "./env.js";
 
 async function start() {
-  await connectDB();
   const app = createApp();
   app.listen(env.PORT, () => {
     console.log(`🚀 TripWeaver server running on http://localhost:${env.PORT}`);
+  });
+
+  connectDB().catch((err) => {
+    console.error("MongoDB connection failed:", err.message);
   });
 }
 

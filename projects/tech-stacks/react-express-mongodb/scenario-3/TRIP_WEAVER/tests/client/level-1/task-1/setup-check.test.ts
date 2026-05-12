@@ -13,7 +13,7 @@
  *   4. SURFACE stderr on failure (actionable feedback for the student)
  */
 
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, afterAll } from "vitest";
 import { spawn, spawnSync, type ChildProcess } from "child_process";
 import { join, resolve } from "path";
 import fs from "fs";
@@ -32,7 +32,7 @@ const serverRoot =
 
 // Host/port are also overridable for Docker networking
 const SERVER_HOST = process.env.DEVSIM_SERVER_HOST ?? "127.0.0.1";
-const SERVER_PORT = process.env.DEVSIM_SERVER_PORT ?? "5052";
+const SERVER_PORT = process.env.DEVSIM_SERVER_PORT ?? "5000";
 const CLIENT_HOST = process.env.DEVSIM_CLIENT_HOST ?? "127.0.0.1";
 const CLIENT_PORT = process.env.DEVSIM_CLIENT_PORT ?? "5173";
 
@@ -42,6 +42,24 @@ const npxCmd = process.platform === "win32" ? "npx.cmd" : "npx";
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
+
+/**
+ * Kill a spawned process and its entire child tree.
+ * On Windows, `shell: true` wraps the command in cmd.exe — killing only the
+ * shell leaves the grandchild node/vite process alive holding the port.
+ * `taskkill /T /F` terminates the whole tree atomically.
+ */
+function killTree(proc: ChildProcess): void {
+  if (proc.exitCode !== null) return;
+  if (process.platform === "win32" && proc.pid) {
+    spawnSync("taskkill", ["/T", "/F", "/PID", String(proc.pid)], {
+      shell: false,
+      windowsHide: true,
+    });
+  } else {
+    proc.kill("SIGTERM");
+  }
+}
 
 /** Filter out any env values that are not strings (spawnSync requirement). */
 const safeEnv = Object.fromEntries(
@@ -140,7 +158,16 @@ const waitForHttp = async (
 // Tests
 // ---------------------------------------------------------------------------
 
+// Tracks processes spawned during the suite so afterAll can clean up even
+// if a test times out or Vitest is interrupted mid-run.
+const spawnedProcesses: ChildProcess[] = [];
+
 describe("Level 1 Task 1: Environment Setup", () => {
+  afterAll(() => {
+    for (const proc of spawnedProcesses) killTree(proc);
+    spawnedProcesses.length = 0;
+  });
+
   // -------------------------------------------------------------------------
   // Test 1 — Root dependencies precondition
   // -------------------------------------------------------------------------
@@ -274,6 +301,7 @@ describe("Level 1 Task 1: Environment Setup", () => {
           shell: true,
           windowsHide: true,
         });
+        spawnedProcesses.push(serverProcess);
 
         serverProcess.stdout?.on("data", (c: Buffer | string) => {
           logs += String(c);
@@ -295,9 +323,7 @@ describe("Level 1 Task 1: Environment Setup", () => {
           `Backend did not become healthy at ${url}.\nLast HTTP error: ${lastError}\n\nServer logs:\n${logs}`,
         ).toBe(true);
       } finally {
-        if (serverProcess && serverProcess.exitCode === null) {
-          serverProcess.kill("SIGTERM");
-        }
+        if (serverProcess) killTree(serverProcess);
       }
     },
     60_000,
@@ -324,6 +350,7 @@ describe("Level 1 Task 1: Environment Setup", () => {
           shell: true,
           windowsHide: true,
         });
+        spawnedProcesses.push(clientProcess);
 
         clientProcess.stdout?.on("data", (c: Buffer | string) => {
           logs += String(c);
@@ -345,9 +372,7 @@ describe("Level 1 Task 1: Environment Setup", () => {
           `Client dev server did not become healthy at ${url}.\nLast HTTP error: ${lastError}\n\nClient logs:\n${logs}`,
         ).toBe(true);
       } finally {
-        if (clientProcess && clientProcess.exitCode === null) {
-          clientProcess.kill("SIGTERM");
-        }
+        if (clientProcess) killTree(clientProcess);
       }
     },
     60_000,

@@ -6,6 +6,10 @@ import userRoutes from "./user.routes.js";
 
 const router = Router();
 
+router.get("/health", (_req, res) => {
+  res.json({ status: "ok" });
+});
+
 router.use("/auth", authRoutes);
 router.use("/workouts", workoutRoutes);
 router.use("/comments", commentRoutes);

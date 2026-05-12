@@ -3,10 +3,13 @@ import { connectDB } from "./db.js";
 import { env } from "./env.js";
 
 async function main() {
-  await connectDB();
   const app = createApp();
   app.listen(env.PORT, () => {
     console.log(`[recipe-nest] API listening on http://localhost:${env.PORT}`);
+  });
+
+  connectDB().catch((err) => {
+    console.error("[recipe-nest] MongoDB connection failed:", err.message);
   });
 }
 

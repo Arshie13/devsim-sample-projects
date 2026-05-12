@@ -3,7 +3,7 @@ import { z } from "zod";
 
 const EnvSchema = z.object({
   MONGO_URI: z.string().min(1),
-  PORT: z.coerce.number().int().positive().default(4000),
+  PORT: z.coerce.number().int().positive().default(5000),
   JWT_SECRET: z.string().min(8),
 });
 
