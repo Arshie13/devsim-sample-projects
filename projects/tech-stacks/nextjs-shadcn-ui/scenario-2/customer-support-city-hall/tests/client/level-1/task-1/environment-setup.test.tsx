@@ -26,6 +26,29 @@ const clientRoot =
   process.env.DEVSIM_CLIENT_ROOT ?? join(projectRoot, 'client')
 
 // ---------------------------------------------------------------------------
+// .env.local parsing helper
+//
+// Tolerant of how the file was authored — LF or CRLF line endings, surrounding
+// whitespace, `export ` prefixes, and single/double quoted values. Previously
+// the line scan split only on '\n', so a CRLF-authored file left a trailing
+// '\r' that the anchored `$` regex could not match (JS `.` does not match
+// '\r'), making the test pass only for LF-only files.
+// ---------------------------------------------------------------------------
+function readEnvValue(envContent: string, key: string): string | undefined {
+  for (const rawLine of envContent.split(/\r?\n/)) {
+    const line = rawLine.trim()
+    const match = line.match(
+      new RegExp(`^(?:export\\s+)?${key}\\s*=\\s*(.*)$`)
+    )
+    if (match) {
+      // Strip a single matching pair of surrounding quotes, if present.
+      return match[1].trim().replace(/^(['"])(.*)\1$/, '$2').trim()
+    }
+  }
+  return undefined
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -76,12 +99,10 @@ describe('Level 1 Task 1.1: Environment Setup (Client)', () => {
     const envLocalPath = join(clientRoot, '.env.local')
     if (fs.existsSync(envLocalPath)) {
       const envContent = fs.readFileSync(envLocalPath, 'utf-8')
-      envContent.split('\n').forEach((line) => {
-        const match = line.match(/^NEXT_PUBLIC_APP_NAME\s*=\s*["']?(.+?)["']?$/)
-        if (match) {
-          process.env.NEXT_PUBLIC_APP_NAME = match[1].trim()
-        }
-      })
+      const value = readEnvValue(envContent, 'NEXT_PUBLIC_APP_NAME')
+      if (value !== undefined) {
+        process.env.NEXT_PUBLIC_APP_NAME = value
+      }
     }
     expect(process.env.NEXT_PUBLIC_APP_NAME).toBe('City Hall Support')
   })
@@ -90,12 +111,10 @@ describe('Level 1 Task 1.1: Environment Setup (Client)', () => {
     const envLocalPath = join(clientRoot, '.env.local')
     if (fs.existsSync(envLocalPath)) {
       const envContent = fs.readFileSync(envLocalPath, 'utf-8')
-      envContent.split('\n').forEach((line) => {
-        const match = line.match(/^NEXT_PUBLIC_SUPPORT_PHONE\s*=\s*["']?(.+?)["']?$/)
-        if (match) {
-          process.env.NEXT_PUBLIC_SUPPORT_PHONE = match[1].trim()
-        }
-      })
+      const value = readEnvValue(envContent, 'NEXT_PUBLIC_SUPPORT_PHONE')
+      if (value !== undefined) {
+        process.env.NEXT_PUBLIC_SUPPORT_PHONE = value
+      }
     }
     expect(process.env.NEXT_PUBLIC_SUPPORT_PHONE).toBe('(555) 123-4567')
   })
@@ -104,12 +123,10 @@ describe('Level 1 Task 1.1: Environment Setup (Client)', () => {
     const envLocalPath = join(clientRoot, '.env.local')
     if (fs.existsSync(envLocalPath)) {
       const envContent = fs.readFileSync(envLocalPath, 'utf-8')
-      envContent.split('\n').forEach((line) => {
-        const match = line.match(/^NEXT_PUBLIC_SUPPORT_EMAIL\s*=\s*["']?(.+?)["']?$/)
-        if (match) {
-          process.env.NEXT_PUBLIC_SUPPORT_EMAIL = match[1].trim()
-        }
-      })
+      const value = readEnvValue(envContent, 'NEXT_PUBLIC_SUPPORT_EMAIL')
+      if (value !== undefined) {
+        process.env.NEXT_PUBLIC_SUPPORT_EMAIL = value
+      }
     }
     expect(process.env.NEXT_PUBLIC_SUPPORT_EMAIL).toBe('support@cityhall.gov')
   })
