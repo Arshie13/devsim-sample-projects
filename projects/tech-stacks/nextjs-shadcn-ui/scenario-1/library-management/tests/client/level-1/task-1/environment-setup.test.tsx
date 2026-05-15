@@ -76,8 +76,8 @@ describe('Level 1 Task 1.1: Environment Setup (Client)', () => {
     const envContent = fs.readFileSync(envLocalPath, 'utf-8');
     expect(
       envContent,
-      '.env.local should contain NEXT_PUBLIC_APP_NAME with value BookStop Library'
-    ).toMatch(/NEXT_PUBLIC_APP_NAME\s*=[\s\"]*BookStop Library[\"]*/);
+      '.env.local should contain NEXT_PUBLIC_APP_NAME with value SM Tech Library'
+    ).toMatch(/NEXT_PUBLIC_APP_NAME\s*=[\s\"]*SM Tech Library[\"]*/);
     expect(
       envContent,
       '.env.local should contain NEXT_PUBLIC_API_URL with value http://localhost:3000/api'
@@ -94,7 +94,7 @@ describe('Level 1 Task 1.1: Environment Setup (Client)', () => {
         process.env.NEXT_PUBLIC_APP_NAME = value;
       }
     }
-    expect(process.env.NEXT_PUBLIC_APP_NAME).toBe('BookStop Library');
+    expect(process.env.NEXT_PUBLIC_APP_NAME).toBe('SM Tech Library');
   });
 
   it('should have NEXT_PUBLIC_API_URL environment variable defined', () => {

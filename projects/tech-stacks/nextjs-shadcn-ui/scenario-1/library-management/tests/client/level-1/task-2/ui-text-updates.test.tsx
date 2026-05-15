@@ -50,17 +50,17 @@ describe('Level 1 - Task 1.2: UI Text Updates', () => {
       localStorage.setItem('librarian', JSON.stringify(mockLibrarian))
     })
 
-    it('should display "BookWise Public Library" in the header', () => {
+    it('should display "SM Tech Library" in the header', () => {
       render(<DashboardPage />)
-      // The header should contain the updated library name
-      const headerText = screen.getByText(/BookWise Public Library/i)
+      // The header should contain the corrected library name
+      const headerText = screen.getByText(/SM Tech Library/i)
       expect(headerText).toBeInTheDocument()
     })
 
-    it('should not display "SM Tech Library"', () => {
+    it('should not display the placeholder "BookWise Library"', () => {
       render(<DashboardPage />)
-      const oldText = screen.queryByText(/SM Tech Library/i)
-      expect(oldText).not.toBeInTheDocument()
+      const placeholderText = screen.queryByText(/BookWise Library/i)
+      expect(placeholderText).not.toBeInTheDocument()
     })
   })
 })

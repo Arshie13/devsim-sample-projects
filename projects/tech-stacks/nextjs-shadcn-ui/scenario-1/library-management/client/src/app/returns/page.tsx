@@ -77,7 +77,7 @@ export default function ReturnsPage() {
                 </svg>
               </div>
               <h1 className="text-xl font-serif font-bold text-amber-900 dark:text-amber-100">
-                SM Tech Library
+                BookWise Library
               </h1>
             </div>
             <div className="flex items-center gap-4">
