@@ -1,43 +1,62 @@
 /**
  * Ambient declarations for modules that students implement during the
  * challenge but don't yet exist in the starter code. Without these,
- * TypeScript would flag dynamic imports of `@/lib/dateUtils`, etc., as
+ * TypeScript would flag dynamic imports of `@/lib/intentMatcher`, etc., as
  * red-line errors before the student has had a chance to create them.
  *
  * The actual implementations replace these declarations once the file is
  * created — TypeScript prefers the real source over an ambient stub.
  */
 
-declare module '@/lib/dateUtils' {
-  export function formatRelativeTime(date: Date | string): string
-  export function isStale(date: Date | string): boolean
-  export function formatTimestamp(date: Date | string): string
+declare module '@/lib/intentMatcher' {
+  export function matchIntent(input: string): { intent: string; score: number }
+  export function getAssistantReply(input: string): string
 }
 
-declare module '@/hooks/useLocalStorage' {
-  export function useLocalStorage<T>(
-    key: string,
-    initialValue: T,
-  ): [T, (value: T) => void]
-  const _default: typeof useLocalStorage
+declare module '@/lib/quickReplies' {
+  export interface QuickReply {
+    id: string
+    label: string
+    text: string
+  }
+  export const quickReplies: QuickReply[]
+  const _default: QuickReply[]
   export default _default
 }
 
-declare module '@/app/support/history/page' {
-  const HistoryPage: () => JSX.Element
-  export default HistoryPage
+declare module '@/lib/priority' {
+  interface PriorityConversation {
+    status: string
+    unreadCount: number
+    createdAt: Date | string
+  }
+  export function getPriorityScore(conversation: PriorityConversation): number
+  export function getPriorityLevel(
+    conversation: PriorityConversation,
+  ): 'low' | 'normal' | 'high' | 'urgent'
 }
 
-declare module '@/components/MessageBubble' {
-  export interface MessageBubbleProps {
-    message: {
-      id: string
-      role: 'customer' | 'agent' | 'user' | 'ai' | 'system'
-      content: string
-      timestamp: Date
-    }
-    viewer: 'customer' | 'agent'
+declare module '@/lib/sla' {
+  interface SlaConversation {
+    status: string
+    messages: { role: string }[]
   }
-  export const MessageBubble: (props: MessageBubbleProps) => JSX.Element
-  export default MessageBubble
+  export function hasAgentReplied(conversation: { messages: { role: string }[] }): boolean
+  export function getServiceState(
+    conversation: SlaConversation,
+  ): 'awaiting-first-reply' | 'in-progress' | 'resolved'
+}
+
+declare module '@/lib/queue' {
+  export function estimateWaitMinutes(position: number, avgHandleMinutes?: number): number
+  export function formatWait(minutes: number): string
+}
+
+declare module '@/lib/transcript' {
+  interface TranscriptConversation {
+    customer: { fullName: string }
+    status?: string
+    messages: { role: string; content: string; timestamp: Date | string }[]
+  }
+  export function formatTranscript(conversation: TranscriptConversation): string
 }
