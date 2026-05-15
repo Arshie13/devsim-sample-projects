@@ -20,7 +20,7 @@ The library has onboarded a new developer (you!) and needs the system running lo
    ```
 2. Configure environment variables by creating a `.env.local` file:
    ```
-   NEXT_PUBLIC_APP_NAME=BookWise Library
+   NEXT_PUBLIC_APP_NAME=SM Tech Library
    NEXT_PUBLIC_API_URL=http://localhost:3000/api
    ```
 3. Start the development server:
@@ -31,21 +31,28 @@ The library has onboarded a new developer (you!) and needs the system running lo
 5. Update [`src/app/layout.tsx`](src/app/layout.tsx:1) to use `NEXT_PUBLIC_APP_NAME` for the page title
 6. Update the dashboard header to display the app name from env variables
 
-#### Task 1.2: UI Text Updates
+#### Task 1.2: Fix the Library Name Mismatches
 1. Change "Sign Up" to "Register" on the auth pages
    - File: [`src/app/login/page.tsx`](src/app/login/page.tsx:1)
    - File: [`src/app/signup/page.tsx`](src/app/signup/page.tsx:1)
 
-2. Update the library name in the dashboard header to:
-   **"BookStop Public Library"**
-   - File: [`src/app/dashboard/page.tsx`](src/app/dashboard/page.tsx:66)
+2. **Bug:** Several pages display a leftover placeholder name **"BookWise Library"**
+   instead of the real library name **"SM Tech Library"**. Correct the header/title
+   text on every page so it reads **"SM Tech Library"**:
+   - [`src/app/dashboard/page.tsx`](src/app/dashboard/page.tsx:66)
+   - [`src/app/login/page.tsx`](src/app/login/page.tsx:55)
+   - [`src/app/signup/page.tsx`](src/app/signup/page.tsx:78)
+   - [`src/app/returns/page.tsx`](src/app/returns/page.tsx:80)
 
-3. Change the page title to "BookWise Library System"
+3. The browser tab title in [`src/app/layout.tsx`](src/app/layout.tsx:16) also still
+   shows the placeholder. Update it so the page title reads **"SM Tech Library"**
+   (sourcing it from `NEXT_PUBLIC_APP_NAME` satisfies this).
 
 ### Success Criteria
 - [ ] App runs without errors on `npm run dev`
 - [ ] `.env.local` file is properly configured
-- [ ] Updated text appears correctly
+- [ ] "Register" replaces "Sign Up" on the auth pages
+- [ ] Every page header reads "SM Tech Library" — no "BookWise Library" left
 - [ ] Page title reflects the environment variable
 
 ---
