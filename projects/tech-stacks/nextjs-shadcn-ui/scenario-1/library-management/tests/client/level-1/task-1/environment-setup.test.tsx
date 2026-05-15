@@ -25,6 +25,29 @@ const clientRoot =
   process.env.DEVSIM_CLIENT_ROOT ?? join(projectRoot, 'client');
 
 // ---------------------------------------------------------------------------
+// .env.local parsing helper
+//
+// Tolerant of how the file was authored — LF or CRLF line endings, surrounding
+// whitespace, `export ` prefixes, and single/double quoted values. Splitting
+// only on '\n' left a trailing '\r' on CRLF-authored files that the anchored
+// `$` regex could not match (JS `.` does not match '\r'), making the test pass
+// only for LF-only files.
+// ---------------------------------------------------------------------------
+function readEnvValue(envContent: string, key: string): string | undefined {
+  for (const rawLine of envContent.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    const match = line.match(
+      new RegExp(`^(?:export\\s+)?${key}\\s*=\\s*(.*)$`)
+    );
+    if (match) {
+      // Strip a single matching pair of surrounding quotes, if present.
+      return match[1].trim().replace(/^(['"])(.*)\1$/, '$2').trim();
+    }
+  }
+  return undefined;
+}
+
+// ---------------------------------------------------------------------------
 // Tests
 // ---------------------------------------------------------------------------
 
@@ -66,12 +89,10 @@ describe('Level 1 Task 1.1: Environment Setup (Client)', () => {
     const envLocalPath = join(projectRoot, '.env.local');
     if (fs.existsSync(envLocalPath)) {
       const envContent = fs.readFileSync(envLocalPath, 'utf-8');
-      envContent.split('\n').forEach((line) => {
-        const match = line.match(/^NEXT_PUBLIC_APP_NAME\s*=\s*[\s\"]*(.+?)[\s\"]*$/);
-        if (match) {
-          process.env.NEXT_PUBLIC_APP_NAME = match[1].trim();
-        }
-      });
+      const value = readEnvValue(envContent, 'NEXT_PUBLIC_APP_NAME');
+      if (value !== undefined) {
+        process.env.NEXT_PUBLIC_APP_NAME = value;
+      }
     }
     expect(process.env.NEXT_PUBLIC_APP_NAME).toBe('BookStop Library');
   });
@@ -81,12 +102,10 @@ describe('Level 1 Task 1.1: Environment Setup (Client)', () => {
     const envLocalPath = join(projectRoot, '.env.local');
     if (fs.existsSync(envLocalPath)) {
       const envContent = fs.readFileSync(envLocalPath, 'utf-8');
-      envContent.split('\n').forEach((line) => {
-        const match = line.match(/^NEXT_PUBLIC_API_URL\s*=\s*(.+)$/);
-        if (match) {
-          process.env.NEXT_PUBLIC_API_URL = match[1].trim();
-        }
-      });
+      const value = readEnvValue(envContent, 'NEXT_PUBLIC_API_URL');
+      if (value !== undefined) {
+        process.env.NEXT_PUBLIC_API_URL = value;
+      }
     }
     expect(process.env.NEXT_PUBLIC_API_URL).toBe('http://localhost:3000/api');
   });
