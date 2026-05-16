@@ -22,7 +22,9 @@ describe('Level 3 - Task 3.2: Returns Page', () => {
   it('should render the returns page with borrowed books table', () => {
     render(<ReturnsPage />)
     expect(screen.getByText(/returns/i)).toBeInTheDocument()
-    expect(screen.getByText(/book title/i)).toBeInTheDocument()
+    expect(
+      screen.getByRole('columnheader', { name: /title/i })
+    ).toBeInTheDocument()
   })
 
   it('should display all currently borrowed books', () => {
