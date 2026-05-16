@@ -4,7 +4,8 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest'
-import { formatDate, isOverdue } from '../../utils/render-utils'
+// Import the candidate's own date utilities, not the test helper.
+import { formatDate, isOverdue } from '@/lib/dateUtils'
 
 // Helper function to get all files recursively with specific extensions
 function getAllFiles(dir: string, extensions: string[]): string[] {
@@ -74,13 +75,16 @@ describe('Level 5 - Task 5.2: Utilities & Documentation', () => {
       const fs = require('fs');
       const path = require('path');
       
-      const readmePath = path.resolve(__dirname, '../../../README.md');
+      const readmePath = path.resolve(__dirname, '../../../../README.md');
       expect(fs.existsSync(readmePath)).toBe(true);
       
       const readmeContent = fs.readFileSync(readmePath, 'utf8');
-      // Check for some feature documentation
-      expect(readmeContent).toContain('Getting Started');
-      expect(readmeContent).toContain('Next.js');
+      // The default create-next-app README is generic boilerplate. The task
+      // requires documenting THIS project's own features, so check for
+      // library-management-specific documentation the candidate must add.
+      expect(readmeContent).toMatch(/library management/i);
+      expect(readmeContent).toMatch(/\bbook/i);
+      expect(readmeContent).toMatch(/feature/i);
       expect(readmeContent.length).toBeGreaterThan(100); // Reasonable length
     })
 
@@ -88,7 +92,7 @@ describe('Level 5 - Task 5.2: Utilities & Documentation', () => {
       const fs = require('fs');
       const path = require('path');
       
-      const srcDir = path.resolve(__dirname, '../../../client/src');
+      const srcDir = path.resolve(__dirname, '../../../../client/src');
       const files = getAllFiles(srcDir, ['.tsx', '.ts']);
       
       let totalFiles = 0;

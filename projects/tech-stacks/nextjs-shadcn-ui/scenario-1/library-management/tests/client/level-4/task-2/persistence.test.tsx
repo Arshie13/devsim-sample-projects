@@ -4,9 +4,11 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest'
-import { render, screen, fireEvent, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, waitFor, renderHook, act } from '@testing-library/react'
 import DashboardPage from '@/app/dashboard/page'
 import ReturnsPage from '@/app/returns/page'
+// useLocalStorage is a Task 4.2 deliverable: src/hooks/useLocalStorage.ts
+import { useLocalStorage } from '@/hooks/useLocalStorage'
 
 describe('Level 4 - Task 4.2: Confirmation & Persistence', () => {
   describe('Confirmation Dialogs', () => {
@@ -80,10 +82,29 @@ describe('Level 4 - Task 4.2: Confirmation & Persistence', () => {
       expect(screen.getByText('Test Book')).toBeInTheDocument()
     })
 
-    it('should clear librarian on logout', async () => {
-      render(<DashboardPage />)
-      fireEvent.click(screen.getByRole('button', { name: /logout/i }))
-      expect(localStorage.getItem('librarian')).toBeNull()
+  })
+
+  describe('useLocalStorage hook', () => {
+    it('should return the initial value when no stored value exists', () => {
+      const { result } = renderHook(() => useLocalStorage('test-key', 'initial'))
+      expect(result.current[0]).toBe('initial')
+    })
+
+    it('should update state and persist the value to localStorage', () => {
+      const { result } = renderHook(() => useLocalStorage('test-key', 'initial'))
+
+      act(() => {
+        result.current[1]('updated')
+      })
+
+      expect(result.current[0]).toBe('updated')
+      expect(JSON.parse(localStorage.getItem('test-key') as string)).toBe('updated')
+    })
+
+    it('should read an existing value from localStorage on mount', () => {
+      localStorage.setItem('test-key', JSON.stringify('stored'))
+      const { result } = renderHook(() => useLocalStorage('test-key', 'initial'))
+      expect(result.current[0]).toBe('stored')
     })
   })
 })
