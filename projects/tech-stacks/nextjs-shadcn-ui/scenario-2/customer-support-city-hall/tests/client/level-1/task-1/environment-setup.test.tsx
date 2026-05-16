@@ -79,20 +79,23 @@ describe('Level 1 Task 1.1: Environment Setup (Client)', () => {
 
     const envContent = fs.readFileSync(envLocalPath, 'utf-8')
 
+    // Parse with the same tolerant helper the tests below use, so quoting
+    // style, LF/CRLF line endings, and surrounding whitespace are all handled
+    // in one place — instead of per-variable regexes that drift out of sync.
     expect(
-      envContent,
+      readEnvValue(envContent, 'NEXT_PUBLIC_APP_NAME'),
       '.env.local should contain NEXT_PUBLIC_APP_NAME with value "City Hall Support"'
-    ).toMatch(/NEXT_PUBLIC_APP_NAME\s*=\s*["']?City Hall Support["']?/)
+    ).toBe('City Hall Support')
 
     expect(
-      envContent,
+      readEnvValue(envContent, 'NEXT_PUBLIC_SUPPORT_PHONE'),
       '.env.local should contain NEXT_PUBLIC_SUPPORT_PHONE with value "(555) 123-4567"'
-    ).toMatch(/NEXT_PUBLIC_SUPPORT_PHONE\s*=\s*["']?\(555\) 123-4567["']?/)
+    ).toBe('(555) 123-4567')
 
     expect(
-      envContent,
+      readEnvValue(envContent, 'NEXT_PUBLIC_SUPPORT_EMAIL'),
       '.env.local should contain NEXT_PUBLIC_SUPPORT_EMAIL with value "support@cityhall.gov"'
-    ).toMatch(/NEXT_PUBLIC_SUPPORT_EMAIL\s*=\s*["']?support@cityhall\.gov["']?/)
+    ).toBe('support@cityhall.gov')
   })
 
   it('should expose NEXT_PUBLIC_APP_NAME after parsing .env.local', () => {
