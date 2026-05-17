@@ -64,29 +64,32 @@ describe('Level 1 Task 1.1: Environment Setup (Client)', () => {
     ).toBe(true);
   });
 
-  it('should have .env.local file at project root with correct environment variables', () => {
-    // Check that .env.local exists at the library-management project root
-    const envLocalPath = join(projectRoot, '.env.local');
+  it('should have .env.local file at client/ with correct environment variables', () => {
+    // .env.local must live alongside the Next.js config (client/), since that
+    // is the directory `next dev` reads NEXT_PUBLIC_* variables from.
+    const envLocalPath = join(clientRoot, '.env.local');
     expect(
       fs.existsSync(envLocalPath),
       `.env.local file not found at ${envLocalPath}. Create it with NEXT_PUBLIC_APP_NAME and NEXT_PUBLIC_API_URL.`
     ).toBe(true);
 
-    // Read and verify the .env.local file contents
+    // Parse with the same tolerant helper the tests below use, so quoting
+    // style, LF/CRLF line endings, and surrounding whitespace are all handled
+    // in one place — instead of per-variable regexes that drift out of sync.
     const envContent = fs.readFileSync(envLocalPath, 'utf-8');
     expect(
-      envContent,
+      readEnvValue(envContent, 'NEXT_PUBLIC_APP_NAME'),
       '.env.local should contain NEXT_PUBLIC_APP_NAME with value SM Tech Library'
-    ).toMatch(/NEXT_PUBLIC_APP_NAME\s*=[\s\"]*SM Tech Library[\"]*/);
+    ).toBe('SM Tech Library');
     expect(
-      envContent,
+      readEnvValue(envContent, 'NEXT_PUBLIC_API_URL'),
       '.env.local should contain NEXT_PUBLIC_API_URL with value http://localhost:3000/api'
-    ).toMatch(/NEXT_PUBLIC_API_URL\s*=\s*http:\/\/localhost:3000\/api/);
+    ).toBe('http://localhost:3000/api');
   });
 
   it('should have NEXT_PUBLIC_APP_NAME environment variable defined', () => {
     // Load environment variables from .env.local file
-    const envLocalPath = join(projectRoot, '.env.local');
+    const envLocalPath = join(clientRoot, '.env.local');
     if (fs.existsSync(envLocalPath)) {
       const envContent = fs.readFileSync(envLocalPath, 'utf-8');
       const value = readEnvValue(envContent, 'NEXT_PUBLIC_APP_NAME');
@@ -99,7 +102,7 @@ describe('Level 1 Task 1.1: Environment Setup (Client)', () => {
 
   it('should have NEXT_PUBLIC_API_URL environment variable defined', () => {
     // Load environment variables from .env.local file
-    const envLocalPath = join(projectRoot, '.env.local');
+    const envLocalPath = join(clientRoot, '.env.local');
     if (fs.existsSync(envLocalPath)) {
       const envContent = fs.readFileSync(envLocalPath, 'utf-8');
       const value = readEnvValue(envContent, 'NEXT_PUBLIC_API_URL');
