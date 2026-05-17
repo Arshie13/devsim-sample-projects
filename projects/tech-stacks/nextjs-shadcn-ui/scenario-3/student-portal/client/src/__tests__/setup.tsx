@@ -52,8 +52,16 @@ if (typeof window !== 'undefined') {
 }
 
 vi.mock('next/link', () => ({
-  default: ({ children, href }: { children: React.ReactNode; href: string }) => {
-    return React.createElement('a', { href }, children)
+  default: ({
+    children,
+    href,
+    ...props
+  }: {
+    children: React.ReactNode
+    href: string
+    [key: string]: unknown
+  }) => {
+    return React.createElement('a', { href, ...props }, children)
   },
 }))
 

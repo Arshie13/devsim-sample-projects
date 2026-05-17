@@ -12,6 +12,14 @@ import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import GradesPage from '@/app/dashboard/grades/page'
 
+// Radix Tabs activates a tab on mousedown/focus, not on a bare click event.
+// fireEvent.click dispatches only a click, so use this helper to actually switch tabs.
+function selectTab(name: RegExp) {
+  const tab = screen.getByRole('tab', { name })
+  fireEvent.mouseDown(tab)
+  fireEvent.focus(tab)
+}
+
 describe('Level 2 - Task 2.2: SemesterGroup primitive', () => {
   it('should render a button labeled by `title` exposing aria-expanded', async () => {
     const { SemesterGroup } = await import('@/components/SemesterGroup')
@@ -64,7 +72,7 @@ describe('Level 2 - Task 2.2: Grades page wires SemesterGroup into All Semesters
     render(<GradesPage />)
 
     // Switch to "All Semesters" tab so its content is in the DOM.
-    fireEvent.click(screen.getByRole('tab', { name: /all semesters/i }))
+    selectTab(/all semesters/i)
 
     // From mockData: ("1st Semester", "2025-2026") and ("2nd Semester", "2024-2025")
     const triggerA = screen.getByRole('button', {
@@ -80,7 +88,7 @@ describe('Level 2 - Task 2.2: Grades page wires SemesterGroup into All Semesters
 
   it('should mark the first accordion group as open by default', () => {
     render(<GradesPage />)
-    fireEvent.click(screen.getByRole('tab', { name: /all semesters/i }))
+    selectTab(/all semesters/i)
 
     const semesterTriggers = screen
       .getAllByRole('button')
