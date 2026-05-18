@@ -1,157 +1,157 @@
 # StudyPlanner — Frontend Developer Challenge Levels
 
-Welcome to StudyPlanner! You've been hired as a frontend developer and assigned to build and enhance the StudyPlanner app. Complete these challenges to level up your frontend engineering skills!
+Welcome to StudyPlanner! You've been hired as a frontend developer to build and enhance the StudyPlanner app — a tool that helps students organize subjects and track tasks with deadlines.
+
+The five levels below form a **gradual ramp**: Level 1 is a gentle onboarding step, and each level after it is meaningfully harder than the last. Finish them in order.
+
+Every level has **two tasks**, and each task is tagged **[Server]** (API routes, Prisma schema, data layer) or **[Client]** (pages, components, UI). Levels mix the two — some pair one of each, some are two of a kind.
+
+> **Theme of this scenario:** organizing and surfacing study work — search, calendars, reminders, and insights.
 
 ---
 
-## 🎮 Level 1: Environment Setup & Database Initialization
+## 🎮 Level 1: Onboarding & First Change
 **Difficulty: ⭐ Easy**
 **Estimated Time: 30 minutes**
 **Points: 10**
+**Mix: 1 Server · 1 Client**
 
 ### Scenario
-You just cloned the frontend repository. Set up the environment and ensure everything runs correctly.
+You just cloned the StudyPlanner repository. Get it running locally, then make one small, safe change to prove your environment works.
 
 ### Tasks
 
-#### Task 1.1: Environment Setup
+#### Task 1.1 — [Server] Get the Project Running & Add a Health Route
 1. Install dependencies (`npm install`)
-2. Configure `.env` from `.env.example`
+2. Copy `.env.example` to `.env` and fill in the database URL
 3. Start PostgreSQL with Docker (`docker-compose up -d`)
-4. Run Prisma migrations (`npx prisma generate` and `npx prisma db push`)
-5. Seed the database (`npx prisma db seed`)
-6. Start the development server (`npm run dev`)
+4. Generate the Prisma client and push the schema (`npx prisma generate`, `npm run db:push`)
+5. Seed the database (`npm run db:seed`) and start the dev server (`npm run dev`)
+6. Add a health-check route at `src/app/api/health/route.ts` that responds to `GET` with `{ status: "ok" }`
 
-#### Task 1.2: Minor Schema Update
-Add a new optional field `priority` (String, enum: 'low', 'medium', 'high') to the Task model to allow users to prioritize tasks.
-
-- Update `prisma/schema.prisma`
-- Run database push
-- Update the seed script to include priorities on a few sample tasks
-- Update the frontend to display priority
+#### Task 1.2 — [Client] Highlight Overdue Tasks
+On the homepage (`src/app/page.tsx`), visually flag any task whose `deadline` is in the past and not completed.
+- Compare each task's deadline against the current date
+- Give overdue tasks a distinct style (e.g. red text or an "Overdue" label)
 
 ### Success Criteria
-- [ ] Server runs without errors on `http://localhost:3000`
-- [ ] Database seeded successfully with subjects and tasks
-- [ ] New `priority` field works in task creation and display
+- [ ] App runs without errors and `GET /api/health` returns `{ status: "ok" }`
+- [ ] Overdue tasks are visually distinct on the homepage
 
 ---
 
-## 🎮 Level 2: Task Management Enhancements
+## 🎮 Level 2: Task Search & Filtering
 **Difficulty: ⭐⭐ Medium**
-**Estimated Time: 1–2 hours**
-**Points: 25**
+**Estimated Time: 1–1.5 hours**
+**Points: 20**
+**Mix: 1 Server · 1 Client**
 
 ### Scenario
-The StudyPlanner team wants to improve task browsing and management. Add filtering, sorting, and bulk operations.
+Students with many tasks need to find them quickly. Add server-side filtering and search, then wire the UI to it.
 
 ### Tasks
 
-#### Task 2.1: Add Filtering and Sorting to Tasks
-Implement filtering and sorting for tasks:
-- Support `?status=` (completed, pending, all)
-- Support `?priority=` (low, medium, high, all)
-- Support `?sortBy=` (deadline, createdAt, priority)
-- Support `?sortOrder=` (asc, desc)
-- Default: status=all, sortBy=deadline, sortOrder=asc
+#### Task 2.1 — [Server] Filtering & Search API
+Extend `GET /api/tasks` to read query parameters and build a Prisma `where` clause:
+- `?subjectId=` — only tasks for that subject
+- `?completed=true|false` — only completed or pending tasks
+- `?search=` — case-insensitive partial match on the task title (`contains`, `mode: "insensitive"`)
+- All parameters must combine into a single `where` clause
 
-#### Task 2.2: Add Bulk Task Operations
-Add bulk actions for tasks:
-- Bulk mark as completed/incomplete
-- Bulk delete tasks
-- Select all/none functionality
-- Show selected count
+#### Task 2.2 — [Client] Filter & Search Controls
+On the homepage, add the UI that drives the API:
+- A subject filter dropdown
+- A pending/completed status filter
+- A search input
+- Send the selected filters to `GET /api/tasks` as query parameters
 
 ### Success Criteria
-- [ ] Tasks can be filtered by status and priority
-- [ ] Tasks can be sorted by deadline, created date, and priority
-- [ ] Bulk operations work correctly
+- [ ] Tasks can be filtered by subject, status, and title search via the API
+- [ ] The homepage controls send all active filters to the API together
 
 ---
 
-## 🎮 Level 3: User Authentication & Multi-User Support
+## 🎮 Level 3: Deadline Calendar View
 **Difficulty: ⭐⭐⭐ Hard**
 **Estimated Time: 2–3 hours**
-**Points: 40**
+**Points: 35**
+**Mix: 2 Client**
 
 ### Scenario
-StudyPlanner needs to support multiple users. Implement authentication and user-specific data isolation.
+A flat list doesn't show students *when* work is due. Build a calendar that lays tasks out by deadline date — this is a pure front-end level.
 
 ### Tasks
 
-#### Task 3.1: Add User Model and Authentication
-- Add User model to Prisma schema (email, password hash, name)
-- Implement JWT authentication with NextAuth.js
-- Add login/register pages
-- Protect API routes with authentication
+#### Task 3.1 — [Client] Build a Month Calendar Page
+Create `src/app/calendar/page.tsx`:
+- Render a month grid (7 columns, one per weekday)
+- Show the current month name and year
+- Provide previous / next month navigation
 
-#### Task 3.2: Add Calendar View
-- Create a calendar view showing tasks by deadline date
-- Support month/week/day views
-- Click on a date to view tasks due that day
-- Add new task directly from a date cell
-- Show task indicators (dots) on dates with tasks
-- Color-code tasks by subject or priority
+#### Task 3.2 — [Client] Show Tasks on Calendar Dates
+- Display an indicator (dot/count) on each date that has tasks due
+- Clicking a date reveals the tasks due that day
+- Allow creating a new task pre-filled with the clicked date's deadline
 
 ### Success Criteria
-- [ ] Users can register and login securely
-- [ ] Data is properly isolated between users
-- [ ] Calendar view displays tasks by deadline
-- [ ] Month/week/day views work correctly
-- [ ] Tasks can be added from calendar date cells
+- [ ] Calendar renders a navigable month grid
+- [ ] Dates with deadlines show task indicators
+- [ ] Tasks can be viewed and added directly from a date cell
 
 ---
 
-## 🎮 Level 4: Notifications & Reminders
+## 🎮 Level 4: Deadline Reminders & Notifications
 **Difficulty: ⭐⭐⭐⭐ Expert**
-**Estimated Time: 2–3 hours**
-**Points: 60**
+**Estimated Time: 2.5–3.5 hours**
+**Points: 55**
+**Mix: 1 Server · 1 Client**
 
 ### Scenario
-Students need reminders for upcoming deadlines. Implement notification system and deadline tracking.
+Students miss deadlines they can't see coming. Build a notification system that warns them about upcoming due dates.
 
 ### Tasks
 
-#### Task 4.1: Implement Deadline Notifications
-- Add notification preferences to User model
-- Create API endpoint for sending deadline reminders
-- Implement email notifications for upcoming deadlines (1 day, 3 days, 1 week)
-- Create cron job to check and send reminders automatically
+#### Task 4.1 — [Server] Notification Model & Reminders API
+- Add a `Notification` model to the schema (`message`, `read` boolean, `type`, `createdAt`, link to a task)
+- Create `src/app/api/notifications/route.ts` — `GET` lists notifications, `POST` creates one
+- Implement reminder logic that generates notifications for tasks due within 1 / 3 / 7 days
+- Add `src/app/api/notifications/[id]/route.ts` with `PATCH` to mark a notification read
 
-#### Task 4.2: Add Notification History
-- Create Notification model (userId, type, message, read status, createdAt)
-- Add notifications page to view past notifications
-- Mark notifications as read/unread
-- Clean up old notifications (30+ days)
+#### Task 4.2 — [Client] Notifications Page & Unread Badge
+- Create `src/app/notifications/page.tsx` listing notifications, newest first
+- Show an unread-count badge in the app layout/header
+- Provide a "mark as read" action per notification
 
 ### Success Criteria
-- [ ] Deadline notifications are sent correctly
-- [ ] Notification history is maintained
+- [ ] Notifications are generated for upcoming deadlines and can be marked read
+- [ ] The notifications page lists them and an unread badge reflects the count
 
 ---
 
-## 🎮 Level 5: Analytics & Progress Reports
+## 🎮 Level 5: Study Analytics Dashboard
 **Difficulty: ⭐⭐⭐⭐⭐ Master**
-**Estimated Time: 3–4 hours**
+**Estimated Time: 3.5–5 hours**
 **Points: 80**
+**Mix: 1 Server · 1 Client**
 
 ### Scenario
-Students want insights into their study habits. Implement comprehensive analytics and reporting.
+Students want to understand their study habits. Build an analytics layer that aggregates their data and visualizes it.
 
 ### Tasks
 
-#### Task 5.1: Implement Study Analytics
-Create analytics API endpoints:
-- `GET /api/analytics/overview` - total tasks, completion rate, average progress
-- `GET /api/analytics/subject-breakdown` - progress by subject
-- `GET /api/analytics/time-tracking` - study time estimates
+#### Task 5.1 — [Server] Analytics Aggregation API
+Create `src/app/api/analytics/route.ts` (or `/api/analytics/overview`) that returns:
+- Overall completion rate and average task progress
+- A per-subject breakdown (task counts, completion rate)
+- A completion-rate **trend** grouped by week or month
+- Use Prisma aggregation (`count`, `groupBy`, `_avg`) — do not fetch everything and compute in JS
 
-#### Task 5.2: Add Progress Trends
-- Implement trend analysis over time (weekly/monthly)
-- Completion rate trends
-- Subject performance tracking
-- Productivity patterns
+#### Task 5.2 — [Client] Analytics Dashboard
+Create `src/app/analytics/page.tsx`:
+- Render visual charts (bar/progress) for the per-subject breakdown
+- Show the completion-rate trend over time
+- Surface percentage-based productivity insights
 
 ### Success Criteria
-- [ ] Analytics provide accurate insights
-- [ ] Trends show meaningful patterns
+- [ ] Analytics endpoints return accurate aggregated data and a time-based trend
+- [ ] The dashboard visualizes per-subject performance and trends
