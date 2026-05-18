@@ -57,6 +57,13 @@ The server will run on `http://localhost:3000/api` (or the port specified in .en
 - `npm run start:dev` - Start development server with hot reload
 - `npm run build` - Compile TypeScript to JavaScript
 - `npm run start:prod` - Start production server
+- `npm run test` - Run all tests
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:tasks:l1` - Run Level 1 tests only
+- `npm run test:tasks:l2` - Run Level 2 tests only
+- `npm run test:tasks:l3` - Run Level 3 tests only
+- `npm run test:tasks:l4` - Run Level 4 tests only
+- `npm run test:tasks:l5` - Run Level 5 tests only
 - `npm run prisma:generate` - Generate Prisma client
 - `npm run prisma:migrate` - Run Prisma migrations
 - `npm run prisma:seed` - Seed database with sample data
@@ -194,3 +201,24 @@ The system uses the following main entities:
 - **Settings** - Store configuration (tax rate, payment methods)
 
 See [prisma/schema.prisma](prisma/schema.prisma) for the complete schema definition.
+
+---
+
+## 🧩 Task — Test Mapping
+
+Use this table to find the test file that validates each challenge task.
+
+| Level | Task | Title | Test File |
+| ----- | ---- | ----- | --------- |
+| 1 | 1 | Environment Setup | `tests/server/level-1/task-1/environment-bootstrap.test.ts` |
+| 1 | 2 | Add `phoneNumber` to Store Settings | `tests/server/level-1/task-2/store-settings-phone-field.test.ts` |
+| 2 | 1 | Inventory Integrity Guards | `tests/server/level-2/task-1/inventory-integrity.test.ts` |
+| 2 | 2 | Paginated Product Listing | `tests/server/level-2/task-2/products-pagination.test.ts` |
+| 3 | 1 | Transactional Checkout: Tax, Discount & Inventory | `tests/server/level-3/task-1/checkout-tax-discount-inventory.test.ts` |
+| 3 | 2 | Payment Method Validation | `tests/server/level-3/task-2/payment-method-validation.test.ts` |
+| 4 | 1 | Daily Sales Report | `tests/server/level-4/task-1/sales-report-daily.test.ts` |
+| 4 | 2 | Weekly Sales Report | `tests/server/level-4/task-2/sales-report-weekly.test.ts` |
+| 5 | 1 | Fix Oversell, Decimal Drift & Timezone | `tests/server/level-5/task-1/concurrency-decimals-timezone.test.ts` |
+| 5 | 2 | Write Postmortem Document | `tests/server/level-5/task-2/postmortem-document.test.ts` |
+
+> **Test DB setup:** Copy `.env.example` to `.env`, set `DATABASE_URL_TEST` to a separate Postgres database, then run `npm run test`.
