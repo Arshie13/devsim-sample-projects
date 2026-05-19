@@ -2,7 +2,7 @@
 
 ## Project Overview
 
-A Study Planner application built with Next.js 15, Prisma, and PostgreSQL that allows students to organize subjects and track tasks with deadlines.
+A Study Planner application built with Next.js 15, Prisma, and MongoDB that allows students to organize subjects and track tasks with deadlines.
 
 ## Core Features
 
@@ -26,14 +26,14 @@ A Study Planner application built with Next.js 15, Prisma, and PostgreSQL that a
 
 - **Frontend**: Next.js 15 (App Router), React 19, Tailwind CSS
 - **Backend**: Next.js API Routes (Route Handlers)
-- **Database**: PostgreSQL with Prisma ORM
+- **Database**: MongoDB with Prisma ORM
 
 ## Data Models
 
 ### Subject
 | Field | Type | Description |
 |-------|------|-------------|
-| id | String | Primary key (cuid) |
+| id | String | Primary key (ObjectId) |
 | name | String | Subject name (e.g., Math, CS) |
 | description | String? | Optional description |
 | color | String | Hex color for UI |
@@ -43,7 +43,7 @@ A Study Planner application built with Next.js 15, Prisma, and PostgreSQL that a
 ### Task
 | Field | Type | Description |
 |-------|------|-------------|
-| id | String | Primary key (cuid) |
+| id | String | Primary key (ObjectId) |
 | title | String | Task title |
 | description | String? | Optional description |
 | completed | Boolean | Completion status |
@@ -80,7 +80,7 @@ This is an **intermediate** level project with:
 ## Getting Started
 
 1. Install dependencies: `npm install`
-2. Set up PostgreSQL and configure `.env`
+2. Set up MongoDB and configure `.env`
 3. Generate Prisma client: `npx prisma generate`
 4. Push schema: `npm run db:push`
 5. Seed data: `npm run db:seed`

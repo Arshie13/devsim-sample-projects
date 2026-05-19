@@ -3,13 +3,13 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mongodb"
   url      = env("DATABASE_URL")
 }
 
 // Category model - represents expense categories like Food, Transport, etc.
 model Category {
-  id        String    @id @default(cuid())
+  id        String    @id @default(auto()) @map("_id") @db.ObjectId
   name      String
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -21,14 +21,14 @@ model Category {
 
 // Expense model - represents an individual expense
 model Expense {
-  id          String    @id @default(cuid())
+  id          String    @id @default(auto()) @map("_id") @db.ObjectId
   description String
   amount      Float
   date        DateTime
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
-  categoryId  String
+  categoryId  String    @db.ObjectId
   category    Category  @relation(fields: [categoryId], references: [id], onDelete: Cascade)
 
   @@map("expenses")

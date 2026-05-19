@@ -24,7 +24,7 @@ You just cloned the StudyPlanner repository. Get it running locally, then make o
 #### Task 1.1 — [Server] Get the Project Running & Add a Health Route
 1. Install dependencies (`npm install`)
 2. Copy `.env.example` to `.env` and fill in the database URL
-3. Start PostgreSQL with Docker (`docker-compose up -d`)
+3. Start MongoDB with Docker (`docker-compose up -d`)
 4. Generate the Prisma client and push the schema (`npx prisma generate`, `npm run db:push`)
 5. Seed the database (`npm run db:seed`) and start the dev server (`npm run dev`)
 6. Add a health-check route at `src/app/api/health/route.ts` that responds to `GET` with `{ status: "ok" }`

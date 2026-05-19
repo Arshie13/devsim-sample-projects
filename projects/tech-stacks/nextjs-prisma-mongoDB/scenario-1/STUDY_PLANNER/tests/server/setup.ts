@@ -10,7 +10,7 @@ loadEnv({ path: fileURLToPath(new URL('../../server/.env', import.meta.url)) });
 process.env.NODE_ENV = 'test';
 process.env.DATABASE_URL =
   process.env.DATABASE_URL ||
-  'postgresql://studyuser:studypassword@localhost:5432/study_planner_test?schema=public';
+  'mongodb://studyuser:studypassword@localhost:27017/study_planner_test?authSource=study_planner&directConnection=true';
 process.env.NEXTAUTH_SECRET = process.env.NEXTAUTH_SECRET || 'test-secret-key';
 process.env.NEXTAUTH_URL = 'http://localhost:3000';
 

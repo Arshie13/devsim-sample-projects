@@ -1,6 +1,6 @@
 # Study Planner
 
-A Next.js application with Prisma and PostgreSQL for managing subjects and tasks.
+A Next.js application with Prisma and MongoDB for managing subjects and tasks.
 
 ## Features
 
@@ -13,34 +13,34 @@ A Next.js application with Prisma and PostgreSQL for managing subjects and tasks
 
 - **Frontend**: Next.js 15 (App Router), React 19, Tailwind CSS
 - **Backend**: Next.js API Routes
-- **Database**: PostgreSQL with Prisma ORM
+- **Database**: MongoDB with Prisma ORM
 
 ## Getting Started
 
 ### Prerequisites
 
 - Node.js 18+
-- Docker Desktop (for local PostgreSQL) or any PostgreSQL instance
+- Docker Desktop (for local MongoDB) or any MongoDB instance running as a replica set
 
-### PostgreSQL Setup with Docker (Recommended)
+### MongoDB Setup with Docker (Recommended)
 
-Use Docker for an easy local PostgreSQL setup without installing PostgreSQL directly.
+Use Docker for an easy local MongoDB setup without installing MongoDB directly.
 
 1. Install Docker Desktop
 
-2. Start PostgreSQL:
+2. Start MongoDB:
 
 ```bash
 docker-compose up -d
 ```
 
-This starts a PostgreSQL container with the database and credentials defined in `docker-compose.yml`.
+This starts a MongoDB container (configured as a single-node replica set, which Prisma requires) with the database and credentials defined in `docker-compose.yml` and `init.js`.
 
-### Alternative: Hosted PostgreSQL
+### Alternative: Hosted MongoDB
 
-For cloud-hosted PostgreSQL without local setup (e.g. Neon, Supabase, Railway):
+For cloud-hosted MongoDB without local setup (e.g. MongoDB Atlas):
 
-1. Create a database with your provider
+1. Create a cluster with your provider
 2. Get the connection string and update `DATABASE_URL` in `.env`
 
 ### Installation
@@ -94,7 +94,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ## Data Models
 
 ### Subject
-- `id`: String (cuid)
+- `id`: String (ObjectId)
 - `name`: String
 - `description`: String?
 - `color`: String (hex color)
@@ -103,7 +103,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 - `tasks`: Task[]
 
 ### Task
-- `id`: String (cuid)
+- `id`: String (ObjectId)
 - `title`: String
 - `description`: String?
 - `completed`: Boolean
