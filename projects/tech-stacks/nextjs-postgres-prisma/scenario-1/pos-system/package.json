@@ -1,0 +1,56 @@
+{
+  "name": "pos-system",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev",
+    "prisma:seed": "prisma db seed",
+    "prisma:studio": "prisma studio",
+    "db:check": "tsx scripts/db-check.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:tasks:l1": "vitest run tests/level-1",
+    "test:tasks:l2": "vitest run tests/level-2",
+    "test:tasks:l3": "vitest run tests/level-3",
+    "test:tasks:l4": "vitest run tests/level-4",
+    "test:tasks:l5": "vitest run tests/level-5",
+    "test:task:l1:t1": "vitest run tests/level-1/task-1",
+    "test:task:l1:t2": "vitest run tests/level-1/task-2",
+    "test:task:l2:t1": "vitest run tests/level-2/task-1",
+    "test:task:l2:t2": "vitest run tests/level-2/task-2",
+    "test:task:l3:t1": "vitest run tests/level-3/task-1",
+    "test:task:l3:t2": "vitest run tests/level-3/task-2",
+    "test:task:l4:t1": "vitest run tests/level-4/task-1",
+    "test:task:l4:t2": "vitest run tests/level-4/task-2",
+    "test:task:l5:t1": "vitest run tests/level-5/task-1",
+    "test:task:l5:t2": "vitest run tests/level-5/task-2"
+  },
+  "prisma": {
+    "seed": "tsx prisma/seed.ts"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.2.1",
+    "next": "^15.0.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4",
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "dotenv": "^16.4.7",
+    "eslint": "^9",
+    "eslint-config-next": "16.1.6",
+    "prisma": "^6.2.1",
+    "tailwindcss": "^4",
+    "tsx": "^4.19.2",
+    "typescript": "^5",
+    "vitest": "^2.1.8"
+  }
+}
