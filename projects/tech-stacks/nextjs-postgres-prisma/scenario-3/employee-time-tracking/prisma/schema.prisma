@@ -1,0 +1,86 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Employee {
+  id          Int     @id @default(autoincrement())
+  email       String  @unique
+  first_name  String
+  last_name   String
+  role        String  @default("employee")
+  manager_id  Int?
+  hourly_rate Float?
+  created_at  String
+
+  time_entries      TimeEntry[]
+  time_off_requests TimeOffRequest[]
+  payroll_records   PayrollRecord[]
+
+  @@map("employees")
+}
+
+model TimeEntry {
+  id          Int     @id @default(autoincrement())
+  employee_id Int
+  clock_in    String
+  clock_out   String?
+  notes       String?
+  created_at  String
+
+  employee Employee @relation(fields: [employee_id], references: [id])
+
+  @@map("time_entries")
+}
+
+model TimeOffRequest {
+  id           Int     @id @default(autoincrement())
+  employee_id  Int
+  start_date   String
+  end_date     String
+  hours        Float
+  request_type String
+  status       String  @default("pending")
+  notes        String?
+  reviewed_by  Int?
+  reviewed_at  String?
+  created_at   String
+
+  employee Employee @relation(fields: [employee_id], references: [id])
+
+  @@map("time_off_requests")
+}
+
+model PayrollPeriod {
+  id           Int     @id @default(autoincrement())
+  start_date   String
+  end_date     String
+  status       String  @default("open")
+  processed_at String?
+  created_at   String
+
+  payroll_records PayrollRecord[]
+
+  @@map("payroll_periods")
+}
+
+model PayrollRecord {
+  id                Int   @id @default(autoincrement())
+  payroll_period_id Int
+  employee_id       Int
+  regular_hours     Float
+  overtime_hours    Float
+  total_hours       Float
+  hourly_rate       Float
+  gross_pay         Float
+  created_at        String
+
+  period   PayrollPeriod @relation(fields: [payroll_period_id], references: [id])
+  employee Employee      @relation(fields: [employee_id], references: [id])
+
+  @@map("payroll_records")
+}

@@ -1,0 +1,60 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Product {
+  product_id   String   @id @default(uuid())
+  product_name String
+  price        Float
+  quantity     Int      @default(0)
+  created_at   DateTime @default(now())
+
+  order_items OrderItem[]
+
+  @@map("products")
+}
+
+model Coupon {
+  coupon_id        String   @id @default(uuid())
+  code             String   @unique
+  discount_percent Float
+  is_active        Boolean  @default(true)
+  created_at       DateTime @default(now())
+
+  orders Order[]
+
+  @@map("coupons")
+}
+
+model Order {
+  order_id        String   @id @default(uuid())
+  order_date      DateTime @default(now())
+  customer_name   String
+  total_amount    Float
+  discount_amount Float    @default(0)
+  coupon_id       String?
+
+  coupon Coupon?     @relation(fields: [coupon_id], references: [coupon_id])
+  items  OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String @id @default(uuid())
+  order_id   String
+  product_id String
+  quantity   Int
+  unit_price Float
+  subtotal   Float
+
+  order   Order   @relation(fields: [order_id], references: [order_id])
+  product Product @relation(fields: [product_id], references: [product_id])
+
+  @@map("order_items")
+}
