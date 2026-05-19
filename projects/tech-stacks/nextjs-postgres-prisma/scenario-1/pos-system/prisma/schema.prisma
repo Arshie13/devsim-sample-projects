@@ -1,0 +1,124 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Auth.js (NextAuth) models
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String? // bcrypt hash (credentials provider)
+  firstName     String?   @map("first_name")
+  lastName      String?   @map("last_name")
+  name          String?
+  emailVerified DateTime?
+  image         String?
+  createdAt     DateTime  @default(now()) @map("created_at")
+
+  accounts Account[]
+  sessions Session[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ---------------------------------------------------------------------------
+// POS domain models
+// ---------------------------------------------------------------------------
+
+model Product {
+  product_id   String @id @default(cuid())
+  product_name String
+  price        Float
+  quantity     Int    @default(0)
+
+  order_items OrderItem[]
+
+  @@map("products")
+}
+
+model Coupon {
+  coupon_id        String   @id @default(cuid())
+  code             String   @unique
+  discount_percent Float
+  is_active        Boolean  @default(true)
+  created_at       DateTime @default(now())
+
+  orders Order[]
+
+  @@map("coupons")
+}
+
+model Order {
+  order_id        String   @id @default(cuid())
+  order_date      DateTime @default(now())
+  customer_name   String
+  total_amount    Float
+  discount_amount Float    @default(0)
+  coupon_id       String?
+
+  coupon Coupon?     @relation(fields: [coupon_id], references: [coupon_id])
+  items  OrderItem[]
+
+  @@map("orders")
+}
+
+model OrderItem {
+  id         String @id @default(cuid())
+  order_id   String
+  product_id String
+  quantity   Int
+  unit_price Float
+  subtotal   Float
+
+  order   Order   @relation(fields: [order_id], references: [order_id], onDelete: Cascade)
+  product Product @relation(fields: [product_id], references: [product_id])
+
+  @@map("order_items")
+}

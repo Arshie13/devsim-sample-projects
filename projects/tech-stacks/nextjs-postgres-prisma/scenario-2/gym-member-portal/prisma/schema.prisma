@@ -1,0 +1,128 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------------------
+// Auth.js (NextAuth) + member account
+// ---------------------------------------------------------------------------
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  password      String? // bcrypt hash (credentials provider)
+  first_name    String?
+  last_name     String?
+  phone         String?
+  status        String    @default("active")
+  name          String?
+  emailVerified DateTime?
+  image         String?
+  created_at    DateTime  @default(now())
+
+  accounts    Account[]
+  sessions    Session[]
+  membership  Membership?
+  bookings    Booking[]
+  attendances Attendance[]
+
+  @@map("users")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("sessions")
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+  @@map("verification_tokens")
+}
+
+// ---------------------------------------------------------------------------
+// Gym domain models
+// ---------------------------------------------------------------------------
+
+model Membership {
+  id         String   @id @default(cuid())
+  user_id    String   @unique
+  type       String
+  status     String
+  start_date DateTime
+  end_date   DateTime
+
+  user User @relation(fields: [user_id], references: [id], onDelete: Cascade)
+
+  @@map("memberships")
+}
+
+model Class {
+  id         Int    @id @default(autoincrement())
+  name       String
+  schedule   String
+  instructor String
+  capacity   Int
+
+  bookings    Booking[]
+  attendances Attendance[]
+
+  @@map("classes")
+}
+
+model Booking {
+  id        Int      @id @default(autoincrement())
+  user_id   String
+  class_id  Int
+  booked_at DateTime @default(now())
+
+  user    User  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  classes Class @relation(fields: [class_id], references: [id], onDelete: Cascade)
+
+  @@map("bookings")
+}
+
+model Attendance {
+  id          Int      @id @default(autoincrement())
+  user_id     String
+  class_id    Int
+  attended_at DateTime @default(now())
+
+  user    User  @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  classes Class @relation(fields: [class_id], references: [id], onDelete: Cascade)
+
+  @@map("attendances")
+}
