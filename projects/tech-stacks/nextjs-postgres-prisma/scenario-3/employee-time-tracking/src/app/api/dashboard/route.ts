@@ -1,9 +1,15 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { auth } from '@/auth';
 
 // GET /api/dashboard - Aggregate all data the manager dashboard needs
 export async function GET() {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const [employees, timeEntries, timeOffRequests, payrollPeriods, payrollRecords] =
       await Promise.all([
         prisma.employee.findMany({

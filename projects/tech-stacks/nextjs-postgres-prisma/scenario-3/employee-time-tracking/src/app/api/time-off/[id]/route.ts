@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { auth } from '@/auth';
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -8,6 +9,11 @@ interface RouteParams {
 // PATCH /api/time-off/[id] - Approve or reject a time-off request
 export async function PATCH(request: Request, { params }: RouteParams) {
   try {
+    const session = await auth();
+    if (!session?.user) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
     const { id } = await params;
     const body = await request.json();
     const { status, reviewed_by } = body;

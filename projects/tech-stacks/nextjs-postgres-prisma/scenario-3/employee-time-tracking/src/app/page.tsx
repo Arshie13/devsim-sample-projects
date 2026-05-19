@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 import { Employee, TimeEntry, TimeOffRequest, PayrollPeriod, PayrollRecord, PayrollWithEmployee, getTodayDate, getStartOfWeek, calculateHours } from '@/lib/types';
 
 
@@ -65,6 +66,15 @@ export default function ManagerDashboard() {
   const [employeesWithStatus, setEmployeesWithStatus] = useState<EmployeeWithStatus[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  const { data: session } = useSession();
+  const managerName = session?.user?.name ?? 'Manager';
+  const managerInitials = managerName
+    .split(' ')
+    .map((part) => part[0] ?? '')
+    .join('')
+    .slice(0, 2)
+    .toUpperCase();
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -300,12 +310,18 @@ export default function ManagerDashboard() {
                 Refresh Data
               </button>
               <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">John Manager</p>
-                <p className="text-xs text-gray-500">HR Manager</p>
+                <p className="text-sm font-medium text-gray-900">{managerName}</p>
+                <p className="text-xs text-gray-500">Manager</p>
               </div>
               <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
-                <span className="text-sm font-medium text-gray-700">JM</span>
+                <span className="text-sm font-medium text-gray-700">{managerInitials}</span>
               </div>
+              <button
+                onClick={() => signOut({ callbackUrl: '/login' })}
+                className="text-sm text-gray-500 hover:text-gray-700 font-medium border border-gray-300 rounded-lg px-3 py-1.5 transition-colors"
+              >
+                Sign out
+              </button>
             </div>
           </div>
         </div>
@@ -646,11 +662,8 @@ export default function ManagerDashboard() {
             </div>
 
               <div className="bg-white shadow rounded-lg overflow-hidden">
-              <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+              <div className="px-6 py-4 border-b border-gray-200">
                 <h2 className="text-lg font-medium text-gray-900">Payroll Records</h2>
-                <button className="bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors">
-                  Export CSV
-                </button>
               </div>
               {payrollRecords.length === 0 ? (
                 <div className="px-6 py-8 text-center text-gray-500">

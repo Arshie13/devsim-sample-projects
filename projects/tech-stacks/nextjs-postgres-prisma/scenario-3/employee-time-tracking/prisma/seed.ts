@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient();
 
@@ -18,10 +19,15 @@ async function main() {
   await prisma.payrollPeriod.deleteMany();
   await prisma.employee.deleteMany();
 
+  // Shared password for every seeded account — login is "<email> / password123".
+  // Only managers can actually sign in (see src/auth.ts).
+  const passwordHash = await bcrypt.hash("password123", 10);
+
   // Manager first — employees reference manager_id.
   const manager = await prisma.employee.create({
     data: {
       email: "manager@acme.test",
+      password: passwordHash,
       first_name: "Morgan",
       last_name: "Price",
       role: "manager",
@@ -32,6 +38,7 @@ async function main() {
   const alice = await prisma.employee.create({
     data: {
       email: "alice@acme.test",
+      password: passwordHash,
       first_name: "Alice",
       last_name: "Nguyen",
       role: "employee",
@@ -43,6 +50,7 @@ async function main() {
   const bob = await prisma.employee.create({
     data: {
       email: "bob@acme.test",
+      password: passwordHash,
       first_name: "Bob",
       last_name: "Reyes",
       role: "employee",
