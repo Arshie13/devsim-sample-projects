@@ -16,8 +16,18 @@ export class ReportsController {
     return this.reportsService.getDailySales();
   }
 
+  @Get('daily')
+  async getDaily() {
+    return this.reportsService.getDailySales();
+  }
+
   @Get('weekly-sales')
   async getWeeklySales() {
+    return this.reportsService.getWeeklySales();
+  }
+
+  @Get('weekly')
+  async getWeekly() {
     return this.reportsService.getWeeklySales();
   }
 
@@ -30,5 +40,11 @@ export class ReportsController {
   async getTopProducts(@Query('limit') limit?: string) {
     const parsedLimit = limit ? parseInt(limit, 10) : 10;
     return this.reportsService.getTopProducts(parsedLimit);
+  }
+
+  @Get('low-stock')
+  async getLowStock(@Query('threshold') threshold?: string) {
+    const parsedThreshold = threshold ? parseInt(threshold, 10) : 10;
+    return this.reportsService.getLowStock(parsedThreshold);
   }
 }

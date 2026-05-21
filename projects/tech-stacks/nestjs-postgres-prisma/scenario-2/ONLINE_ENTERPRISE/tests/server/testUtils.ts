@@ -1,4 +1,4 @@
-import * as request from "supertest";
+import request from "supertest";
 import { getApp, getPrisma } from "./setup";
 import * as bcrypt from "bcrypt";
 
@@ -24,7 +24,7 @@ export async function signInToken(email: string, password = "password123"): Prom
   const res = await request(getApp().getHttpServer())
     .post("/api/auth/login")
     .send({ email, password });
-  return res.body.access_token as string;
+  return res.body.accessToken as string;
 }
 
 export async function createTestCategory(overrides: {
@@ -44,7 +44,6 @@ export async function createTestProduct(categoryId: string, overrides: {
   name?: string;
   price?: number;
   stock?: number;
-  roastLevel?: string;
   isActive?: boolean;
 } = {}) {
   const prisma = getPrisma();
@@ -57,7 +56,6 @@ export async function createTestProduct(categoryId: string, overrides: {
       image: "test.jpg",
       sku,
       stock: overrides.stock ?? 50,
-      roastLevel: overrides.roastLevel,
       isActive: overrides.isActive ?? true,
       categoryId,
     },

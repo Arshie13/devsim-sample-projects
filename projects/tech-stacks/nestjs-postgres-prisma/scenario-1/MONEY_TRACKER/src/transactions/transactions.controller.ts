@@ -6,7 +6,6 @@ import {
   Delete,
   Body,
   Param,
-  Query,
   UseGuards,
   Request,
 } from '@nestjs/common';
@@ -15,7 +14,6 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 import { CreateTransactionDto, CreateTransactionDtoSchema } from './dto/create-transaction.dto';
 import { UpdateTransactionDto, UpdateTransactionDtoSchema } from './dto/update-transaction.dto';
 import { ZodValidationPipe } from '../common/pipes/zod-validation.pipe';
-import { TransactionType } from '@prisma/client';
 
 @Controller('transactions')
 @UseGuards(JwtAuthGuard)
@@ -31,25 +29,8 @@ export class TransactionsController {
   }
 
   @Get()
-  async findAll(
-    @Request() req,
-    @Query('page') page?: string,
-    @Query('limit') limit?: string,
-    @Query('startDate') startDate?: string,
-    @Query('endDate') endDate?: string,
-    @Query('accountId') accountId?: string,
-    @Query('categoryId') categoryId?: string,
-    @Query('type') type?: TransactionType,
-  ) {
-    return this.transactionsService.findAll(req.user.id, {
-      page: page ? parseInt(page) : undefined,
-      limit: limit ? parseInt(limit) : undefined,
-      startDate,
-      endDate,
-      accountId,
-      categoryId,
-      type,
-    });
+  async findAll(@Request() req) {
+    return this.transactionsService.findAll(req.user.id);
   }
 
   @Get(':id')

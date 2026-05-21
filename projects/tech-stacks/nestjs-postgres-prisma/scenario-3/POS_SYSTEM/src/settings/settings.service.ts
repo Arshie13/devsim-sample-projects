@@ -33,13 +33,21 @@ export class SettingsService {
   }) {
     const settings = await this.prisma.setting.findFirst();
 
+    const safeData = {
+      storeName: data.storeName,
+      storeAddress: data.storeAddress,
+      taxRate: data.taxRate,
+      acceptCash: data.acceptCash,
+      acceptCard: data.acceptCard,
+    };
+
     if (!settings) {
-      return this.prisma.setting.create({ data: data as any });
+      return this.prisma.setting.create({ data: safeData as any });
     }
 
     return this.prisma.setting.update({
       where: { id: settings.id },
-      data,
+      data: safeData,
     });
   }
 }

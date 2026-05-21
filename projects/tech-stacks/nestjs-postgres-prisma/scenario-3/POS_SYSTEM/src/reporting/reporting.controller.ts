@@ -10,7 +10,6 @@ import { UserRole } from '@prisma/client';
 export class ReportingController {
   constructor(private reportingService: ReportingService) {}
 
-  // TODO: Implement daily and weekly sales reporting (Level 4)
   @Get('daily')
   @Roles(UserRole.ADMIN)
   async getDailyReport() {

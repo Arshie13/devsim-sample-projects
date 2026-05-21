@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import * as request from "supertest";
+import request from "supertest";
 import { getApp, getPrisma } from "../../setup";
 
 describe("Level 1 / Task 1 — Environment Setup", () => {

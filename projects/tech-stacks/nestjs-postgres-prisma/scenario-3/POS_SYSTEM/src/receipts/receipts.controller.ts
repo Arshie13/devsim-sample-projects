@@ -7,7 +7,6 @@ import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
 export class ReceiptsController {
   constructor(private receiptsService: ReceiptsService) {}
 
-  // TODO: Implement receipt endpoint
   @Get(':orderId')
   async getReceipt(@Param('orderId') orderId: string) {
     return this.receiptsService.generateReceipt(orderId);

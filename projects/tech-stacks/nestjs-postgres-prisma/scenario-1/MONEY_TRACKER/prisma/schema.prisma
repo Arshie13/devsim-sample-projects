@@ -7,6 +7,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -87,7 +88,6 @@ model Transaction {
   amount      Decimal         @db.Decimal(10, 2)
   type        TransactionType
   description String?
-  note        String?
   date        DateTime
   accountId   String
   account     Account         @relation(fields: [accountId], references: [id], onDelete: Cascade)

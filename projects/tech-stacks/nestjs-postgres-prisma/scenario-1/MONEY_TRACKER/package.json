@@ -17,10 +17,20 @@
     "test:watch": "vitest",
     "test:cov": "vitest run --coverage",
     "test:tasks:l1": "vitest run tests/server/level-1",
+    "test:tasks:l1:t1": "vitest run tests/server/level-1/task-1",
+    "test:tasks:l1:t2": "vitest run tests/server/level-1/task-2",
     "test:tasks:l2": "vitest run tests/server/level-2",
+    "test:tasks:l2:t1": "vitest run tests/server/level-2/task-1",
+    "test:tasks:l2:t2": "vitest run tests/server/level-2/task-2",
     "test:tasks:l3": "vitest run tests/server/level-3",
+    "test:tasks:l3:t1": "vitest run tests/server/level-3/task-1",
+    "test:tasks:l3:t2": "vitest run tests/server/level-3/task-2",
     "test:tasks:l4": "vitest run tests/server/level-4",
+    "test:tasks:l4:t1": "vitest run tests/server/level-4/task-1",
+    "test:tasks:l4:t2": "vitest run tests/server/level-4/task-2",
     "test:tasks:l5": "vitest run tests/server/level-5",
+    "test:tasks:l5:t1": "vitest run tests/server/level-5/task-1",
+    "test:tasks:l5:t2": "vitest run tests/server/level-5/task-2",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
     "prisma:seed": "ts-node prisma/seed.ts",
@@ -73,5 +83,5 @@
   },
   "prisma": {
     "seed": "ts-node prisma/seed.ts"
-  },
+  }
 }

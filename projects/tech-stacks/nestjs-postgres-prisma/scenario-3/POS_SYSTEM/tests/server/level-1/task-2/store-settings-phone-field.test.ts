@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import * as request from "supertest";
+import request from "supertest";
 import { getApp } from "../../setup";
 import { createTestUser, signInToken, createTestSettings } from "../../testUtils";
 

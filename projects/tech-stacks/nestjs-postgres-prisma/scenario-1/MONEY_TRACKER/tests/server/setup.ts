@@ -1,12 +1,16 @@
+import "reflect-metadata";
 import { beforeAll, afterAll, afterEach } from "vitest";
 import { Test, TestingModule } from "@nestjs/testing";
 import { INestApplication } from "@nestjs/common";
 import { AppModule } from "../../src/app.module";
 import { PrismaService } from "../../src/prisma/prisma.service";
 
-// Point to the test database before any module loads.
-process.env.DATABASE_URL = process.env.DATABASE_URL_TEST ?? process.env.DATABASE_URL;
-process.env.JWT_SECRET = process.env.JWT_SECRET ?? "test-secret-change-me";
+// Hardcoded fallbacks so tests run without .env files (matches MERN/PNR pattern).
+process.env.DATABASE_URL_TEST = process.env.DATABASE_URL_TEST
+  || process.env.DATABASE_URL
+  || "postgresql://postgres:bambam073004@localhost:5432/flexispend_test?schema=public";
+process.env.DATABASE_URL = process.env.DATABASE_URL_TEST;
+process.env.JWT_SECRET = process.env.JWT_SECRET || "test-secret-change-me";
 process.env.NODE_ENV = "test";
 
 let app: INestApplication;

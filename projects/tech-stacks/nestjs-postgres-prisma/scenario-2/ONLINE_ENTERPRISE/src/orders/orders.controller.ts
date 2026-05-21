@@ -27,7 +27,7 @@ export class OrdersController {
     @Request() req,
     @Body(new ZodValidationPipe(createOrderSchema)) dto: CreateOrderDto,
   ) {
-    return this.ordersService.create(req.user.userId, dto);
+    return this.ordersService.create(req.user.id, dto);
   }
 
   @Get()
@@ -39,7 +39,7 @@ export class OrdersController {
 
   @Get('my-orders')
   async findMyOrders(@Request() req) {
-    return this.ordersService.findByUser(req.user.userId);
+    return this.ordersService.findByUser(req.user.id);
   }
 
   @Get(':id')

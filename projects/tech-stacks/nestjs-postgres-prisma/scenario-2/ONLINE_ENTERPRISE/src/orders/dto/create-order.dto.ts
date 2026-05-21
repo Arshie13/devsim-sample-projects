@@ -4,7 +4,7 @@ import { PaymentMethod } from '@prisma/client';
 const orderItemSchema = z.object({
   productId: z.string().min(1, 'Product ID is required'),
   quantity: z.number().int().positive('Quantity must be positive'),
-  price: z.number().positive('Price must be positive'),
+  price: z.number().positive('Price must be positive').optional(),
 });
 
 export const createOrderSchema = z.object({

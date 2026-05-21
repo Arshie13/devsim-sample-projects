@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from "vitest";
-import * as request from "supertest";
+import request from "supertest";
 import { getApp } from "../../setup";
 import { createTestUser, signInToken, createTestCategory, createTestProduct } from "../../testUtils";
 
@@ -21,7 +21,7 @@ describe("Level 1 / Task 2 — Product roastLevel Field", () => {
       .send({
         name: "Ethiopian Yirgacheffe",
         price: 18.99,
-        image: "yirgacheffe.jpg",
+        image: "https://example.com/yirgacheffe.jpg",
         sku: "ETH-YIR-001",
         stock: 20,
         categoryId,
@@ -39,7 +39,7 @@ describe("Level 1 / Task 2 — Product roastLevel Field", () => {
       .send({
         name: "Generic Coffee",
         price: 12.99,
-        image: "generic.jpg",
+        image: "https://example.com/generic.jpg",
         sku: "GEN-001",
         stock: 10,
         categoryId,

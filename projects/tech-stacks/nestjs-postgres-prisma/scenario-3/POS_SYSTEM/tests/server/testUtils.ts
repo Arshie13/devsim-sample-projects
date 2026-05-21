@@ -1,5 +1,5 @@
 import * as bcrypt from "bcrypt";
-import * as request from "supertest";
+import request from "supertest";
 import { getApp, getPrisma } from "./setup";
 
 let userCounter = 0;
@@ -32,10 +32,10 @@ export async function signInToken(email: string, password = "password123"): Prom
     .post("/api/auth/login")
     .send({ email, password });
 
-  if (!res.body.access_token) {
+  if (!res.body.accessToken) {
     throw new Error(`signInToken failed for ${email}: ${JSON.stringify(res.body)}`);
   }
-  return res.body.access_token;
+  return res.body.accessToken;
 }
 
 export async function createTestCategory(overrides: {
