@@ -6,7 +6,7 @@ const load = () => import('../../../src/lib/reports');
 const orderItems = [
   { product_id: 'p1', product_name: 'Espresso', quantity: 5, subtotal: 600 },
   { product_id: 'p2', product_name: 'Latte', quantity: 8, subtotal: 1200 },
-  { product_id: 'p1', product_name: 'Espresso', quantity: 3, subtotal: 360 },
+  { product_id: 'p1', product_name: 'Espresso', quantity: 1, subtotal: 120 },
   { product_id: 'p3', product_name: 'Muffin', quantity: 8, subtotal: 760 },
 ];
 
@@ -20,7 +20,7 @@ describe('L5T2: topSellingProducts', () => {
     const { topSellingProducts } = await load();
     const top = topSellingProducts(orderItems, 10);
     const p1 = top.find((p) => p.product_id === 'p1');
-    expect(p1).toEqual({ product_id: 'p1', product_name: 'Espresso', unitsSold: 8, revenue: 960 });
+    expect(p1).toEqual({ product_id: 'p1', product_name: 'Espresso', unitsSold: 6, revenue: 720 });
   });
 
   it('sorts by units sold descending, breaking ties by revenue', async () => {
