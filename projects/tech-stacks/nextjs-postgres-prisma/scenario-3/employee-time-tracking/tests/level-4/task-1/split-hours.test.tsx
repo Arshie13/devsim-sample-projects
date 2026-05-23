@@ -1,31 +1,54 @@
+// @vitest-environment jsdom
+
 import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import React from 'react';
 
-// Candidate creates: src/lib/payroll.ts
-const load = () => import('../../../src/lib/payroll');
+// Candidate creates: src/components/HoursBreakdown.tsx
+//
+// Default-exports a React component:
+//   <HoursBreakdown totalHours={number} threshold?={number} />
+//
+// Rules (mirrors splitHours from the original task):
+//  - Splits totalHours into regular (up to threshold) and overtime (above).
+//  - Default threshold is 40.
+//  - Renders both values with these test ids:
+//      data-testid="regular-hours"
+//      data-testid="overtime-hours"
 
-describe('L4T1: splitHours', () => {
-  it('is exported as a function', async () => {
-    const { splitHours } = await load();
-    expect(typeof splitHours).toBe('function');
+const load = () => import('../../../src/components/HoursBreakdown');
+
+describe('L4T1: <HoursBreakdown />', () => {
+  it('is a React component (default export)', async () => {
+    const mod = await load();
+    expect(typeof mod.default).toBe('function');
   });
 
   it('treats all hours as regular below the 40-hour threshold', async () => {
-    const { splitHours } = await load();
-    expect(splitHours(35)).toEqual({ regular: 35, overtime: 0 });
+    const { default: HoursBreakdown } = await load();
+    render(<HoursBreakdown totalHours={35} />);
+    expect(screen.getByTestId('regular-hours')).toHaveTextContent('35');
+    expect(screen.getByTestId('overtime-hours')).toHaveTextContent('0');
   });
 
   it('splits hours above the threshold into overtime', async () => {
-    const { splitHours } = await load();
-    expect(splitHours(48)).toEqual({ regular: 40, overtime: 8 });
+    const { default: HoursBreakdown } = await load();
+    render(<HoursBreakdown totalHours={48} />);
+    expect(screen.getByTestId('regular-hours')).toHaveTextContent('40');
+    expect(screen.getByTestId('overtime-hours')).toHaveTextContent('8');
   });
 
   it('handles exactly the threshold', async () => {
-    const { splitHours } = await load();
-    expect(splitHours(40)).toEqual({ regular: 40, overtime: 0 });
+    const { default: HoursBreakdown } = await load();
+    render(<HoursBreakdown totalHours={40} />);
+    expect(screen.getByTestId('regular-hours')).toHaveTextContent('40');
+    expect(screen.getByTestId('overtime-hours')).toHaveTextContent('0');
   });
 
   it('accepts a custom threshold', async () => {
-    const { splitHours } = await load();
-    expect(splitHours(45, 35)).toEqual({ regular: 35, overtime: 10 });
+    const { default: HoursBreakdown } = await load();
+    render(<HoursBreakdown totalHours={45} threshold={35} />);
+    expect(screen.getByTestId('regular-hours')).toHaveTextContent('35');
+    expect(screen.getByTestId('overtime-hours')).toHaveTextContent('10');
   });
 });

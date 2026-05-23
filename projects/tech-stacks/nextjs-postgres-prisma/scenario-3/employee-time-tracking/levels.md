@@ -14,9 +14,9 @@ npm run test:task:l2:t1    # run a single task
 ```
 
 > **Grading rule:** every test fails on the starter code and passes once you
-> finish the task. Tests grade pure helper functions you create under
-> `src/lib/` — wiring them into the dashboard is part of the task but the
-> function itself is what's scored.
+> finish the task. Each level mixes the kinds of tests you'll see in a real
+> Next.js codebase — **server tests** (mocked Prisma server actions) and
+> **client tests** (React components rendered with Testing Library).
 
 ---
 
@@ -59,140 +59,168 @@ Use them across the dashboard's hour and payroll columns.
 
 ---
 
-## 🎮 Level 2: Time Calculations
+## 🎮 Level 2: Time Calculations (Server)
 **Difficulty: ⭐⭐ Medium** · **Estimated Time: 1–1.5 hrs**
 
-### Task 2.1 — Employee Status
-Create [`src/lib/time.ts`](src/lib/time.ts) exporting:
-```ts
-export function getEmployeeStatus(
-  entry: { clock_in: string; clock_out: string | null } | null,
-): 'clocked-in' | 'clocked-out' | 'off'
-```
-- `null` entry → `'off'`.
-- No `clock_out` → `'clocked-in'`.
-- Has a `clock_out` → `'clocked-out'`.
+Both tasks at this level are **server actions** backed by Prisma. The graders
+mock `@/lib/prisma`, so you write real Prisma queries — no DB calls actually
+execute in the test.
 
-### Task 2.2 — Sum Hours
+### Task 2.1 — Employee Status (Server Action)
+Create [`src/app/actions/time.ts`](src/app/actions/time.ts) exporting:
+```ts
+export async function getEmployeeStatusForId(
+  employeeId: number,
+): Promise<'off' | 'clocked-in' | 'clocked-out'>
+```
+- Look up the employee's most recent time entry via
+  `prisma.timeEntry.findFirst({ where: { employee_id: employeeId } })`.
+- No entry → `'off'`. No `clock_out` → `'clocked-in'`. Has a `clock_out` → `'clocked-out'`.
+
+### Task 2.2 — Sum Hours (Server Action)
 Add to the same file:
 ```ts
-export function sumHours(
-  entries: { clock_in: string; clock_out: string | null }[],
-): number
+export async function sumHoursForEmployee(employeeId: number): Promise<number>
 ```
-- Sum the duration (in hours) of every **completed** entry.
-- Ignore entries with no `clock_out`. Round the total to 2 decimals.
-
-Drive the attendance table's status badge and "hours this week" column.
+- Use `prisma.timeEntry.findMany({ where: { employee_id: employeeId } })`.
+- Sum the duration (in hours) of completed entries (those with a `clock_out`).
+- Ignore open entries. Round the total to 2 decimals. Empty → `0`.
 
 ### Success Criteria
-- [ ] `getEmployeeStatus` classifies all three states
-- [ ] `sumHours` totals completed shifts and skips open ones
+- [ ] Both server actions live under `src/app/actions/time.ts`
+- [ ] Each one queries Prisma (the test mocks the client, not your code)
+- [ ] Hour sums skip open entries and round to two decimals
 
 ---
 
-## 🎮 Level 3: Time-Off Logic
+## 🎮 Level 3: Time-Off Logic (Client)
 **Difficulty: ⭐⭐⭐ Hard** · **Estimated Time: 2–3 hrs**
 
-### Task 3.1 — Validate Time-Off Request
-Create [`src/lib/timeoff.ts`](src/lib/timeoff.ts) exporting:
-```ts
-export function validateTimeOffRequest(
-  req: { start_date: string; end_date: string; hours: number; request_type: string },
-): { ok: boolean; errors: string[] }
-```
-- `start_date` after `end_date` → an error.
-- `hours <= 0` → an error.
-- `request_type` not one of `vacation`, `sick`, `personal`, `unpaid` → an error.
-- `ok` is `true` only when `errors` is empty.
+Both tasks at this level are **React components**. The graders use
+`@testing-library/react` to render the component in jsdom and assert on
+its rendered output.
 
-### Task 3.2 — Time-Off Balance
-Add to the same file:
-```ts
-export function computeTimeOffBalance(
-  annualAllowance: number,
-  requests: { hours: number; status: string; request_type: string }[],
-): { used: number; pending: number; remaining: number }
+### Task 3.1 — Time-Off Request Form
+Create [`src/components/TimeOffRequestForm.tsx`](src/components/TimeOffRequestForm.tsx)
+with a default-exported component:
+```tsx
+export default function TimeOffRequestForm({ onSubmit }: {
+  onSubmit: (req: {
+    start_date: string; end_date: string; hours: number; request_type: string;
+  }) => void;
+}): JSX.Element
 ```
-- `used` = Σ hours of **approved**, non-`unpaid` requests.
-- `pending` = Σ hours of **pending** requests.
-- `remaining` = `annualAllowance − used`.
+- Render labelled inputs: "Start date", "End date", "Hours", and a "Type"
+  `<select>` with options `vacation` / `sick` / `personal` / `unpaid`.
+- On submit, when valid (`end_date >= start_date` AND `hours > 0`), call
+  `onSubmit` with the typed request.
+- When invalid, do NOT call `onSubmit` and render a
+  `data-testid="form-error"` element.
 
-Surface the balance on the time-off tab.
+### Task 3.2 — Time-Off Balance Panel
+Create [`src/components/TimeOffBalance.tsx`](src/components/TimeOffBalance.tsx)
+with a default-exported component:
+```tsx
+export default function TimeOffBalance(props: {
+  allowance: number;
+  requests: { hours: number; status: 'approved'|'pending'|'rejected';
+              request_type: 'vacation'|'sick'|'personal'|'unpaid' }[];
+}): JSX.Element
+```
+- Show three values: `used-hours`, `pending-hours`, `remaining-hours`
+  (use `data-testid`).
+- `used` = Σ hours of approved, non-unpaid requests.
+- `pending` = Σ hours of pending requests.
+- `remaining` = `allowance − used`.
 
 ### Success Criteria
-- [ ] `validateTimeOffRequest` catches bad dates, hours and types
-- [ ] `computeTimeOffBalance` counts only approved non-unpaid hours as used
+- [ ] Both components live under `src/components/`
+- [ ] `<TimeOffRequestForm />` rejects bad dates / non-positive hours
+- [ ] `<TimeOffBalance />` correctly groups approved / pending / remaining
 
 ---
 
-## 🎮 Level 4: Payroll Computation
+## 🎮 Level 4: Payroll Computation (Mixed)
 **Difficulty: ⭐⭐⭐⭐ Expert** · **Estimated Time: 2.5–3.5 hrs**
 
-### Task 4.1 — Split Regular & Overtime
-Create [`src/lib/payroll.ts`](src/lib/payroll.ts) exporting:
-```ts
-export function splitHours(
-  totalHours: number,
-  threshold?: number,
-): { regular: number; overtime: number }
-```
-- `threshold` defaults to `40`.
-- `regular` is hours up to the threshold; `overtime` is anything beyond it.
+This level mixes one **client component** (Task 4.1) with one **server action**
+(Task 4.2).
 
-### Task 4.2 — Gross Pay
-Add to the same file:
+### Task 4.1 — Hours Breakdown (Client)
+Create [`src/components/HoursBreakdown.tsx`](src/components/HoursBreakdown.tsx)
+with a default-exported component:
+```tsx
+export default function HoursBreakdown({ totalHours, threshold }: {
+  totalHours: number;
+  threshold?: number;
+}): JSX.Element
+```
+- Default threshold: `40`.
+- Render the regular (up to threshold) and overtime (above threshold) hours
+  with these test ids: `data-testid="regular-hours"`,
+  `data-testid="overtime-hours"`.
+
+### Task 4.2 — Gross Pay (Server Action)
+Create [`src/app/actions/payroll.ts`](src/app/actions/payroll.ts) exporting:
 ```ts
-export function computeGrossPay(
+export async function computeGrossPayForEmployee(
+  employeeId: number,
   regularHours: number,
   overtimeHours: number,
-  hourlyRate: number,
-): number
+): Promise<number>
 ```
-- Regular hours pay at `hourlyRate`; overtime pays at `1.5 ×` the rate.
-- Round the result to 2 decimals.
+- Read `hourly_rate` via `prisma.employee.findUnique({ where: { id: employeeId } })`.
+- Throw when the employee has no `hourly_rate`.
+- Gross = `regular × rate + overtime × rate × 1.5`, rounded to two decimals.
 
 ### Success Criteria
-- [ ] `splitHours` splits at the threshold (default and custom)
-- [ ] `computeGrossPay` applies the 1.5× overtime multiplier and rounds
+- [ ] `<HoursBreakdown />` splits at the default and custom thresholds
+- [ ] `computeGrossPayForEmployee` queries Prisma and applies the 1.5× multiplier
 
 ---
 
-## 🎮 Level 5: Payroll Reporting
+## 🎮 Level 5: Payroll Reporting (Mixed)
 **Difficulty: ⭐⭐⭐⭐⭐ Master** · **Estimated Time: 3–4 hrs**
 
-### Task 5.1 — Payroll Summary
-Add to [`src/lib/payroll.ts`](src/lib/payroll.ts):
-```ts
-export function summarizePayroll(
-  records: { regular_hours: number; overtime_hours: number;
-             total_hours: number; gross_pay: number }[],
-): { totalRegular: number; totalOvertime: number; totalHours: number;
-     totalGross: number; averageGross: number }
-```
-- Sum each column; `averageGross = totalGross / count` rounded to 2 decimals,
-  `0` when there are no records (no division by zero).
+This level mixes one **client component** (Task 5.1) with one **server action**
+(Task 5.2). Build a "Department Report" view on the payroll tab.
 
-### Task 5.2 — Department Report
-Add to the same file:
-```ts
-export function buildDepartmentReport(
-  records: { employee_id: number; total_hours: number; gross_pay: number }[],
-  employees: { id: number; first_name: string; last_name: string }[],
-): { department: string; headcount: number;
-     totalHours: number; totalGross: number }[]
+### Task 5.1 — Payroll Summary (Client)
+Create [`src/components/PayrollSummary.tsx`](src/components/PayrollSummary.tsx)
+with a default-exported component:
+```tsx
+export default function PayrollSummary({ records }: {
+  records: { regular_hours: number; overtime_hours: number;
+             total_hours: number; gross_pay: number }[];
+}): JSX.Element
 ```
+- `data-testid="total-regular"` — Σ `regular_hours`.
+- `data-testid="total-overtime"` — Σ `overtime_hours`.
+- `data-testid="total-hours"` — Σ `total_hours`.
+- `data-testid="total-gross"` — Σ `gross_pay`, dollar-formatted `$X,XXX.XX`.
+- `data-testid="average-gross"` — `totalGross / count`, rounded 2dp,
+  dollar-formatted (0 when there are no records — no division by zero).
+
+### Task 5.2 — Department Report (Server Action)
+Create [`src/app/actions/reports.ts`](src/app/actions/reports.ts) exporting:
+```ts
+export async function getDepartmentReport(): Promise<{
+  department: string;
+  headcount: number;
+  totalHours: number;
+  totalGross: number;
+}[]>
+```
+- Query `prisma.payrollRecord.findMany({ include: { employee: true } })`.
 - Department is derived from the employee's first name, using the dashboard's
   mapping: `Sarah`/`Robert` → Engineering, `Michael` → Design, `Emily` →
   Marketing, `James` → Sales, everyone else → HR.
-- Group by department: `headcount` is the number of distinct employees;
-  sum hours and gross pay. Sort departments alphabetically.
-
-Build a "Department Report" view on the payroll tab.
+- Group by department: `headcount` = distinct employees; sum hours and gross
+  pay. Sort departments alphabetically.
 
 ### Success Criteria
-- [ ] `summarizePayroll` totals correctly and is safe for zero records
-- [ ] `buildDepartmentReport` groups by department, counts headcount, sorts
+- [ ] `<PayrollSummary />` totals correctly and is safe for zero records
+- [ ] `getDepartmentReport` groups by department, counts headcount, sorts
 
 ---
 

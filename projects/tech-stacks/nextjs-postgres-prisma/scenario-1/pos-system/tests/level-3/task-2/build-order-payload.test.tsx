@@ -1,44 +1,70 @@
-import { describe, it, expect } from 'vitest';
+// @vitest-environment jsdom
 
-// Candidate adds buildOrderPayload to: src/lib/checkout.ts
-const load = () => import('../../../src/lib/checkout');
+import { describe, it, expect } from 'vitest';
+import { render, screen, within } from '@testing-library/react';
+import React from 'react';
+
+// Candidate creates: src/components/OrderSummary.tsx
+//
+// Default-exports a React component:
+//   <OrderSummary
+//     customerName={string}
+//     items={{ product_id: string; product_name: string; price: number; cartQuantity: number }[]}
+//     coupon?={{ coupon_id: string; code: string; discount_percent: number }}
+//   />
+//
+// Rules:
+//  - Renders the customer name (data-testid="customer-name").
+//  - Renders one row per item (data-testid="order-item") showing the name and
+//    a subtotal of price × cartQuantity formatted as "₱X.XX".
+//  - Renders the total (data-testid="order-total"). With a coupon, also
+//    renders the discount (data-testid="order-discount").
 
 const cart = [
-  { product_id: 'p1', price: 100, cartQuantity: 2 }, // 200
-  { product_id: 'p2', price: 50, cartQuantity: 1 },  // 50
+  { product_id: 'p1', product_name: 'Espresso', price: 100, cartQuantity: 2 }, // 200
+  { product_id: 'p2', product_name: 'Latte', price: 50, cartQuantity: 1 },     // 50
 ];
 
-describe('L3T2: buildOrderPayload', () => {
-  it('is exported as a function', async () => {
-    const { buildOrderPayload } = await load();
-    expect(typeof buildOrderPayload).toBe('function');
+const load = () => import('../../../src/components/OrderSummary');
+
+describe('L3T2: <OrderSummary />', () => {
+  it('is a React component (default export)', async () => {
+    const mod = await load();
+    expect(typeof mod.default).toBe('function');
   });
 
-  it('passes the customer name through', async () => {
-    const { buildOrderPayload } = await load();
-    expect(buildOrderPayload(cart, 'Ada Lovelace').customer_name).toBe('Ada Lovelace');
+  it('shows the customer name', async () => {
+    const { default: OrderSummary } = await load();
+    render(<OrderSummary customerName="Ada Lovelace" items={cart} />);
+    expect(screen.getByTestId('customer-name')).toHaveTextContent('Ada Lovelace');
   });
 
-  it('builds one item per cart line with computed subtotal', async () => {
-    const { buildOrderPayload } = await load();
-    const { items } = buildOrderPayload(cart, 'Walk-in');
-    expect(items).toHaveLength(2);
-    expect(items[0]).toEqual({ product_id: 'p1', quantity: 2, unit_price: 100, subtotal: 200 });
+  it('renders one row per cart item with a peso-formatted subtotal', async () => {
+    const { default: OrderSummary } = await load();
+    render(<OrderSummary customerName="Walk-in" items={cart} />);
+    const rows = screen.getAllByTestId('order-item');
+    expect(rows).toHaveLength(2);
+    expect(within(rows[0]).getByText(/Espresso/)).toBeInTheDocument();
+    expect(within(rows[0]).getByText(/₱200\.00/)).toBeInTheDocument();
   });
 
-  it('totals to the subtotal when there is no coupon', async () => {
-    const { buildOrderPayload } = await load();
-    const payload = buildOrderPayload(cart, 'Walk-in');
-    expect(payload.discount_amount).toBe(0);
-    expect(payload.total_amount).toBe(250);
-    expect(payload.coupon_id).toBeNull();
+  it('shows the total equal to the subtotal when no coupon is applied', async () => {
+    const { default: OrderSummary } = await load();
+    render(<OrderSummary customerName="Walk-in" items={cart} />);
+    expect(screen.getByTestId('order-total')).toHaveTextContent('₱250.00');
+    expect(screen.queryByTestId('order-discount')).not.toBeInTheDocument();
   });
 
-  it('applies a coupon discount and records the coupon id', async () => {
-    const { buildOrderPayload } = await load();
-    const payload = buildOrderPayload(cart, 'Walk-in', { coupon_id: 'c1', discount_percent: 20 });
-    expect(payload.discount_amount).toBe(50);
-    expect(payload.total_amount).toBe(200);
-    expect(payload.coupon_id).toBe('c1');
+  it('applies a coupon discount and updates the total', async () => {
+    const { default: OrderSummary } = await load();
+    render(
+      <OrderSummary
+        customerName="Walk-in"
+        items={cart}
+        coupon={{ coupon_id: 'c1', code: 'SAVE20', discount_percent: 20 }}
+      />,
+    );
+    expect(screen.getByTestId('order-discount')).toHaveTextContent('₱50.00');
+    expect(screen.getByTestId('order-total')).toHaveTextContent('₱200.00');
   });
 });

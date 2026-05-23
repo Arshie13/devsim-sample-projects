@@ -1,38 +1,77 @@
-import { describe, it, expect } from 'vitest';
+// @vitest-environment node
 
-// Candidate adds groupAttendanceByMonth to: src/lib/stats.ts
-const load = () => import('../../../src/lib/stats');
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-const attendances = [
-  { attended_at: '2026-01-12T07:00:00Z' },
-  { attended_at: '2026-03-04T18:00:00Z' },
-  { attended_at: '2026-01-28T07:00:00Z' },
-  { attended_at: '2026-03-19T17:30:00Z' },
-  { attended_at: '2026-03-30T08:00:00Z' },
-];
+// Candidate creates: src/app/actions/attendance.ts
+//
+// Must export an async server action:
+//   getAttendanceByMonth(userId: string):
+//     Promise<{ month: string; count: number }[]>
+//
+// Queries Prisma for the user's attendances (mocked) and groups by
+// "YYYY-MM" (UTC). Returns months sorted ascending. Returns [] when
+// the user has no attendance records.
 
-describe('L4T2: groupAttendanceByMonth', () => {
-  it('is exported as a function', async () => {
-    const { groupAttendanceByMonth } = await load();
-    expect(typeof groupAttendanceByMonth).toBe('function');
+const findMany = vi.fn();
+
+vi.mock('@/lib/prisma', () => ({
+  prisma: {
+    attendance: {
+      findMany,
+    },
+  },
+}));
+
+const load = () => import('../../../src/app/actions/attendance');
+
+describe('L4T2: getAttendanceByMonth (server action)', () => {
+  beforeEach(() => {
+    findMany.mockReset();
   });
 
-  it('groups attendance counts by YYYY-MM', async () => {
-    const { groupAttendanceByMonth } = await load();
-    expect(groupAttendanceByMonth(attendances)).toEqual([
+  it('is exported as an async function', async () => {
+    const mod = await load();
+    expect(typeof mod.getAttendanceByMonth).toBe('function');
+  });
+
+  it('queries Prisma by user_id', async () => {
+    findMany.mockResolvedValue([]);
+    const { getAttendanceByMonth } = await load();
+    await getAttendanceByMonth('u1');
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { user_id: 'u1' } }),
+    );
+  });
+
+  it('groups attendance counts by YYYY-MM (UTC)', async () => {
+    findMany.mockResolvedValue([
+      { attended_at: new Date('2026-01-12T07:00:00Z') },
+      { attended_at: new Date('2026-03-04T18:00:00Z') },
+      { attended_at: new Date('2026-01-28T07:00:00Z') },
+      { attended_at: new Date('2026-03-19T17:30:00Z') },
+      { attended_at: new Date('2026-03-30T08:00:00Z') },
+    ]);
+    const { getAttendanceByMonth } = await load();
+    expect(await getAttendanceByMonth('u1')).toEqual([
       { month: '2026-01', count: 2 },
       { month: '2026-03', count: 3 },
     ]);
   });
 
   it('sorts months ascending', async () => {
-    const { groupAttendanceByMonth } = await load();
-    const result = groupAttendanceByMonth(attendances);
-    expect(result.map((r) => r.month)).toEqual(['2026-01', '2026-03']);
+    findMany.mockResolvedValue([
+      { attended_at: new Date('2026-04-01T00:00:00Z') },
+      { attended_at: new Date('2026-02-01T00:00:00Z') },
+      { attended_at: new Date('2026-03-01T00:00:00Z') },
+    ]);
+    const { getAttendanceByMonth } = await load();
+    const result = await getAttendanceByMonth('u1');
+    expect(result.map((r) => r.month)).toEqual(['2026-02', '2026-03', '2026-04']);
   });
 
-  it('returns an empty array for no attendance', async () => {
-    const { groupAttendanceByMonth } = await load();
-    expect(groupAttendanceByMonth([])).toEqual([]);
+  it('returns an empty array when there is no attendance', async () => {
+    findMany.mockResolvedValue([]);
+    const { getAttendanceByMonth } = await load();
+    expect(await getAttendanceByMonth('u1')).toEqual([]);
   });
 });

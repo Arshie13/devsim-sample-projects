@@ -1,45 +1,87 @@
-import { describe, it, expect } from 'vitest';
+// @vitest-environment node
 
-// Candidate adds applyBestCoupon to: src/lib/coupon.ts
-const load = () => import('../../../src/lib/coupon');
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// Candidate creates: src/app/actions/coupons.ts
+//
+// Must export an async server action:
+//   applyBestCoupon(subtotal: number, now?: Date):
+//     Promise<{ coupon: { coupon_id: string; code: string; discount_percent: number };
+//               discount: number } | null>
+//
+// The action queries Prisma for ACTIVE coupons (filtered at the DB layer) and
+// picks the one yielding the largest discount on the given subtotal. Coupons
+// whose expires_at is in the past must be ignored. Returns null when none
+// qualify.
+
+const findMany = vi.fn();
+
+vi.mock('@/lib/prisma', () => ({
+  prisma: {
+    coupon: {
+      findMany,
+    },
+  },
+}));
+
+const load = () => import('../../../src/app/actions/coupons');
 
 const now = new Date('2026-06-01T00:00:00Z');
 
-const coupons = [
-  { coupon_id: 'a', discount_percent: 10, is_active: true, expires_at: null },
-  { coupon_id: 'b', discount_percent: 25, is_active: true, expires_at: null },
-  { coupon_id: 'c', discount_percent: 50, is_active: false, expires_at: null },
-  { coupon_id: 'd', discount_percent: 40, is_active: true, expires_at: '2026-05-01T00:00:00Z' },
-];
-
-describe('L4T2: applyBestCoupon', () => {
-  it('is exported as a function', async () => {
-    const { applyBestCoupon } = await load();
-    expect(typeof applyBestCoupon).toBe('function');
+describe('L4T2: applyBestCoupon (server action)', () => {
+  beforeEach(() => {
+    findMany.mockReset();
   });
 
-  it('picks the valid coupon giving the largest discount', async () => {
+  it('is exported as an async function', async () => {
+    const mod = await load();
+    expect(typeof mod.applyBestCoupon).toBe('function');
+  });
+
+  it('queries Prisma for active coupons', async () => {
+    findMany.mockResolvedValue([]);
     const { applyBestCoupon } = await load();
-    const result = applyBestCoupon(200, coupons, now);
+    await applyBestCoupon(200, now);
+    expect(findMany).toHaveBeenCalledWith(
+      expect.objectContaining({
+        where: expect.objectContaining({ is_active: true }),
+      }),
+    );
+  });
+
+  it('picks the coupon with the largest discount', async () => {
+    findMany.mockResolvedValue([
+      { coupon_id: 'a', code: 'A10', discount_percent: 10, is_active: true, expires_at: null },
+      { coupon_id: 'b', code: 'B25', discount_percent: 25, is_active: true, expires_at: null },
+    ]);
+    const { applyBestCoupon } = await load();
+    const result = await applyBestCoupon(200, now);
     expect(result?.coupon.coupon_id).toBe('b');
     expect(result?.discount).toBe(50);
   });
 
-  it('ignores inactive and expired coupons even if their percent is higher', async () => {
+  it('ignores expired coupons even if their percent is higher', async () => {
+    findMany.mockResolvedValue([
+      { coupon_id: 'a', code: 'A10', discount_percent: 10, is_active: true, expires_at: null },
+      { coupon_id: 'd', code: 'D40', discount_percent: 40, is_active: true, expires_at: new Date('2026-05-01T00:00:00Z') },
+    ]);
     const { applyBestCoupon } = await load();
-    const result = applyBestCoupon(200, coupons, now);
-    expect(result?.coupon.coupon_id).not.toBe('c');
-    expect(result?.coupon.coupon_id).not.toBe('d');
+    const result = await applyBestCoupon(200, now);
+    expect(result?.coupon.coupon_id).toBe('a');
+    expect(result?.discount).toBe(20);
   });
 
-  it('returns null when no coupon is valid', async () => {
+  it('returns null when Prisma returns no active coupons', async () => {
+    findMany.mockResolvedValue([]);
     const { applyBestCoupon } = await load();
-    const result = applyBestCoupon(200, [coupons[2], coupons[3]], now);
-    expect(result).toBeNull();
+    expect(await applyBestCoupon(200, now)).toBeNull();
   });
 
-  it('returns null for an empty coupon list', async () => {
+  it('returns null when every active coupon is expired', async () => {
+    findMany.mockResolvedValue([
+      { coupon_id: 'd', code: 'D40', discount_percent: 40, is_active: true, expires_at: new Date('2026-05-01T00:00:00Z') },
+    ]);
     const { applyBestCoupon } = await load();
-    expect(applyBestCoupon(200, [], now)).toBeNull();
+    expect(await applyBestCoupon(200, now)).toBeNull();
   });
 });

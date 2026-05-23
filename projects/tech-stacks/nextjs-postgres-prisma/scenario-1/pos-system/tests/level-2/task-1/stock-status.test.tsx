@@ -1,34 +1,75 @@
-import { describe, it, expect } from 'vitest';
+// @vitest-environment node
 
-// Candidate creates: src/lib/inventory.ts
-const load = () => import('../../../src/lib/inventory');
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-describe('L2T1: getStockStatus', () => {
-  it('is exported as a function', async () => {
-    const { getStockStatus } = await load();
-    expect(typeof getStockStatus).toBe('function');
+// Candidate creates: src/app/actions/inventory.ts
+//
+// Must export an async server action:
+//   getStockStatusForProduct(productId: string):
+//     Promise<{ productId: string; quantity: number; status: 'OUT_OF_STOCK' | 'LOW_STOCK' | 'IN_STOCK' }>
+//
+// The action must read from Prisma — we mock @/lib/prisma so the test does
+// not hit a real database. The candidate should classify by quantity:
+//   quantity <= 0 -> OUT_OF_STOCK
+//   1..5          -> LOW_STOCK
+//   > 5           -> IN_STOCK
+
+const findUnique = vi.fn();
+
+vi.mock('@/lib/prisma', () => ({
+  prisma: {
+    product: {
+      findUnique,
+    },
+  },
+}));
+
+const load = () => import('../../../src/app/actions/inventory');
+
+describe('L2T1: getStockStatusForProduct (server action)', () => {
+  beforeEach(() => {
+    findUnique.mockReset();
   });
 
-  it('returns OUT_OF_STOCK for zero or negative quantity', async () => {
-    const { getStockStatus } = await load();
-    expect(getStockStatus(0)).toBe('OUT_OF_STOCK');
-    expect(getStockStatus(-3)).toBe('OUT_OF_STOCK');
+  it('is exported as an async function', async () => {
+    const mod = await load();
+    expect(typeof mod.getStockStatusForProduct).toBe('function');
   });
 
-  it('returns LOW_STOCK for 1 through 5 (inclusive)', async () => {
-    const { getStockStatus } = await load();
-    expect(getStockStatus(1)).toBe('LOW_STOCK');
-    expect(getStockStatus(5)).toBe('LOW_STOCK');
+  it('queries Prisma by product_id', async () => {
+    findUnique.mockResolvedValue({ product_id: 'p1', quantity: 10 });
+    const { getStockStatusForProduct } = await load();
+    await getStockStatusForProduct('p1');
+    expect(findUnique).toHaveBeenCalledWith(
+      expect.objectContaining({ where: { product_id: 'p1' } }),
+    );
   });
 
-  it('returns IN_STOCK above 5', async () => {
-    const { getStockStatus } = await load();
-    expect(getStockStatus(6)).toBe('IN_STOCK');
-    expect(getStockStatus(500)).toBe('IN_STOCK');
+  it('classifies zero/negative quantity as OUT_OF_STOCK', async () => {
+    findUnique.mockResolvedValue({ product_id: 'p1', quantity: 0 });
+    const { getStockStatusForProduct } = await load();
+    const result = await getStockStatusForProduct('p1');
+    expect(result.status).toBe('OUT_OF_STOCK');
   });
 
-  it('is a pure function — same input, same output', async () => {
-    const { getStockStatus } = await load();
-    expect(getStockStatus(4)).toBe(getStockStatus(4));
+  it('classifies 1–5 quantity as LOW_STOCK', async () => {
+    findUnique.mockResolvedValue({ product_id: 'p1', quantity: 3 });
+    const { getStockStatusForProduct } = await load();
+    const result = await getStockStatusForProduct('p1');
+    expect(result.status).toBe('LOW_STOCK');
+    expect(result.quantity).toBe(3);
+  });
+
+  it('classifies quantity above 5 as IN_STOCK', async () => {
+    findUnique.mockResolvedValue({ product_id: 'p1', quantity: 42 });
+    const { getStockStatusForProduct } = await load();
+    const result = await getStockStatusForProduct('p1');
+    expect(result.status).toBe('IN_STOCK');
+  });
+
+  it('throws when the product does not exist', async () => {
+    findUnique.mockResolvedValue(null);
+    const { getStockStatusForProduct } = await load();
+    await expect(getStockStatusForProduct('ghost')).rejects.toThrow();
   });
 });

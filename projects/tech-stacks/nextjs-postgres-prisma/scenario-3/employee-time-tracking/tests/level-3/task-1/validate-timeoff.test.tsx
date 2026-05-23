@@ -1,48 +1,89 @@
-import { describe, it, expect } from 'vitest';
+// @vitest-environment jsdom
 
-// Candidate creates: src/lib/timeoff.ts
-const load = () => import('../../../src/lib/timeoff');
+import { describe, it, expect, vi } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import React from 'react';
 
-const valid = {
-  start_date: '2026-06-01',
-  end_date: '2026-06-05',
-  hours: 32,
-  request_type: 'vacation',
-};
+// Candidate creates: src/components/TimeOffRequestForm.tsx
+//
+// Default-exports a React component:
+//   <TimeOffRequestForm onSubmit={(req: {
+//     start_date: string; end_date: string; hours: number; request_type: string;
+//   }) => void} />
+//
+// Rules:
+//  - Renders inputs labelled "Start date", "End date", "Hours" and a
+//    select labelled "Type" (with options vacation/sick/personal/unpaid).
+//  - Submitting with valid values calls onSubmit with the typed request.
+//  - When end_date is before start_date OR hours <= 0, the form must
+//    NOT call onSubmit and must render a data-testid="form-error" element.
 
-describe('L3T1: validateTimeOffRequest', () => {
-  it('is exported as a function', async () => {
-    const { validateTimeOffRequest } = await load();
-    expect(typeof validateTimeOffRequest).toBe('function');
+const load = () => import('../../../src/components/TimeOffRequestForm');
+
+describe('L3T1: <TimeOffRequestForm />', () => {
+  it('is a React component (default export)', async () => {
+    const mod = await load();
+    expect(typeof mod.default).toBe('function');
   });
 
-  it('accepts a well-formed request', async () => {
-    const { validateTimeOffRequest } = await load();
-    expect(validateTimeOffRequest(valid)).toEqual({ ok: true, errors: [] });
+  it('renders start, end, hours, and type inputs', async () => {
+    const { default: TimeOffRequestForm } = await load();
+    render(<TimeOffRequestForm onSubmit={() => {}} />);
+    expect(screen.getByLabelText(/start date/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/end date/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/hours/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/type/i)).toBeInTheDocument();
   });
 
-  it('rejects an end date before the start date', async () => {
-    const { validateTimeOffRequest } = await load();
-    const result = validateTimeOffRequest({ ...valid, start_date: '2026-06-10' });
-    expect(result.ok).toBe(false);
-    expect(result.errors.length).toBeGreaterThan(0);
+  it('submits a well-formed request', async () => {
+    const { default: TimeOffRequestForm } = await load();
+    const onSubmit = vi.fn();
+    render(<TimeOffRequestForm onSubmit={onSubmit} />);
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText(/start date/i), '2026-06-01');
+    await user.type(screen.getByLabelText(/end date/i), '2026-06-05');
+    await user.clear(screen.getByLabelText(/hours/i));
+    await user.type(screen.getByLabelText(/hours/i), '32');
+    await user.selectOptions(screen.getByLabelText(/type/i), 'vacation');
+    await user.click(screen.getByRole('button', { name: /submit/i }));
+    expect(onSubmit).toHaveBeenCalledWith(
+      expect.objectContaining({
+        start_date: '2026-06-01',
+        end_date: '2026-06-05',
+        hours: 32,
+        request_type: 'vacation',
+      }),
+    );
   });
 
-  it('rejects non-positive hours', async () => {
-    const { validateTimeOffRequest } = await load();
-    expect(validateTimeOffRequest({ ...valid, hours: 0 }).ok).toBe(false);
-    expect(validateTimeOffRequest({ ...valid, hours: -8 }).ok).toBe(false);
+  it('blocks submit and shows an error when end is before start', async () => {
+    const { default: TimeOffRequestForm } = await load();
+    const onSubmit = vi.fn();
+    render(<TimeOffRequestForm onSubmit={onSubmit} />);
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText(/start date/i), '2026-06-10');
+    await user.type(screen.getByLabelText(/end date/i), '2026-06-05');
+    await user.clear(screen.getByLabelText(/hours/i));
+    await user.type(screen.getByLabelText(/hours/i), '16');
+    await user.selectOptions(screen.getByLabelText(/type/i), 'vacation');
+    await user.click(screen.getByRole('button', { name: /submit/i }));
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(screen.getByTestId('form-error')).toBeInTheDocument();
   });
 
-  it('rejects an unknown request type', async () => {
-    const { validateTimeOffRequest } = await load();
-    expect(validateTimeOffRequest({ ...valid, request_type: 'holiday' }).ok).toBe(false);
-  });
-
-  it('accepts every supported request type', async () => {
-    const { validateTimeOffRequest } = await load();
-    for (const type of ['vacation', 'sick', 'personal', 'unpaid']) {
-      expect(validateTimeOffRequest({ ...valid, request_type: type }).ok).toBe(true);
-    }
+  it('blocks submit when hours are non-positive', async () => {
+    const { default: TimeOffRequestForm } = await load();
+    const onSubmit = vi.fn();
+    render(<TimeOffRequestForm onSubmit={onSubmit} />);
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText(/start date/i), '2026-06-01');
+    await user.type(screen.getByLabelText(/end date/i), '2026-06-02');
+    await user.clear(screen.getByLabelText(/hours/i));
+    await user.type(screen.getByLabelText(/hours/i), '0');
+    await user.selectOptions(screen.getByLabelText(/type/i), 'sick');
+    await user.click(screen.getByRole('button', { name: /submit/i }));
+    expect(onSubmit).not.toHaveBeenCalled();
+    expect(screen.getByTestId('form-error')).toBeInTheDocument();
   });
 });

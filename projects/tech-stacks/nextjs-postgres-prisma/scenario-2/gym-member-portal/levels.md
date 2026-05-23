@@ -13,9 +13,9 @@ npm run test:task:l2:t1    # run a single task
 ```
 
 > **Grading rule:** every test fails on the starter code and passes once you
-> finish the task. Tests grade pure helper functions you create under
-> `src/lib/` — wiring them into the UI is part of the task but the function
-> itself is what's scored.
+> finish the task. Each level mixes the kinds of tests you'll see in a real
+> Next.js codebase — **server tests** (mocked Prisma server actions) and
+> **client tests** (React components rendered with Testing Library).
 
 ---
 
@@ -58,135 +58,170 @@ Use both in the portal header and membership card.
 
 ---
 
-## 🎮 Level 2: Membership Logic
+## 🎮 Level 2: Membership Logic (Server)
 **Difficulty: ⭐⭐ Medium** · **Estimated Time: 1–1.5 hrs**
 
-### Task 2.1 — Membership Status
-Create [`src/lib/membership.ts`](src/lib/membership.ts) exporting:
+Both tasks at this level are **server actions** backed by Prisma. The graders
+mock `@/lib/prisma`, so you write real Prisma queries — no DB calls actually
+execute in the test.
+
+### Task 2.1 — Membership Status (Server Action)
+Create [`src/app/actions/membership.ts`](src/app/actions/membership.ts) exporting:
 ```ts
-export function getMembershipStatus(
-  membership: { status: string; start_date: string | Date; end_date: string | Date },
-  now: Date,
-): 'active' | 'expired' | 'inactive'
+export async function getMembershipStatusForUser(
+  userId: string,
+  now?: Date,
+): Promise<'active' | 'expired' | 'inactive'>
 ```
+- Use `prisma.membership.findFirst({ where: { user_id: userId } })`.
 - `now` past `end_date` → `'expired'`.
 - Otherwise `status === 'active'` and `now >= start_date` → `'active'`.
-- Anything else → `'inactive'`.
+- Anything else (incl. no membership) → `'inactive'`.
 
-### Task 2.2 — Days Until Expiry
+### Task 2.2 — Days Until Expiry (Server Action)
 Add to the same file:
 ```ts
-export function daysUntilExpiry(endDate: string | Date, now: Date): number
+export async function getDaysUntilExpiry(
+  userId: string,
+  now?: Date,
+): Promise<number | null>
 ```
-- Whole days between `now` and `endDate`, floored.
-- `0` on the expiry day, negative once expired.
-
-Drive the membership card's status badge and "expires in N days" line.
+- Look up the user's membership end_date (mocked Prisma).
+- Whole days between `now` and `end_date`, floored.
+- `0` on the expiry day, negative once expired, `null` when no membership.
 
 ### Success Criteria
-- [ ] `getMembershipStatus` covers active / expired / inactive / not-yet-started
-- [ ] `daysUntilExpiry` floors partial days and goes negative when expired
+- [ ] Both server actions live under `src/app/actions/membership.ts`
+- [ ] Each one queries Prisma (the test mocks the client, not your code)
+- [ ] Status covers active / expired / inactive / not-yet-started
 
 ---
 
-## 🎮 Level 3: Class Capacity
+## 🎮 Level 3: Class Capacity (Client)
 **Difficulty: ⭐⭐⭐ Hard** · **Estimated Time: 2–3 hrs**
 
-### Task 3.1 — Seat Helpers
-Create [`src/lib/classes.ts`](src/lib/classes.ts) exporting:
-```ts
-export function getAvailableSpots(capacity: number, bookedCount: number): number
-export function isClassFull(capacity: number, bookedCount: number): boolean
-```
-- `getAvailableSpots` never returns a negative number.
-- `isClassFull` is `true` once `bookedCount` reaches or exceeds `capacity`.
+Both tasks at this level are **React components**. The graders use
+`@testing-library/react` to render the component in jsdom and assert on
+its rendered output.
 
-### Task 3.2 — Booking Guard
-Add to the same file:
-```ts
-export function canBookClass(
-  classId: number,
-  capacity: number,
-  bookedCount: number,
-  userBookedClassIds: number[],
-): { allowed: boolean; reason: string }
+### Task 3.1 — Class Spots Indicator
+Create [`src/components/ClassSpotsIndicator.tsx`](src/components/ClassSpotsIndicator.tsx)
+with a default-exported component:
+```tsx
+export default function ClassSpotsIndicator({ capacity, booked }: {
+  capacity: number;
+  booked: number;
+}): JSX.Element
 ```
-- If the user already booked the class → `{ allowed: false, reason: 'Already booked' }`.
-- Else if the class is full → `{ allowed: false, reason: 'Class is full' }`.
-- Else → `{ allowed: true, reason: '' }`.
-- The already-booked check takes precedence over the full check.
+- Show "N spots left" (`data-testid="spots-left"`), where N is the remaining
+  count — never below zero.
+- When `booked >= capacity`, render a `data-testid="full-badge"` element
+  containing the text "Class Full". The badge must NOT appear while seats
+  remain.
 
-Use these in the Class Booking component to gate the "Book" button.
+### Task 3.2 — Booking Button
+Create [`src/components/BookingButton.tsx`](src/components/BookingButton.tsx)
+with a default-exported component:
+```tsx
+export default function BookingButton(props: {
+  classId: number;
+  capacity: number;
+  booked: number;
+  userBookedClassIds: number[];
+  onBook: (classId: number) => void;
+}): JSX.Element
+```
+- Default label: "Book". Calls `onBook(classId)` on click when enabled.
+- If the user has already booked this class → label "Already booked", disabled.
+- Else if the class is full → label "Class full", disabled.
+- "Already booked" wins when both conditions are true.
 
 ### Success Criteria
-- [ ] `getAvailableSpots` and `isClassFull` behave at the boundary
-- [ ] `canBookClass` returns the correct reason, already-booked first
+- [ ] Both components live under `src/components/`
+- [ ] `ClassSpotsIndicator` clamps the count at zero and shows the full badge
+- [ ] `BookingButton` resolves the three states in the documented priority
 
 ---
 
-## 🎮 Level 4: Booking Aggregation
+## 🎮 Level 4: Booking Aggregation (Mixed)
 **Difficulty: ⭐⭐⭐⭐ Expert** · **Estimated Time: 2.5–3.5 hrs**
 
-### Task 4.1 — Bookings Per Class
-Create [`src/lib/stats.ts`](src/lib/stats.ts) exporting:
-```ts
-export function countBookingsByClass(
-  bookings: { class_id: number }[],
-): { class_id: number; count: number }[]
-```
-- One entry per class id, sorted by `class_id` ascending.
+This level mixes one **client component** (Task 4.1) with one **server action**
+(Task 4.2).
 
-### Task 4.2 — Attendance By Month
-Add to the same file:
-```ts
-export function groupAttendanceByMonth(
-  attendances: { attended_at: string | Date }[],
-): { month: string; count: number }[]
+### Task 4.1 — Bookings By Class List (Client)
+Create [`src/components/BookingsByClassList.tsx`](src/components/BookingsByClassList.tsx)
+with a default-exported component:
+```tsx
+export default function BookingsByClassList(props: {
+  bookings: { class_id: number }[];
+  classes: { id: number; name: string }[];
+}): JSX.Element
 ```
-- `month` is `YYYY-MM`; results sorted ascending by month.
+- Counts bookings per class_id and renders one row per class that has at
+  least one booking (`data-testid="booking-row"`). Each row shows the class
+  name and the booking count.
+- Rows are sorted by class id ascending.
+- When there are no bookings, render a `data-testid="empty-state"` element.
 
-Surface both on a new "Class Insights" panel.
+### Task 4.2 — Attendance By Month (Server Action)
+Create [`src/app/actions/attendance.ts`](src/app/actions/attendance.ts) exporting:
+```ts
+export async function getAttendanceByMonth(userId: string): Promise<
+  { month: string; count: number }[]
+>
+```
+- Query `prisma.attendance.findMany({ where: { user_id: userId } })`.
+- Group by `YYYY-MM` (UTC) and return entries sorted ascending by month.
+- Return `[]` when there is no attendance.
 
 ### Success Criteria
-- [ ] `countBookingsByClass` groups and sorts by class id
-- [ ] `groupAttendanceByMonth` buckets by `YYYY-MM` and sorts ascending
+- [ ] `<BookingsByClassList />` groups, sorts, and shows an empty state
+- [ ] `getAttendanceByMonth` queries Prisma and buckets results by `YYYY-MM`
 
 ---
 
-## 🎮 Level 5: Attendance Analytics
+## 🎮 Level 5: Attendance Analytics (Mixed)
 **Difficulty: ⭐⭐⭐⭐⭐ Master** · **Estimated Time: 3–4 hrs**
 
-### Task 5.1 — Member Stats
-Add to [`src/lib/stats.ts`](src/lib/stats.ts):
-```ts
-export function computeMemberStats(
-  bookings: { class_id: number }[],
-  attendances: { class_id: number }[],
-  classes: { id: number; name: string }[],
-): { totalBooked: number; totalAttended: number;
-     attendanceRate: number; favoriteClassName: string | null }
-```
-- `attendanceRate` = `round(totalAttended / totalBooked × 100)`, `0` when no bookings.
-- `favoriteClassName` = name of the most-attended class (ties → lowest class id),
-  `null` when there is no attendance.
+This level mixes one **client component** (Task 5.1) with one **server action**
+(Task 5.2). Build a "Member Insights" page that surfaces both.
 
-### Task 5.2 — Active Member Leaderboard
-Add to the same file:
-```ts
-export function rankActiveMembers(
-  members: { user_id: string; first_name: string; last_name: string }[],
-  attendances: { user_id: string }[],
-): { user_id: string; name: string; attendedCount: number }[]
+### Task 5.1 — Member Stats Card (Client)
+Create [`src/components/MemberStatsCard.tsx`](src/components/MemberStatsCard.tsx)
+with a default-exported component:
+```tsx
+export default function MemberStatsCard(props: {
+  bookings: { class_id: number }[];
+  attendances: { class_id: number }[];
+  classes: { id: number; name: string }[];
+}): JSX.Element
 ```
-- One row per member (including those with zero attendance).
-- `name` is `"first last"`.
-- Sorted by `attendedCount` descending, ties broken by `name` ascending.
+- `data-testid="total-booked"` — `bookings.length`.
+- `data-testid="total-attended"` — `attendances.length`.
+- `data-testid="attendance-rate"` — `round(totalAttended / totalBooked × 100)`
+  formatted as `"N%"` (0% when no bookings).
+- `data-testid="favorite-class"` — name of the most-attended class
+  (ties → lowest class id). Renders `"—"` when there is no attendance.
 
-Build a "Member Insights" page that renders both.
+### Task 5.2 — Active Members Ranking (Server Action)
+Create [`src/app/actions/leaderboard.ts`](src/app/actions/leaderboard.ts)
+exporting:
+```ts
+export async function getActiveMembersRanking(): Promise<{
+  user_id: string;
+  name: string;
+  attendedCount: number;
+}[]>
+```
+- Query `prisma.user.findMany({ include: { attendances: true } })`.
+- Project `{ user_id, name: \`${first_name} ${last_name}\`, attendedCount: attendances.length }`.
+- Include members with zero attendance.
+- Sort by `attendedCount` descending, breaking ties by `name` ascending.
 
 ### Success Criteria
-- [ ] `computeMemberStats` totals, rates, and favourite class are correct
-- [ ] `rankActiveMembers` includes everyone and sorts with the tie-break
+- [ ] `<MemberStatsCard />` totals, rates, and favourite class are correct
+- [ ] `getActiveMembersRanking` queries Prisma and sorts with the tie-break
 
 ---
 

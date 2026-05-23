@@ -1,39 +1,54 @@
+// @vitest-environment jsdom
+
 import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import React from 'react';
 
-// Candidate creates: src/lib/classes.ts
-const load = () => import('../../../src/lib/classes');
+// Candidate creates: src/components/ClassSpotsIndicator.tsx
+//
+// Default-exports a React component:
+//   <ClassSpotsIndicator capacity={number} booked={number} />
+//
+// Rules:
+//  - Shows "X spots left" (data-testid="spots-left"), where X = max(capacity - booked, 0).
+//  - When booked >= capacity, shows a badge "Class Full" (data-testid="full-badge").
+//  - The "full" badge is NOT rendered while seats remain.
 
-describe('L3T1: getAvailableSpots', () => {
-  it('is exported as a function', async () => {
-    const { getAvailableSpots } = await load();
-    expect(typeof getAvailableSpots).toBe('function');
+const load = () => import('../../../src/components/ClassSpotsIndicator');
+
+describe('L3T1: <ClassSpotsIndicator />', () => {
+  it('is a React component (default export)', async () => {
+    const mod = await load();
+    expect(typeof mod.default).toBe('function');
   });
 
-  it('returns the remaining seats', async () => {
-    const { getAvailableSpots } = await load();
-    expect(getAvailableSpots(15, 4)).toBe(11);
+  it('reports the remaining seat count', async () => {
+    const { default: ClassSpotsIndicator } = await load();
+    render(<ClassSpotsIndicator capacity={15} booked={4} />);
+    expect(screen.getByTestId('spots-left')).toHaveTextContent(/11/);
   });
 
-  it('never returns a negative number', async () => {
-    const { getAvailableSpots } = await load();
-    expect(getAvailableSpots(10, 14)).toBe(0);
-  });
-});
-
-describe('L3T1: isClassFull', () => {
-  it('is exported as a function', async () => {
-    const { isClassFull } = await load();
-    expect(typeof isClassFull).toBe('function');
+  it('never shows a negative seat count', async () => {
+    const { default: ClassSpotsIndicator } = await load();
+    render(<ClassSpotsIndicator capacity={10} booked={14} />);
+    expect(screen.getByTestId('spots-left')).toHaveTextContent(/0/);
   });
 
-  it('is false while seats remain', async () => {
-    const { isClassFull } = await load();
-    expect(isClassFull(15, 14)).toBe(false);
+  it('does not show the full badge while seats remain', async () => {
+    const { default: ClassSpotsIndicator } = await load();
+    render(<ClassSpotsIndicator capacity={15} booked={14} />);
+    expect(screen.queryByTestId('full-badge')).not.toBeInTheDocument();
   });
 
-  it('is true at and beyond capacity', async () => {
-    const { isClassFull } = await load();
-    expect(isClassFull(15, 15)).toBe(true);
-    expect(isClassFull(15, 16)).toBe(true);
+  it('shows the full badge once the class is at capacity', async () => {
+    const { default: ClassSpotsIndicator } = await load();
+    render(<ClassSpotsIndicator capacity={15} booked={15} />);
+    expect(screen.getByTestId('full-badge')).toHaveTextContent(/full/i);
+  });
+
+  it('shows the full badge once the class is over capacity', async () => {
+    const { default: ClassSpotsIndicator } = await load();
+    render(<ClassSpotsIndicator capacity={15} booked={16} />);
+    expect(screen.getByTestId('full-badge')).toBeInTheDocument();
   });
 });
