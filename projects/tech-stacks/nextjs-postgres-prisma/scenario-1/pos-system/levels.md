@@ -13,9 +13,9 @@ npm run test:task:l2:t1    # run a single task
 ```
 
 > **Grading rule:** every test fails on the starter code and passes once you
-> finish the task. Tests grade pure helper functions you create under
-> `src/lib/` — wiring them into the UI is part of the task but the function
-> itself is what's scored.
+> finish the task. Each level mixes the kinds of tests you'll see in a real
+> Next.js codebase — **server tests** (mocked Prisma server actions) and
+> **client tests** (React components rendered with Testing Library).
 
 ---
 
@@ -57,160 +57,171 @@ Then use `formatPeso` for the price displays in the POS and Inventory pages.
 
 ---
 
-## 🎮 Level 2: Inventory Quality
+## 🎮 Level 2: Inventory Quality (Server)
 **Difficulty: ⭐⭐ Medium** · **Estimated Time: 1–1.5 hrs**
 
-### Task 2.1 — Stock Status Helper
-Create [`src/lib/inventory.ts`](src/lib/inventory.ts) exporting:
+Both tasks at this level are **server actions** backed by Prisma. The graders
+mock `@/lib/prisma`, so you write real Prisma queries — no DB calls actually
+execute in the test.
+
+### Task 2.1 — Stock Status (Server Action)
+Create [`src/app/actions/inventory.ts`](src/app/actions/inventory.ts) exporting:
 ```ts
-export function getStockStatus(quantity: number): 'OUT_OF_STOCK' | 'LOW_STOCK' | 'IN_STOCK'
+export async function getStockStatusForProduct(productId: string): Promise<{
+  productId: string;
+  quantity: number;
+  status: 'OUT_OF_STOCK' | 'LOW_STOCK' | 'IN_STOCK';
+}>
 ```
-- `quantity <= 0` → `'OUT_OF_STOCK'`
-- `1`–`5` inclusive → `'LOW_STOCK'`
-- `> 5` → `'IN_STOCK'`
+- Use `prisma.product.findUnique({ where: { product_id: productId } })`.
+- Throw when the product does not exist.
+- Classify the quantity: `<= 0` → `OUT_OF_STOCK`, `1–5` → `LOW_STOCK`,
+  `> 5` → `IN_STOCK`.
 
-Show a coloured stock badge on the Inventory page driven by this helper.
-
-### Task 2.2 — Cart Totals Helper
-Create [`src/lib/cart.ts`](src/lib/cart.ts) exporting:
+### Task 2.2 — Cart Totals (Server Action)
+Create [`src/app/actions/cart.ts`](src/app/actions/cart.ts) exporting:
 ```ts
-export function calculateCartTotals(
-  items: { price: number; cartQuantity: number }[],
-  discountPercent?: number,
-): { subtotal: number; discount: number; total: number }
+export async function getCartTotals(input: {
+  items: { product_id: string; cartQuantity: number }[];
+  discountPercent?: number;
+}): Promise<{ subtotal: number; discount: number; total: number }>
 ```
-- `subtotal` = Σ `price × cartQuantity`
-- `discount` = `subtotal × discountPercent / 100` (0 when no percent given)
-- `total` = `subtotal − discount`
-- All three rounded to 2 decimals.
-
-Drive the POS cart summary with this helper.
+- Fetch prices via `prisma.product.findMany({ where: { product_id: { in: [...] } } })`.
+- `subtotal` = Σ `price × cartQuantity` using DB prices.
+- `discount` = `subtotal × discountPercent / 100` (0 when not given).
+- `total` = `subtotal − discount`. All three rounded to 2 decimals.
+- Empty `items` → return zeroes without querying Prisma.
 
 ### Success Criteria
-- [ ] `getStockStatus` classifies all three bands correctly
-- [ ] `calculateCartTotals` handles the empty cart and the coupon case
-- [ ] Both helpers are wired into the UI
+- [ ] Both server actions live under `src/app/actions/`
+- [ ] Each one queries Prisma (the test mocks the client, not your code)
+- [ ] Money values are rounded to two decimals
 
 ---
 
-## 🎮 Level 3: Checkout Integrity
+## 🎮 Level 3: Checkout Integrity (Client)
 **Difficulty: ⭐⭐⭐ Hard** · **Estimated Time: 2–3 hrs**
 
-### Task 3.1 — Checkout Validation
-Create [`src/lib/checkout.ts`](src/lib/checkout.ts) exporting:
-```ts
-export function validateCheckout(
-  cart: { product_id: string; cartQuantity: number }[],
-  products: { product_id: string; quantity: number }[],
-): { ok: boolean; errors: string[] }
-```
-- Empty cart → an error.
-- A line with `cartQuantity <= 0` → an error.
-- A line whose quantity exceeds available stock → an error mentioning the
-  `product_id`.
-- A line whose product is not in `products` → an error.
-- `ok` is `true` only when `errors` is empty.
+Both tasks at this level are **React components**. The graders use
+`@testing-library/react` to render the component in jsdom and assert on
+its rendered output.
 
-### Task 3.2 — Order Payload Builder
-Add to the same file:
-```ts
-export function buildOrderPayload(
-  cart: { product_id: string; price: number; cartQuantity: number }[],
-  customerName: string,
-  coupon?: { coupon_id: string; discount_percent: number },
-): { customer_name: string; total_amount: number; discount_amount: number;
-     coupon_id: string | null; items: {
-       product_id: string; quantity: number; unit_price: number; subtotal: number;
-     }[] }
+### Task 3.1 — Checkout Errors Banner
+Create [`src/components/CheckoutErrors.tsx`](src/components/CheckoutErrors.tsx)
+with a default-exported component:
+```tsx
+export default function CheckoutErrors({ errors }: { errors: string[] }): JSX.Element
 ```
-- One `items` entry per cart line, with `subtotal = price × cartQuantity`.
-- `discount_amount` from the coupon percent (0 with no coupon).
-- `total_amount = subtotal − discount_amount`; `coupon_id` is `null` with no coupon.
+- When `errors` is empty, render a status banner (`role="status"`) saying
+  the cart is "Ready to checkout".
+- Otherwise render an alert (`role="alert"`) with a `<ul>` containing one
+  `<li>` per error message.
 
-Use both helpers in the POS checkout flow so totals are computed consistently.
+### Task 3.2 — Order Summary
+Create [`src/components/OrderSummary.tsx`](src/components/OrderSummary.tsx)
+with a default-exported component:
+```tsx
+export default function OrderSummary(props: {
+  customerName: string;
+  items: { product_id: string; product_name: string; price: number; cartQuantity: number }[];
+  coupon?: { coupon_id: string; code: string; discount_percent: number };
+}): JSX.Element
+```
+- Show the customer name (`data-testid="customer-name"`).
+- Render one row per item (`data-testid="order-item"`) with the product name
+  and the line subtotal in `₱X.XX` format.
+- Show the total (`data-testid="order-total"`). When a coupon is supplied,
+  also show the discount (`data-testid="order-discount"`).
 
 ### Success Criteria
-- [ ] `validateCheckout` rejects empty carts, oversells, bad quantities, unknown products
-- [ ] `buildOrderPayload` produces a server-ready order body
-- [ ] POS checkout uses both helpers
+- [ ] Both components live under `src/components/`
+- [ ] Each renders the documented `role`s / `data-testid`s
+- [ ] Money values use the `₱X.XX` format from Level 1
 
 ---
 
-## 🎮 Level 4: Coupons Feature Expansion
+## 🎮 Level 4: Coupons Feature Expansion (Mixed)
 **Difficulty: ⭐⭐⭐⭐ Expert** · **Estimated Time: 2.5–3.5 hrs**
 
-### Task 4.1 — Coupon Normalization & Validity
-Create [`src/lib/coupon.ts`](src/lib/coupon.ts) exporting:
-```ts
-export function normalizeCode(raw: string): string
-export function isCouponValid(
-  coupon: { is_active: boolean; expires_at?: string | null },
-  now: Date,
-): boolean
-```
-- `normalizeCode` trims, uppercases, and removes internal whitespace
-  (`"  save 10 "` → `"SAVE10"`).
-- `isCouponValid` is `true` only when the coupon is active **and** either has no
-  `expires_at` or `expires_at` is in the future relative to `now`.
-
-Add an optional `expires_at DateTime?` field to the `Coupon` model in
+This level mixes one **client component** (Task 4.1) with one **server action**
+(Task 4.2). You'll also need to add `expires_at` to the `Coupon` model in
 `prisma/schema.prisma` and migrate.
 
-### Task 4.2 — Best Coupon Selector
-Add to the same file:
-```ts
-export function applyBestCoupon(
-  subtotal: number,
-  coupons: { coupon_id: string; discount_percent: number;
-             is_active: boolean; expires_at?: string | null }[],
-  now: Date,
-): { coupon: ...; discount: number } | null
+### Task 4.1 — Coupon Input (Client)
+Create [`src/components/CouponInput.tsx`](src/components/CouponInput.tsx)
+with a default-exported component:
+```tsx
+export default function CouponInput({ onApply }: {
+  onApply: (normalizedCode: string) => void;
+}): JSX.Element
 ```
-- Considers only coupons that pass `isCouponValid`.
-- Returns the valid coupon that yields the **largest** discount, plus that
-  discount amount. Returns `null` when none are valid.
+- Render a text input (`role="textbox"`, placeholder containing "coupon")
+  and an "Apply" button.
+- On Apply, call `onApply` with the normalized code: trimmed, uppercased,
+  with internal whitespace removed (`"  save 10 "` → `"SAVE10"`).
+- The button must be disabled when the input is empty / whitespace-only.
+- Clear the input after a successful apply.
+
+### Task 4.2 — Best Coupon Selector (Server Action)
+Create [`src/app/actions/coupons.ts`](src/app/actions/coupons.ts) exporting:
+```ts
+export async function applyBestCoupon(subtotal: number, now?: Date): Promise<{
+  coupon: { coupon_id: string; code: string; discount_percent: number };
+  discount: number;
+} | null>
+```
+- Query Prisma for active coupons (`prisma.coupon.findMany({ where: { is_active: true } })`).
+- Ignore coupons whose `expires_at` is in the past (relative to `now`,
+  defaulting to `new Date()`).
+- Return the coupon yielding the **largest** discount on `subtotal`, plus the
+  discount amount. Return `null` when none qualify.
 
 ### Success Criteria
 - [ ] `Coupon.expires_at` added and migrated
-- [ ] `normalizeCode` and `isCouponValid` behave as specified
-- [ ] `applyBestCoupon` ignores invalid coupons and maximises the discount
+- [ ] `<CouponInput />` normalizes input and disables Apply for empty values
+- [ ] `applyBestCoupon` queries active coupons and picks the largest valid discount
 
 ---
 
-## 🎮 Level 5: Sales Reporting
+## 🎮 Level 5: Sales Reporting (Mixed)
 **Difficulty: ⭐⭐⭐⭐⭐ Master** · **Estimated Time: 3–4 hrs**
 
-### Task 5.1 — Sales Summary
-Create [`src/lib/reports.ts`](src/lib/reports.ts) exporting:
-```ts
-export function summarizeSales(
-  orders: { total_amount: number; discount_amount: number }[],
-): { totalRevenue: number; totalDiscount: number;
-     orderCount: number; averageOrderValue: number }
-```
-- Sum revenue and discount; count orders.
-- `averageOrderValue = totalRevenue / orderCount`, rounded to 2 decimals,
-  `0` when there are no orders (no division by zero).
+This level mixes one **client component** (Task 5.1) with one **server action**
+(Task 5.2). Build a `/admin/reports` page that surfaces both.
 
-### Task 5.2 — Top Selling Products
-Add to the same file:
-```ts
-export function topSellingProducts(
-  items: { product_id: string; product_name: string;
-           quantity: number; subtotal: number }[],
-  limit: number,
-): { product_id: string; product_name: string;
-     unitsSold: number; revenue: number }[]
+### Task 5.1 — Sales Summary (Client)
+Create [`src/components/SalesSummary.tsx`](src/components/SalesSummary.tsx)
+with a default-exported component:
+```tsx
+export default function SalesSummary({ orders }: {
+  orders: { total_amount: number; discount_amount: number }[];
+}): JSX.Element
 ```
-- Aggregate by `product_id`: `unitsSold` = Σ quantity, `revenue` = Σ subtotal.
+- `data-testid="total-revenue"` — Σ `total_amount`, peso-formatted.
+- `data-testid="total-discount"` — Σ `discount_amount`, peso-formatted.
+- `data-testid="order-count"` — number of orders.
+- `data-testid="average-order"` — `totalRevenue / orderCount`, rounded 2dp
+  (0 when there are no orders, no division by zero), peso-formatted.
+
+### Task 5.2 — Top Selling Products (Server Action)
+Create [`src/app/actions/reports.ts`](src/app/actions/reports.ts) exporting:
+```ts
+export async function getTopSellingProducts(limit: number): Promise<{
+  product_id: string;
+  product_name: string;
+  unitsSold: number;
+  revenue: number;
+}[]>
+```
+- Query `prisma.orderItem.findMany({ include: { product: true } })`.
+- Aggregate by `product_id`: `unitsSold` = Σ quantity, `revenue` = Σ subtotal,
+  `product_name` from the related product.
 - Sort by `unitsSold` descending, breaking ties by `revenue` descending.
 - Return the first `limit` entries.
 
-Build a `/admin/reports` page that surfaces both aggregates.
-
 ### Success Criteria
-- [ ] `summarizeSales` totals correctly and is safe for zero orders
-- [ ] `topSellingProducts` aggregates, sorts, tie-breaks, and respects `limit`
+- [ ] `<SalesSummary />` totals correctly and is safe for zero orders
+- [ ] `getTopSellingProducts` aggregates, sorts, tie-breaks, and respects `limit`
 - [ ] A reports page renders both
 
 ---

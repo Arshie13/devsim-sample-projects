@@ -1,7 +1,22 @@
-import { describe, it, expect } from 'vitest';
+// @vitest-environment jsdom
 
-// Candidate creates: src/lib/reports.ts
-const load = () => import('../../../src/lib/reports');
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import React from 'react';
+
+// Candidate creates: src/components/SalesSummary.tsx
+//
+// Default-exports a React component:
+//   <SalesSummary orders={{ total_amount: number; discount_amount: number }[]} />
+//
+// Rules:
+//  - data-testid="total-revenue"    -> Σ total_amount,  peso-formatted
+//  - data-testid="total-discount"   -> Σ discount_amount, peso-formatted
+//  - data-testid="order-count"      -> number of orders
+//  - data-testid="average-order"    -> totalRevenue / orderCount rounded to 2dp
+//                                       (0 when there are no orders, no division by zero),
+//                                       peso-formatted
+//  - Money is rendered as "₱X,XXX.XX".
 
 const orders = [
   { total_amount: 100, discount_amount: 0 },
@@ -9,33 +24,34 @@ const orders = [
   { total_amount: 400, discount_amount: 25 },
 ];
 
-describe('L5T1: summarizeSales', () => {
-  it('is exported as a function', async () => {
-    const { summarizeSales } = await load();
-    expect(typeof summarizeSales).toBe('function');
+const load = () => import('../../../src/components/SalesSummary');
+
+describe('L5T1: <SalesSummary />', () => {
+  it('is a React component (default export)', async () => {
+    const mod = await load();
+    expect(typeof mod.default).toBe('function');
   });
 
-  it('totals revenue, discount and order count', async () => {
-    const { summarizeSales } = await load();
-    const s = summarizeSales(orders);
-    expect(s.totalRevenue).toBe(750);
-    expect(s.totalDiscount).toBe(75);
-    expect(s.orderCount).toBe(3);
+  it('shows total revenue, total discount and order count', async () => {
+    const { default: SalesSummary } = await load();
+    render(<SalesSummary orders={orders} />);
+    expect(screen.getByTestId('total-revenue')).toHaveTextContent('₱750.00');
+    expect(screen.getByTestId('total-discount')).toHaveTextContent('₱75.00');
+    expect(screen.getByTestId('order-count')).toHaveTextContent('3');
   });
 
-  it('computes the average order value rounded to two decimals', async () => {
-    const { summarizeSales } = await load();
-    expect(summarizeSales(orders).averageOrderValue).toBe(250);
-    expect(summarizeSales([{ total_amount: 100, discount_amount: 0 }, { total_amount: 0, discount_amount: 0 }]).averageOrderValue).toBe(50);
+  it('renders the average order value rounded to two decimals', async () => {
+    const { default: SalesSummary } = await load();
+    render(<SalesSummary orders={orders} />);
+    expect(screen.getByTestId('average-order')).toHaveTextContent('₱250.00');
   });
 
-  it('returns zeroes for no orders (no division by zero)', async () => {
-    const { summarizeSales } = await load();
-    expect(summarizeSales([])).toEqual({
-      totalRevenue: 0,
-      totalDiscount: 0,
-      orderCount: 0,
-      averageOrderValue: 0,
-    });
+  it('renders zeroes for no orders (no division by zero)', async () => {
+    const { default: SalesSummary } = await load();
+    render(<SalesSummary orders={[]} />);
+    expect(screen.getByTestId('total-revenue')).toHaveTextContent('₱0.00');
+    expect(screen.getByTestId('total-discount')).toHaveTextContent('₱0.00');
+    expect(screen.getByTestId('order-count')).toHaveTextContent('0');
+    expect(screen.getByTestId('average-order')).toHaveTextContent('₱0.00');
   });
 });

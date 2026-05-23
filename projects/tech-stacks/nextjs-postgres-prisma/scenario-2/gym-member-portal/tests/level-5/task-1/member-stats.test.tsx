@@ -1,7 +1,25 @@
-import { describe, it, expect } from 'vitest';
+// @vitest-environment jsdom
 
-// Candidate adds computeMemberStats to: src/lib/stats.ts
-const load = () => import('../../../src/lib/stats');
+import { describe, it, expect } from 'vitest';
+import { render, screen } from '@testing-library/react';
+import React from 'react';
+
+// Candidate creates: src/components/MemberStatsCard.tsx
+//
+// Default-exports a React component:
+//   <MemberStatsCard
+//     bookings={{ class_id: number }[]}
+//     attendances={{ class_id: number }[]}
+//     classes={{ id: number; name: string }[]}
+//   />
+//
+// Rules (mirror the original computeMemberStats):
+//  - data-testid="total-booked"      -> bookings.length
+//  - data-testid="total-attended"    -> attendances.length
+//  - data-testid="attendance-rate"   -> round(totalAttended / totalBooked * 100) as "N%"
+//                                       (0% when there are no bookings, no division by zero)
+//  - data-testid="favorite-class"    -> name of the most-attended class
+//                                       (renders "—" when there is no attendance)
 
 const classes = [
   { id: 1, name: 'Morning Yoga' },
@@ -9,47 +27,57 @@ const classes = [
   { id: 3, name: 'Spin Class' },
 ];
 
-describe('L5T1: computeMemberStats', () => {
-  it('is exported as a function', async () => {
-    const { computeMemberStats } = await load();
-    expect(typeof computeMemberStats).toBe('function');
+const load = () => import('../../../src/components/MemberStatsCard');
+
+describe('L5T1: <MemberStatsCard />', () => {
+  it('is a React component (default export)', async () => {
+    const mod = await load();
+    expect(typeof mod.default).toBe('function');
   });
 
-  it('counts bookings and attendances', async () => {
-    const { computeMemberStats } = await load();
-    const stats = computeMemberStats(
-      [{ class_id: 1 }, { class_id: 2 }, { class_id: 3 }, { class_id: 1 }],
-      [{ class_id: 1 }, { class_id: 1 }, { class_id: 3 }],
-      classes,
+  it('shows total bookings and attendances', async () => {
+    const { default: MemberStatsCard } = await load();
+    render(
+      <MemberStatsCard
+        bookings={[{ class_id: 1 }, { class_id: 2 }, { class_id: 3 }, { class_id: 1 }]}
+        attendances={[{ class_id: 1 }, { class_id: 1 }, { class_id: 3 }]}
+        classes={classes}
+      />,
     );
-    expect(stats.totalBooked).toBe(4);
-    expect(stats.totalAttended).toBe(3);
+    expect(screen.getByTestId('total-booked')).toHaveTextContent('4');
+    expect(screen.getByTestId('total-attended')).toHaveTextContent('3');
   });
 
-  it('computes the attendance rate as a rounded percentage', async () => {
-    const { computeMemberStats } = await load();
-    const stats = computeMemberStats(
-      [{ class_id: 1 }, { class_id: 2 }, { class_id: 3 }],
-      [{ class_id: 1 }, { class_id: 3 }],
-      classes,
+  it('renders the attendance rate as a rounded percentage', async () => {
+    const { default: MemberStatsCard } = await load();
+    render(
+      <MemberStatsCard
+        bookings={[{ class_id: 1 }, { class_id: 2 }, { class_id: 3 }]}
+        attendances={[{ class_id: 1 }, { class_id: 3 }]}
+        classes={classes}
+      />,
     );
-    expect(stats.attendanceRate).toBe(67);
+    expect(screen.getByTestId('attendance-rate')).toHaveTextContent('67%');
   });
 
-  it('names the most-attended class as the favourite', async () => {
-    const { computeMemberStats } = await load();
-    const stats = computeMemberStats(
-      [{ class_id: 1 }],
-      [{ class_id: 1 }, { class_id: 1 }, { class_id: 3 }],
-      classes,
+  it('shows the most-attended class name as the favourite', async () => {
+    const { default: MemberStatsCard } = await load();
+    render(
+      <MemberStatsCard
+        bookings={[{ class_id: 1 }]}
+        attendances={[{ class_id: 1 }, { class_id: 1 }, { class_id: 3 }]}
+        classes={classes}
+      />,
     );
-    expect(stats.favoriteClassName).toBe('Morning Yoga');
+    expect(screen.getByTestId('favorite-class')).toHaveTextContent('Morning Yoga');
   });
 
-  it('is safe when the member has no bookings or attendance', async () => {
-    const { computeMemberStats } = await load();
-    const stats = computeMemberStats([], [], classes);
-    expect(stats.attendanceRate).toBe(0);
-    expect(stats.favoriteClassName).toBeNull();
+  it('is safe with zero bookings/attendance', async () => {
+    const { default: MemberStatsCard } = await load();
+    render(<MemberStatsCard bookings={[]} attendances={[]} classes={classes} />);
+    expect(screen.getByTestId('total-booked')).toHaveTextContent('0');
+    expect(screen.getByTestId('total-attended')).toHaveTextContent('0');
+    expect(screen.getByTestId('attendance-rate')).toHaveTextContent('0%');
+    expect(screen.getByTestId('favorite-class')).toHaveTextContent('—');
   });
 });
