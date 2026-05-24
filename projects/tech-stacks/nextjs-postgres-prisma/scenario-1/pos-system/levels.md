@@ -8,8 +8,8 @@ Each task ships with a graded test under `tests/level-N/task-M/`. A task is
 complete when its test passes:
 
 ```bash
-npm run test:tasks:l2      # run every task in Level 2
-npm run test:task:l2:t1    # run a single task
+pnpm test:tasks:l2         # run every task in Level 2
+pnpm test:task:l2:t1       # run a single task
 ```
 
 > **Grading rule:** every test fails on the starter code and passes once you
@@ -27,12 +27,12 @@ You just cloned the repo. Get the POS running against your own PostgreSQL
 database, then make one small change to confirm you know where things live.
 
 ### Task 1.1 — Environment Setup
-1. Install dependencies: `npm install`
+1. Install dependencies: `pnpm install`
 2. Copy `.env.example` to `.env` and set `DATABASE_URL` to **your own**
    PostgreSQL connection string (your local Postgres user/password/database).
-3. Create the schema and generate the client: `npm run prisma:migrate`
-4. Load the sample data: `npm run prisma:seed`
-5. Start the app: `npm run dev`
+3. Create the schema and generate the client: `pnpm prisma:migrate`
+4. Load the sample data: `pnpm prisma:seed`
+5. Start the app: `pnpm dev`
 
 **Graded by** `tests/level-1/task-1/setup-check.test.tsx`, which installs-checks,
 runs `prisma migrate deploy`, runs a `SELECT 1` + seed-row smoke query via
@@ -51,7 +51,7 @@ export function formatPeso(amount: number): string
 Then use `formatPeso` for the price displays in the POS and Inventory pages.
 
 ### Success Criteria
-- [ ] `npm run dev` works against your own database
+- [ ] `pnpm dev` works against your own database
 - [ ] Schema migrated and seed data inserted
 - [ ] `formatPeso` exported and used in the UI
 

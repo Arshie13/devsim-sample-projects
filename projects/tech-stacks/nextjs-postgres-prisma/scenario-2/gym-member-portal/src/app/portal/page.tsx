@@ -15,7 +15,7 @@ export default async function Portal() {
         <div className="bg-white rounded-xl shadow-md p-8 text-center max-w-md">
           <h1 className="text-xl font-bold text-gray-800 mb-2">No member found</h1>
           <p className="text-gray-500">
-            Run <code className="bg-gray-100 px-1 rounded">npm run prisma:seed</code> to
+            Run <code className="bg-gray-100 px-1 rounded">pnpm prisma:seed</code> to
             populate the database with a demo member.
           </p>
         </div>

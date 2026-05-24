@@ -41,21 +41,21 @@ const runCommand = (command: string, args: string[], cwd: string, timeoutMs = 12
 };
 
 describe('Level 1 Task 1: Environment Setup', () => {
-  it('has project dependencies installed (run "npm install")', () => {
+  it('has project dependencies installed (run "pnpm install")', () => {
     expect(
       fs.existsSync(join(projectRoot, 'node_modules')),
-      'node_modules missing — run "npm install".',
+      'node_modules missing — run "pnpm install".',
     ).toBe(true);
     expect(
       fs.existsSync(join(projectRoot, 'node_modules', 'next')),
-      'Dependency "next" missing — run "npm install".',
+      'Dependency "next" missing — run "pnpm install".',
     ).toBe(true);
   });
 
   it('has the Prisma client dependency installed', () => {
     expect(
       fs.existsSync(join(projectRoot, 'node_modules', '@prisma', 'client')),
-      'Dependency "@prisma/client" missing — run "npm install".',
+      'Dependency "@prisma/client" missing — run "pnpm install".',
     ).toBe(true);
   });
 
@@ -86,6 +86,6 @@ describe('Level 1 Task 1: Environment Setup', () => {
     expect(result.stdout, 'Expected DB_OK signal from db-check').toContain('DB_OK');
 
     const rows = Number(/ROWS=(\d+)/.exec(result.stdout)?.[1] ?? '0');
-    expect(rows, 'Database has no seeded rows — run "npm run prisma:seed".').toBeGreaterThan(0);
+    expect(rows, 'Database has no seeded rows — run "pnpm prisma:seed".').toBeGreaterThan(0);
   }, 60_000);
 });
