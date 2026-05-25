@@ -9,8 +9,8 @@ Each task ships with a graded test under `tests/level-N/task-M/`. A task is
 complete when its test passes:
 
 ```bash
-npm run test:tasks:l2      # run every task in Level 2
-npm run test:task:l2:t1    # run a single task
+pnpm test:tasks:l2         # run every task in Level 2
+pnpm test:task:l2:t1       # run a single task
 ```
 
 > **Grading rule:** every test fails on the starter code and passes once you
@@ -28,12 +28,12 @@ You just cloned the repo. Get the dashboard running against your own
 PostgreSQL database, then add a couple of formatting helpers.
 
 ### Task 1.1 — Environment Setup
-1. Install dependencies: `npm install`
+1. Install dependencies: `pnpm install`
 2. Copy `.env.example` to `.env` and set `DATABASE_URL` to **your own**
    PostgreSQL connection string.
-3. Create the schema and generate the client: `npm run prisma:migrate`
-4. Load the sample data: `npm run prisma:seed`
-5. Start the app: `npm run dev`
+3. Create the schema and generate the client: `pnpm prisma:migrate`
+4. Load the sample data: `pnpm prisma:seed`
+5. Start the app: `pnpm dev`
 
 **Graded by** `tests/level-1/task-1/setup-check.test.tsx`, which runs
 `prisma migrate deploy`, a `SELECT 1` + seed-row smoke query via
@@ -53,7 +53,7 @@ export function formatCurrency(amount: number): string
 Use them across the dashboard's hour and payroll columns.
 
 ### Success Criteria
-- [ ] `npm run dev` works against your own database
+- [ ] `pnpm dev` works against your own database
 - [ ] Schema migrated and seed data inserted
 - [ ] Both helpers exported and used in the UI
 
