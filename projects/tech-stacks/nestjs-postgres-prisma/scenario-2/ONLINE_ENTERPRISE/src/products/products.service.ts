@@ -16,7 +16,6 @@ export class ProductsService {
         image: dto.image,
         sku: dto.sku,
         weight: dto.weight,
-        roastLevel: dto.roastLevel,
         stock: dto.stock,
         category: {
           connect: { id: dto.categoryId },

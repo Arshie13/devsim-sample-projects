@@ -51,20 +51,9 @@ export class ProductsService {
     return product;
   }
 
-  async findAll(search?: string) {
-    // NOTE: Pagination is NOT implemented yet
-    // TODO: Add pagination support with ?page= and ?limit= query parameters
-    const where: any = { isActive: true };
-
-    if (search) {
-      where.name = {
-        contains: search,
-        mode: 'insensitive',
-      };
-    }
-
+  async findAll() {
     return this.prisma.product.findMany({
-      where,
+      where: { isActive: true },
       include: {
         category: true,
         inventory: true,

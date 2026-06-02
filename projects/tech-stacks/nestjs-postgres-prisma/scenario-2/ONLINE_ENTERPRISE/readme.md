@@ -57,6 +57,13 @@ The server will run on `http://localhost:3000/api` (or the port specified in .en
 - `npm run start:dev` - Start development server with hot reload
 - `npm run build` - Compile TypeScript to JavaScript
 - `npm run start:prod` - Start production server
+- `npm run test` - Run all tests
+- `npm run test:watch` - Run tests in watch mode
+- `npm run test:tasks:l1` - Run Level 1 tests only
+- `npm run test:tasks:l2` - Run Level 2 tests only
+- `npm run test:tasks:l3` - Run Level 3 tests only
+- `npm run test:tasks:l4` - Run Level 4 tests only
+- `npm run test:tasks:l5` - Run Level 5 tests only
 - `npm run prisma:generate` - Generate Prisma client
 - `npm run prisma:migrate` - Run Prisma migrations
 - `npm run prisma:seed` - Seed database with sample data
@@ -198,3 +205,24 @@ The system uses the following main entities:
 
 See [prisma/schema.prisma](prisma/schema.prisma) for the complete schema definition.
 See [architecture.md](architecture.md) for the full technical architecture plan.
+
+---
+
+## 🧩 Task — Test Mapping
+
+Use this table to find the test file that validates each challenge task.
+
+| Level | Task | Title | Test File |
+| ----- | ---- | ----- | --------- |
+| 1 | 1 | Environment Setup | `tests/server/level-1/task-1/environment-bootstrap.test.ts` |
+| 1 | 2 | Add `roastLevel` Field to Product | `tests/server/level-1/task-2/product-roast-level-field.test.ts` |
+| 2 | 1 | Paginated & Category-Filterable Products | `tests/server/level-2/task-1/products-pagination-and-filters.test.ts` |
+| 2 | 2 | Fix Soft-Deleted Categories Visibility | `tests/server/level-2/task-2/categories-soft-delete.test.ts` |
+| 3 | 1 | Transactional Checkout: Stock, Tax & Payment | `tests/server/level-3/task-1/checkout-stock-tax-payment.test.ts` |
+| 3 | 2 | Order Lifecycle State Machine | `tests/server/level-3/task-2/order-lifecycle.test.ts` |
+| 4 | 1 | Daily & Weekly Sales Reports | `tests/server/level-4/task-1/sales-reports-daily-weekly.test.ts` |
+| 4 | 2 | Low-Stock Alert Endpoint | `tests/server/level-4/task-2/low-stock-alerts.test.ts` |
+| 5 | 1 | Fix Oversell, Decimal Drift & Timezone | `tests/server/level-5/task-1/concurrency-decimals-timezone.test.ts` |
+| 5 | 2 | Write Postmortem Document | `tests/server/level-5/task-2/postmortem-document.test.ts` |
+
+> **Test DB setup:** Copy `.env.example` to `.env`, set `DATABASE_URL_TEST` to a separate Postgres database, then run `npm run test`.

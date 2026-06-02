@@ -19,11 +19,9 @@ export class CategoriesService {
   }
 
   async findAll(userId: string) {
-    // Return system defaults + user's custom categories (only active ones)
     return this.prisma.category.findMany({
       where: {
         OR: [{ isDefault: true }, { userId }],
-        isActive: true,
       },
       orderBy: [{ isDefault: 'desc' }, { name: 'asc' }],
     });
@@ -38,7 +36,6 @@ export class CategoriesService {
       throw new NotFoundException('Category not found');
     }
 
-    // Allow access to system defaults or user's own categories
     if (!category.isDefault && category.userId !== userId) {
       throw new ForbiddenException('Access denied');
     }
@@ -49,7 +46,6 @@ export class CategoriesService {
   async update(id: string, userId: string, dto: Partial<CreateCategoryDto>) {
     const category = await this.findOne(id, userId);
 
-    // Prevent editing system defaults
     if (category.isDefault) {
       throw new ForbiddenException('Cannot edit default categories');
     }
@@ -63,7 +59,6 @@ export class CategoriesService {
   async remove(id: string, userId: string) {
     const category = await this.findOne(id, userId);
 
-    // Prevent deleting system defaults
     if (category.isDefault) {
       throw new ForbiddenException('Cannot delete default categories');
     }

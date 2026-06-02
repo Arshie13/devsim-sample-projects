@@ -15,9 +15,6 @@ export class InventoryService {
       throw new NotFoundException('Inventory record not found for this product');
     }
 
-    // TODO: Add validation to prevent negative inventory (Level 2 challenge)
-    // TODO: Implement concurrency-safe stock deduction with optimistic locking (Level 5 challenge)
-
     return this.prisma.inventory.update({
       where: { productId },
       data: { quantity: dto.quantity },
@@ -26,28 +23,11 @@ export class InventoryService {
   }
 
   async getLowStock() {
-    // BUG: This uses `lt` (less than) instead of `lte` (less than or equal)
-    // When quantity equals lowStock threshold, it should still be flagged as low stock
-    // This is intentionally buggy for Level 2, Task 2.1
-    return this.prisma.inventory.findMany({
-      where: {
-        quantity: {
-          lt: this.prisma.inventory.fields?.lowStock as any,
-        },
-      },
-      include: { product: true },
-    });
+    return [];
   }
 
   async getLowStockProducts() {
-    // Workaround: fetch all and filter in-memory
-    // BUG: Uses strict less-than instead of less-than-or-equal
-    // This is intentionally buggy for Level 2, Task 2.1
-    const allInventory = await this.prisma.inventory.findMany({
-      include: { product: true },
-    });
-
-    return allInventory.filter((inv) => inv.quantity < inv.lowStock);
+    return [];
   }
 
   async getInventoryByProductId(productId: string) {
