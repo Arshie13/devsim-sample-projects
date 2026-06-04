@@ -55,12 +55,12 @@ describe('Level 1 Task 1.1: Environment Setup (Client)', () => {
   it('should have client dependencies already installed', () => {
     expect(
       fs.existsSync(join(clientRoot, 'node_modules')),
-      'Client node_modules missing. Run "npm install" in client first.'
+      'Client node_modules missing. Run "pnpm install" in client first.'
     ).toBe(true);
 
     expect(
       fs.existsSync(join(clientRoot, 'node_modules', 'react')),
-      'Client dependency "react" missing. Run "npm install" in client first.'
+      'Client dependency "react" missing. Run "pnpm install" in client first.'
     ).toBe(true);
   });
 

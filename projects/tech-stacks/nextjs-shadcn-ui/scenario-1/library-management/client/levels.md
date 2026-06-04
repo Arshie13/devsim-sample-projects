@@ -16,7 +16,7 @@ The library has onboarded a new developer (you!) and needs the system running lo
 #### Task 1.1: Environment Setup
 1. Install dependencies:
    ```bash
-   npm install
+   pnpm install
    ```
 2. Configure environment variables by creating a `.env.local` file:
    ```
@@ -25,7 +25,7 @@ The library has onboarded a new developer (you!) and needs the system running lo
    ```
 3. Start the development server:
    ```bash
-   npm run dev
+   pnpm run dev
    ```
 4. Open http://localhost:3000 and verify the app loads
 5. Update [`src/app/layout.tsx`](src/app/layout.tsx:1) to use `NEXT_PUBLIC_APP_NAME` for the page title
@@ -49,7 +49,7 @@ The library has onboarded a new developer (you!) and needs the system running lo
    (sourcing it from `NEXT_PUBLIC_APP_NAME` satisfies this).
 
 ### Success Criteria
-- [ ] App runs without errors on `npm run dev`
+- [ ] App runs without errors on `pnpm run dev`
 - [ ] `.env.local` file is properly configured
 - [ ] "Register" replaces "Sign Up" on the auth pages
 - [ ] Every page header reads "SM Tech Library" — no "BookWise Library" left

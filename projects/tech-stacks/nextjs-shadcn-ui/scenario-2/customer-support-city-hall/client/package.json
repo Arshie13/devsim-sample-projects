@@ -22,7 +22,7 @@
     "test:task:l4:t2": "vitest run ../tests/client/level-4/task-2/keyboard-shortcuts.test.tsx",
     "test:task:l5:t1": "vitest run ../tests/client/level-5/task-1/dashboard-bug-hunt.test.tsx",
     "test:task:l5:t2": "vitest run ../tests/client/level-5/task-2/transcript-docs.test.tsx",
-    "test:tasks": "npm run test:task:l1:t1 && npm run test:task:l1:t2 && npm run test:task:l2:t1 && npm run test:task:l2:t2 && npm run test:task:l3:t1 && npm run test:task:l3:t2 && npm run test:task:l4:t1 && npm run test:task:l4:t2 && npm run test:task:l5:t1 && npm run test:task:l5:t2"
+    "test:tasks": "pnpm run test:task:l1:t1 && pnpm run test:task:l1:t2 && pnpm run test:task:l2:t1 && pnpm run test:task:l2:t2 && pnpm run test:task:l3:t1 && pnpm run test:task:l3:t2 && pnpm run test:task:l4:t1 && pnpm run test:task:l4:t2 && pnpm run test:task:l5:t1 && pnpm run test:task:l5:t2"
   },
   "dependencies": {
     "next": "16.1.6",

@@ -49,19 +49,19 @@ Each task has its own subfolder containing the test file(s) for that task.
 
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Run tests in watch mode
-npm test
+pnpm test
 
 # Run tests once (CI mode)
-npm run test:run
+pnpm run test:run
 
 # Run with UI
-npm run test:ui
+pnpm run test:ui
 
 # Generate coverage report
-npm run test:coverage
+pnpm run test:coverage
 ```
 
 ## 📊 Test Coverage
@@ -114,22 +114,22 @@ npm run test:coverage
 
 ```bash
 # Run all tests
-npm test
+pnpm test
 
 # Run specific level
-npm test -- level-1
+pnpm test -- level-1
 
 # Run specific task folder
-npm test -- level-1/task-1
+pnpm test -- level-1/task-1
 
 # Run specific file
-npm test -- level-1/task-1/environment-setup.test.tsx
+pnpm test -- level-1/task-1/environment-setup.test.tsx
 
 # Run tests matching pattern
-npm test -- -t "badge"
+pnpm test -- -t "badge"
 
 # Run with coverage for specific level
-npm run test:coverage -- level-4
+pnpm run test:coverage -- level-4
 ```
 
 ## 📖 Documentation
