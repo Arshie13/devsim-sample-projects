@@ -24,7 +24,7 @@ Two audiences reach this product on day one: citizens looking for help and agent
 #### Task 1.1: Environment & Contact Configuration
 1. Install dependencies:
    ```bash
-   npm install
+   pnpm install
    ```
 2. Configure environment variables by creating a `.env.local` file at [`client/.env.local`](client/.env.local:1):
    ```
@@ -34,7 +34,7 @@ Two audiences reach this product on day one: citizens looking for help and agent
    ```
 3. Start the development server:
    ```bash
-   npm run dev
+   pnpm run dev
    ```
 4. Open http://localhost:3000 and verify the app loads.
 5. Replace the hard-coded phone number and email in the home page footer ([`src/app/page.tsx`](src/app/page.tsx:91)) and the support page ([`src/app/support/page.tsx`](src/app/support/page.tsx:1)) with values from `NEXT_PUBLIC_SUPPORT_PHONE` and `NEXT_PUBLIC_SUPPORT_EMAIL`.
@@ -48,7 +48,7 @@ Two audiences reach this product on day one: citizens looking for help and agent
    - File: [`src/app/page.tsx`](src/app/page.tsx:35)
 
 ### Success Criteria
-- [ ] App runs without errors on `npm run dev`
+- [ ] App runs without errors on `pnpm run dev`
 - [ ] `.env.local` file is properly configured
 - [ ] Updated text appears correctly
 - [ ] Footer phone/email reflect environment variables

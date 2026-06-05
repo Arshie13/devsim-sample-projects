@@ -3,7 +3,7 @@
 ## Prerequisites
 
 - Node.js 18+ installed
-- npm or yarn package manager
+- pnpm or yarn package manager
 - Git (optional)
 
 ## Setup
@@ -15,7 +15,7 @@
 
 2. **Install dependencies**
    ```bash
-   npm install
+   pnpm install
    ```
 
 3. **Verify test configuration**
@@ -27,41 +27,41 @@
 
 ### Watch Mode (Development)
 ```bash
-npm test
+pnpm test
 ```
 Tests will run and watch for file changes.
 
 ### Single Run (CI)
 ```bash
-npm run test:run
+pnpm run test:run
 ```
 Runs tests once and exits.
 
 ### With UI
 ```bash
-npm run test:ui
+pnpm run test:ui
 ```
 Opens Vitest UI for interactive testing.
 
 ### Coverage Report
 ```bash
-npm run test:coverage
+pnpm run test:coverage
 ```
 Generates coverage report in `coverage/` directory.
 
 ### Specific Test File
 ```bash
 # Run all level-1 tests
-npm test -- level-1
+pnpm test -- level-1
 
 # Run specific task folder
-npm test -- level-1/task-1
+pnpm test -- level-1/task-1
 
 # Run specific file
-npm test -- level-1/task-1/environment-setup.test.tsx
+pnpm test -- level-1/task-1/environment-setup.test.tsx
 
 # Run with grep pattern
-npm test -- -t "environment"
+pnpm test -- -t "environment"
 ```
 
 ## Test Structure
@@ -120,14 +120,14 @@ Each level contains **exactly 2 tasks**, each in its own subfolder, matching the
 
 5. **Run tests** to verify:
    ```bash
-   npm test -- level-1/task-3/new-feature.test.tsx
+   pnpm test -- level-1/task-3/new-feature.test.tsx
    ```
 
 ## Common Issues
 
 ### "Cannot find module '@testing-library/react'"
 ```bash
-npm install -D @testing-library/react @testing-library/jest-dom
+pnpm add -D @testing-library/react @testing-library/jest-dom
 ```
 
 ### "No test files found"
@@ -156,11 +156,11 @@ npm install -D @testing-library/react @testing-library/jest-dom
 1. **Check console output** for test failures
 2. **Use `--reporter verbose`** for detailed output:
    ```bash
-   npm test -- --reporter verbose
+   pnpm test -- --reporter verbose
    ```
 3. **Run single test** with `--testNamePattern`:
    ```bash
-   npm test -- -t "should render badge"
+   pnpm test -- -t "should render badge"
    ```
 4. **Use debugger**:
    ```typescript

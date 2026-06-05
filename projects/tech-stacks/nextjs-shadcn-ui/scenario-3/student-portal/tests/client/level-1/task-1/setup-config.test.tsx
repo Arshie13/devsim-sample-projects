@@ -22,7 +22,7 @@ describe('Level 1 - Task 1.1: Setup & Portal Config Module', () => {
   it('should have client dependencies installed', () => {
     expect(
       fs.existsSync(join(clientRoot, 'node_modules')),
-      'Client node_modules missing. Run "npm install" in client first.'
+      'Client node_modules missing. Run "pnpm install" in client first.'
     ).toBe(true)
 
     expect(

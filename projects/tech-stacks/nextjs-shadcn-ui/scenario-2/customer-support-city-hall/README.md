@@ -24,16 +24,16 @@ customer-support-city-hall/
 ## Quick start
 
 ```bash
-npm install
-cd client && npm install && cd ..
-npm run dev:client       # http://localhost:3000
+pnpm install
+cd client && pnpm install && cd ..
+pnpm run dev:client       # http://localhost:3000
 ```
 
 ## Running tests
 
 ```bash
-npm run test:run                  # client + server in parallel
-cd client && npm run test:task:l1:t1   # single task
+pnpm run test:run                  # client + server in parallel
+cd client && pnpm run test:task:l1:t1   # single task
 ```
 
 ## Routes

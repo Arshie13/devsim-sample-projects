@@ -22,8 +22,8 @@ You're being onboarded. Get the portal running locally and make a couple of cosm
 #### Task 1.1: Local Setup & Portal Config Module
 1. Install dependencies and start the dev server:
    ```bash
-   npm install
-   npm run dev
+   pnpm install
+   pnpm run dev
    ```
 2. Open http://localhost:3000 and confirm the app loads.
 3. Create a **plain TypeScript config module** (not env vars) at [`src/lib/portalConfig.ts`](src/lib/portalConfig.ts:1) exporting three named constants:
@@ -44,7 +44,7 @@ You're being onboarded. Get the portal running locally and make a couple of cosm
    Add a **third line** under the program/year that renders `SCHOOL_TAGLINE` in a small, muted style (`text-sm text-gray-500`).
 
 ### Success Criteria
-- [ ] `npm run dev` works without errors
+- [ ] `pnpm run dev` works without errors
 - [ ] `src/lib/portalConfig.ts` exists and exports `SCHOOL_NAME`, `SCHOOL_TAGLINE`, `PORTAL_ACCENT`
 - [ ] Dashboard header reads "Riverside University" (sourced from `SCHOOL_NAME`)
 - [ ] Login page uses the `School` icon and the same `SCHOOL_NAME` heading
