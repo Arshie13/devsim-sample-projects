@@ -14,13 +14,13 @@ A collaborative trip-planning platform for WanderMint Studios — MERN Scenario 
 
 ```bash
 # From the project root (TRIP_WEAVER/)
-npm install
+pnpm install
 
 # Client
-cd client && npm install
+cd client && pnpm install
 
 # Server
-cd ../server && npm install
+cd ../server && pnpm install
 ```
 
 ### 2. Configure environment
@@ -35,14 +35,14 @@ cp .env.example .env
 
 ```bash
 # From TRIP_WEAVER/
-npm run db:seed
+pnpm run db:seed
 ```
 
 ### 4. Start development servers
 
 ```bash
 # From TRIP_WEAVER/ — starts both client and server
-npm run dev
+pnpm run dev
 ```
 
 - Client: http://localhost:5173
@@ -52,14 +52,14 @@ npm run dev
 
 ```bash
 # All tests
-npm test
+pnpm test
 
 # By level
-npm run test:tasks:l1
-npm run test:tasks:l2
-npm run test:tasks:l3
-npm run test:tasks:l4
-npm run test:tasks:l5
+pnpm run test:tasks:l1
+pnpm run test:tasks:l2
+pnpm run test:tasks:l3
+pnpm run test:tasks:l4
+pnpm run test:tasks:l5
 ```
 
 ## Project Structure

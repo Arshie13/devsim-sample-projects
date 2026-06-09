@@ -14,7 +14,7 @@ RECIPE_NEST/
 ## Prerequisites
 
 - Node.js 20+
-- npm 10+
+- pnpm 10+
 - A running MongoDB instance
 
 **Option A — Local MongoDB install:** Install from https://www.mongodb.com/try/download/community and start `mongod`.
@@ -30,19 +30,19 @@ Run these commands in order:
 
 ```bash
 # 1. Install root workspace dependencies  (from RECIPE_NEST/)
-npm install
+pnpm install
 
 # 2. Install client dependencies
 cd client
-npm install
+pnpm install
 cd ..
 
 # 3. Install server dependencies
 cd server
-npm install
+pnpm install
 
 # 4. Seed the database — run this from inside server/
-npm run db:seed
+pnpm run db:seed
 cd ..
 ```
 
@@ -62,7 +62,7 @@ server/
 From `RECIPE_NEST/`:
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 This starts the Express API on port `4000` and the Vite dev server on port `5173`.
@@ -104,17 +104,17 @@ You can re-run `npm run db:seed` at any time to reset the database to a clean kn
 
 ```bash
 # Run all tests
-npm test
+pnpm test
 
 # Run only client or server tests
-npm run test:client
-npm run test:server
+pnpm run test:client
+pnpm run test:server
 
 # Run tests for a specific level
-npm run test:tasks:l3
+pnpm run test:tasks:l3
 
 # Run a specific task's test
-npm run test:task:server:l5:t1
+pnpm run test:task:server:l5:t1
 ```
 
 ## Task Test Map

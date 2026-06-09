@@ -1,4 +1,5 @@
 {
+  "packageManager": "pnpm@10.32.1",
   "name": "flexi-spend-api",
   "version": "1.0.0",
   "description": "FlexiSpend Personal Finance Management API - NestJS + PostgreSQL + Prisma",
