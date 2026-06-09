@@ -5,7 +5,7 @@ A production-ready REST API built with **NestJS + PostgreSQL + Prisma** for trac
 ## 🚀 Quick Start
 
 ### Prerequisites
-- Node.js 18+ and npm
+- Node.js 18+ and pnpm
 - PostgreSQL 14+
 - Git
 
@@ -13,7 +13,7 @@ A production-ready REST API built with **NestJS + PostgreSQL + Prisma** for trac
 
 1. **Install dependencies**
    ```bash
-   npm install
+   pnpm install
    ```
 
 2. **Configure environment**
@@ -24,14 +24,14 @@ A production-ready REST API built with **NestJS + PostgreSQL + Prisma** for trac
 
 3. **Set up database**
    ```bash
-   npx prisma migrate dev --name init
-   npx prisma generate
-   npx prisma db seed
+   pnpm dlx prisma migrate dev --name init
+   pnpm dlx prisma generate
+   pnpm dlx prisma db seed
    ```
 
 4. **Start the server**
    ```bash
-   npm run start:dev
+   pnpm run start:dev
    ```
 
    API will be available at `http://localhost:3000/api`
@@ -74,22 +74,22 @@ A production-ready REST API built with **NestJS + PostgreSQL + Prisma** for trac
 
 | Command                     | Description                          |
 | --------------------------- | ------------------------------------ |
-| `npm run start:dev`         | Start dev server with hot reload     |
-| `npm run start:prod`        | Start production server              |
-| `npm run build`             | Build for production                 |
-| `npm run test`              | Run all tests                        |
-| `npm run test:watch`        | Run tests in watch mode              |
-| `npm run test:tasks:l1`     | Run Level 1 tests only               |
-| `npm run test:tasks:l2`     | Run Level 2 tests only               |
-| `npm run test:tasks:l3`     | Run Level 3 tests only               |
-| `npm run test:tasks:l4`     | Run Level 4 tests only               |
-| `npm run test:tasks:l5`     | Run Level 5 tests only               |
-| `npm run prisma:migrate`    | Run database migrations              |
-| `npm run prisma:generate`   | Generate Prisma client               |
-| `npm run prisma:seed`       | Seed database with sample data       |
-| `npm run prisma:studio`     | Open Prisma Studio (database GUI)    |
-| `npm run lint`              | Lint and fix code                    |
-| `npm run format`            | Format code with Prettier            |
+| `pnpm run start:dev`         | Start dev server with hot reload     |
+| `pnpm run start:prod`        | Start production server              |
+| `pnpm run build`             | Build for production                 |
+| `pnpm run test`              | Run all tests                        |
+| `pnpm run test:watch`        | Run tests in watch mode              |
+| `pnpm run test:tasks:l1`     | Run Level 1 tests only               |
+| `pnpm run test:tasks:l2`     | Run Level 2 tests only               |
+| `pnpm run test:tasks:l3`     | Run Level 3 tests only               |
+| `pnpm run test:tasks:l4`     | Run Level 4 tests only               |
+| `pnpm run test:tasks:l5`     | Run Level 5 tests only               |
+| `pnpm run prisma:migrate`    | Run database migrations              |
+| `pnpm run prisma:generate`   | Generate Prisma client               |
+| `pnpm run prisma:seed`       | Seed database with sample data       |
+| `pnpm run prisma:studio`     | Open Prisma Studio (database GUI)    |
+| `pnpm run lint`              | Lint and fix code                    |
+| `pnpm run format`            | Format code with Prettier            |
 
 ---
 
@@ -110,7 +110,7 @@ Use this table to find the test file that validates each challenge task.
 | 5 | 1 | Fix Balance Drift, Timezone & Div-by-Zero | `tests/server/level-5/task-1/concurrency-timezone-math.test.ts` |
 | 5 | 2 | Write Postmortem Document | `tests/server/level-5/task-2/postmortem-document.test.ts` |
 
-> **Test DB setup:** Copy `.env.example` to `.env`, set `DATABASE_URL_TEST` to a separate Postgres database, then run `npm run test`.
+> **Test DB setup:** Copy `.env.example` to `.env`, set `DATABASE_URL_TEST` to a separate Postgres database, then run `pnpm run test`.
 
 ---
 

@@ -15,26 +15,26 @@ Backend API for the Library Management System built with the PERN stack (Postgre
 
 - Node.js 18+ 
 - PostgreSQL database
-- npm or yarn
+- pnpm
 
 ## 🛠️ Setup Instructions
 
 ### 1. Install Dependencies
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### 2 Generate Prisma Client
 
 ```bash
-npm run prisma:generate
+pnpm run prisma:generate
 ```
 
 ### 3. Run Database Migrations
 
 ```bash
-npm run prisma:migrate
+pnpm run prisma:migrate
 ```
 
 This will create all necessary tables in your database.
@@ -42,7 +42,7 @@ This will create all necessary tables in your database.
 ### 4. Seed Database (Optional)
 
 ```bash
-npm run db:seed
+pnpm run db:seed
 ```
 
 This will populate the database with sample data for testing.
@@ -50,7 +50,7 @@ This will populate the database with sample data for testing.
 ### 5. Start Development Server
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 The server will start on `http://localhost:5000`
@@ -306,23 +306,23 @@ Authorization: Bearer <your-token-here>
 
 ```bash
 # Development
-npm run dev              # Start dev server with hot reload
+pnpm run dev              # Start dev server with hot reload
 
 # Build
-npm run build           # Compile TypeScript to JavaScript
+pnpm run build           # Compile TypeScript to JavaScript
 
 # Production
-npm start               # Run production server
+pnpm start               # Run production server
 
 # Prisma
-npm run prisma:generate # Generate Prisma Client
-npm run prisma:migrate  # Run migrations
-npm run prisma:studio   # Open Prisma Studio (DB GUI)
-npm run prisma:push     # Push schema without migrations
-npm run prisma:reset    # Reset database
+pnpm run prisma:generate # Generate Prisma Client
+pnpm run prisma:migrate  # Run migrations
+pnpm run prisma:studio   # Open Prisma Studio (DB GUI)
+pnpm run prisma:push     # Push schema without migrations
+pnpm run prisma:reset    # Reset database
 
 # Database
-npm run db:seed         # Seed database with sample data
+pnpm run db:seed         # Seed database with sample data
 ```
 
 ## 🚨 Error Handling

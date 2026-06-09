@@ -42,32 +42,32 @@ NODE_ENV=development
 
 ```bash
 # From the server directory
-npm install
+pnpm install
 
 # Generate Prisma client
-npm run db:generate
+pnpm run db:generate
 
 # Run database migrations
-npm run db:migrate
+pnpm run db:migrate
 
 # (Optional) Seed the database
-npm run db:seed
+pnpm run db:seed
 
 # Start development server
-npm run dev
+pnpm run dev
 ```
 
 The server will run on `http://localhost:5000`.
 
 ### Available Scripts
 
-- `npm run dev` - Start development server with hot reload
-- `npm run build` - Compile TypeScript to JavaScript
-- `npm start` - Start production server
-- `npm run db:migrate` - Run Prisma migrations
-- `npm run db:generate` - Generate Prisma client
-- `npm run db:studio` - Open Prisma Studio
-- `npm run db:seed` - Seed database with sample data
+- `pnpm run dev` - Start development server with hot reload
+- `pnpm run build` - Compile TypeScript to JavaScript
+- `pnpm start` - Start production server
+- `pnpm run db:migrate` - Run Prisma migrations
+- `pnpm run db:generate` - Generate Prisma client
+- `pnpm run db:studio` - Open Prisma Studio
+- `pnpm run db:seed` - Seed database with sample data
 
 ## Project Structure
 

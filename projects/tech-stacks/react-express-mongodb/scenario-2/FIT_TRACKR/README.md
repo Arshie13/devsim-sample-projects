@@ -12,19 +12,19 @@ Social fitness-tracking platform for the DevSim MERN scenario.
 
 ```bash
 # 1. Install all dependencies
-npm install            # root
-cd client && npm install
-cd ../server && npm install
+pnpm install            # root
+cd client && pnpm install
+cd ../server && pnpm install
 
 # 2. Configure environment
 cp server/.env.example server/.env
 # Edit server/.env — set MONGO_URI and JWT_SECRET
 
 # 3. Seed the database
-npm run db:seed
+pnpm run db:seed
 
 # 4. Start both dev servers
-npm run dev
+pnpm run dev
 ```
 
 Client → http://localhost:5173  
@@ -49,12 +49,12 @@ All seeded users have password `password123`.
 
 ```bash
 # Run all tests
-npm test
+pnpm test
 
 # Run per-level task tests
-npm run test:tasks:l1
-npm run test:tasks:l2
-npm run test:tasks:l3
-npm run test:tasks:l4
-npm run test:tasks:l5
+pnpm run test:tasks:l1
+pnpm run test:tasks:l2
+pnpm run test:tasks:l3
+pnpm run test:tasks:l4
+pnpm run test:tasks:l5
 ```

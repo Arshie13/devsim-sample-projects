@@ -41,15 +41,15 @@ This project is the host for a 5-level / 10-task DevSim challenge. See [plan.md]
 Run a single level:
 
 ```
-npm run test:tasks:l1   # environment + sidebar brand
-npm run test:tasks:l2   # getStockLevel + POS/Inventory refactor
-npm run test:tasks:l3   # void flow + oversell-safe checkout
-npm run test:tasks:l4   # PromoCode full-stack feature
-npm run test:tasks:l5   # revenue bug + postmortem
+pnpm run test:tasks:l1   # environment + sidebar brand
+pnpm run test:tasks:l2   # getStockLevel + POS/Inventory refactor
+pnpm run test:tasks:l3   # void flow + oversell-safe checkout
+pnpm run test:tasks:l4   # PromoCode full-stack feature
+pnpm run test:tasks:l5   # revenue bug + postmortem
 ```
 
 Run a single task:
 
 ```
-npm run test:task:l3:t2   # atomic void + updateMany gte guard
+pnpm run test:task:l3:t2   # atomic void + updateMany gte guard
 ```
