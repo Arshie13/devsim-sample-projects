@@ -17,26 +17,26 @@ React + TypeScript + Vite frontend for the POS System.
 ### Prerequisites
 
 - Node.js 18+ 
-- npm or yarn
+- pnpm
 
 ### Installation
 
 ```bash
 # From the client directory
-npm install
+pnpm install
 
 # Start development server
-npm run dev
+pnpm run dev
 ```
 
 The client will run on `http://localhost:3000` and proxy API requests to `http://localhost:5000`.
 
 ### Available Scripts
 
-- `npm run dev` - Start development server
-- `npm run build` - Build for production
-- `npm run preview` - Preview production build
-- `npm run lint` - Run ESLint
+- `pnpm run dev` - Start development server
+- `pnpm run build` - Build for production
+- `pnpm run preview` - Preview production build
+- `pnpm run lint` - Run ESLint
 
 ## Project Structure
 

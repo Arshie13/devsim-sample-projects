@@ -55,9 +55,9 @@ TO_DO_LIST/
 1. Install dependencies:
 
 ```bash
-npm install
-cd client && npm install
-cd ../server && npm install
+pnpm install
+cd client && pnpm install
+cd ../server && pnpm install
 ```
 
 2. Create environment file:
@@ -70,13 +70,13 @@ copy .env.example .env
 3. Run Prisma migration:
 
 ```bash
-npm run prisma:migrate
+pnpm run prisma:migrate
 ```
 
 4. Seed starter todos:
 
 ```bash
-npm run db:seed
+pnpm run db:seed
 ```
 
 5. Start both apps from project root:
@@ -84,7 +84,7 @@ npm run db:seed
 ```bash
 cd ..
 cd TO_DO_LIST
-npm run dev
+pnpm run dev
 ```
 
 ## Prisma Notes
