@@ -51,7 +51,7 @@ npm run db:generate
 npm run db:migrate
 
 # (Optional) Seed the database
-npm run prisma:seed
+npm run db:seed
 
 # Start development server
 npm run dev
@@ -67,7 +67,7 @@ The server will run on `http://localhost:5000`.
 - `npm run db:migrate` - Run Prisma migrations
 - `npm run db:generate` - Generate Prisma client
 - `npm run db:studio` - Open Prisma Studio
-- `npm run prisma:seed` - Seed database with sample data
+- `npm run db:seed` - Seed database with sample data
 
 ## Project Structure
 
