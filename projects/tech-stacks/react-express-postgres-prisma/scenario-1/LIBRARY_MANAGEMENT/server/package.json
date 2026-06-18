@@ -1,4 +1,5 @@
 {
+  "packageManager": "pnpm@10.32.1",
   "name": "library-management-server",
   "version": "1.0.0",
   "type": "module",
@@ -24,7 +25,7 @@
     "test:task:l4:t2": "vitest run ../tests/server/level-4/task-2/reservation-lifecycle.test.ts",
     "test:task:l5:t1": "vitest run ../tests/server/level-5/task-1/overdue-classification.test.ts",
     "test:task:l5:t2": "vitest run ../tests/server/level-5/task-2/overdue-fix.test.ts",
-    "test:tasks": "npm run test:task:l3:t1 && npm run test:task:l4:t2 && npm run test:task:l5:t1 && npm run test:task:l5:t2"
+    "test:tasks": "pnpm run test:task:l3:t1 && pnpm run test:task:l4:t2 && pnpm run test:task:l5:t1 && pnpm run test:task:l5:t2"
   },
   "keywords": [
     "library",

@@ -35,39 +35,39 @@ PORT=3000
 
 ```bash
 # Install dependencies
-npm install
+pnpm install
 
 # Generate Prisma client
-npm run prisma:generate
+pnpm run prisma:generate
 
 # Run database migrations
-npm run prisma:migrate
+pnpm run prisma:migrate
 
 # Seed the database with sample data
-npm run prisma:seed
+pnpm run prisma:seed
 
 # Start development server
-npm run start:dev
+pnpm run start:dev
 ```
 
 The server will run on `http://localhost:3000/api` (or the port specified in .env).
 
 ### Available Scripts
 
-- `npm run start:dev` - Start development server with hot reload
-- `npm run build` - Compile TypeScript to JavaScript
-- `npm run start:prod` - Start production server
-- `npm run test` - Run all tests
-- `npm run test:watch` - Run tests in watch mode
-- `npm run test:tasks:l1` - Run Level 1 tests only
-- `npm run test:tasks:l2` - Run Level 2 tests only
-- `npm run test:tasks:l3` - Run Level 3 tests only
-- `npm run test:tasks:l4` - Run Level 4 tests only
-- `npm run test:tasks:l5` - Run Level 5 tests only
-- `npm run prisma:generate` - Generate Prisma client
-- `npm run prisma:migrate` - Run Prisma migrations
-- `npm run prisma:seed` - Seed database with sample data
-- `npm run prisma:studio` - Open Prisma Studio to view database
+- `pnpm run start:dev` - Start development server with hot reload
+- `pnpm run build` - Compile TypeScript to JavaScript
+- `pnpm run start:prod` - Start production server
+- `pnpm run test` - Run all tests
+- `pnpm run test:watch` - Run tests in watch mode
+- `pnpm run test:tasks:l1` - Run Level 1 tests only
+- `pnpm run test:tasks:l2` - Run Level 2 tests only
+- `pnpm run test:tasks:l3` - Run Level 3 tests only
+- `pnpm run test:tasks:l4` - Run Level 4 tests only
+- `pnpm run test:tasks:l5` - Run Level 5 tests only
+- `pnpm run prisma:generate` - Generate Prisma client
+- `pnpm run prisma:migrate` - Run Prisma migrations
+- `pnpm run prisma:seed` - Seed database with sample data
+- `pnpm run prisma:studio` - Open Prisma Studio to view database
 
 ## Project Structure
 
@@ -221,4 +221,4 @@ Use this table to find the test file that validates each challenge task.
 | 5 | 1 | Fix Oversell, Decimal Drift & Timezone | `tests/server/level-5/task-1/concurrency-decimals-timezone.test.ts` |
 | 5 | 2 | Write Postmortem Document | `tests/server/level-5/task-2/postmortem-document.test.ts` |
 
-> **Test DB setup:** Copy `.env.example` to `.env`, set `DATABASE_URL_TEST` to a separate Postgres database, then run `npm run test`.
+> **Test DB setup:** Copy `.env.example` to `.env`, set `DATABASE_URL_TEST` to a separate Postgres database, then run `pnpm run test`.

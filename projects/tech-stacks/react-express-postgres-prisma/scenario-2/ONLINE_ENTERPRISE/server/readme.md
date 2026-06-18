@@ -42,19 +42,19 @@ NODE_ENV=development
 
 ```bash
 # From the server directory
-npm install
+pnpm install
 
 # Generate Prisma client
-npm run db:generate
+pnpm run db:generate
 
 # Run database migrations
-npm run db:migrate
+pnpm run db:migrate
 
 # (Optional) Seed the database
 npm run prisma:seed
 
 # Start development server
-npm run dev
+pnpm run dev
 ```
 
 The server will run on `http://localhost:5000`.

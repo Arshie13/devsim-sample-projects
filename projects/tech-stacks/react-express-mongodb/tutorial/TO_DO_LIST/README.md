@@ -54,6 +54,7 @@ TO_DO_LIST/
 ### Prerequisites
 
 - Node.js 20+
+- pnpm 10+
 - A running MongoDB instance
 
 **Option A — Local MongoDB install:** Install from https://www.mongodb.com/try/download/community and start `mongod`.
@@ -69,9 +70,9 @@ docker run -d -p 27017:27017 --name todo-mongo mongo:7
 1. Install dependencies:
 
 ```bash
-npm install
-cd client && npm install
-cd ../server && npm install
+pnpm install
+cd client && pnpm install
+cd ../server && pnpm install
 ```
 
 2. Create environment file:
@@ -84,21 +85,21 @@ copy .env.example .env
 3. Seed starter todos (run from inside `server/`):
 
 ```bash
-npm run db:seed
+pnpm run db:seed
 ```
 
 4. Start both apps from the project root:
 
 ```bash
 cd ..
-npm run dev
+pnpm run dev
 ```
 
 ## MongoDB Notes
 
 - Unlike relational databases, MongoDB has no migration files. Mongoose schemas live only in your Node.js code.
 - The seed script (`server/src/seed/seed.ts`) connects to MongoDB, clears existing todos, inserts demo todos, then disconnects.
-- You can re-run `npm run db:seed` at any time to reset the database to a clean known state.
+- You can re-run `pnpm run db:seed` at any time to reset the database to a clean known state.
 - The `MONGO_URI` in `.env` defaults to `mongodb://localhost:27017/todo_tutorial`.
 
 ## API Endpoints

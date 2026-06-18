@@ -16,7 +16,7 @@ import fs from 'fs';
 // Path resolution — overridable via env so a Docker grader can relocate things.
 const projectRoot = process.env.DEVSIM_PROJECT_ROOT ?? resolve(__dirname, '../../..');
 
-const npxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+const pnpmExecCmd = 'pnpm exec';
 
 /** Only string env values — spawnSync rejects non-string values. */
 const safeEnv = Object.fromEntries(
@@ -60,7 +60,7 @@ describe('Level 1 Task 1: Environment Setup', () => {
   });
 
   it('generates the Prisma client without errors', () => {
-    const result = runCommand(npxCmd, ['prisma', 'generate'], projectRoot, 120_000);
+    const result = runCommand(pnpmExecCmd, ['prisma', 'generate'], projectRoot, 120_000);
     expect(
       result.status,
       `"prisma generate" failed.\n\nSTDOUT:\n${result.stdout}\n\nSTDERR:\n${result.stderr}`,
@@ -68,7 +68,7 @@ describe('Level 1 Task 1: Environment Setup', () => {
   }, 150_000);
 
   it('applies database migrations with "prisma migrate deploy"', () => {
-    const result = runCommand(npxCmd, ['prisma', 'migrate', 'deploy'], projectRoot, 120_000);
+    const result = runCommand(pnpmExecCmd, ['prisma', 'migrate', 'deploy'], projectRoot, 120_000);
     expect(
       result.status,
       `"prisma migrate deploy" failed.\n\nSTDOUT:\n${result.stdout}\n\nSTDERR:\n${result.stderr}`,
@@ -78,7 +78,7 @@ describe('Level 1 Task 1: Environment Setup', () => {
   it('connects to the database and finds seeded data (DB_OK)', () => {
     // db-check.ts runs SELECT 1, then counts the employees table — proving
     // connectivity, applied migrations, and a populated seed in one shot.
-    const result = runCommand(npxCmd, ['tsx', 'scripts/db-check.ts'], projectRoot, 45_000);
+    const result = runCommand(pnpmExecCmd, ['tsx', 'scripts/db-check.ts'], projectRoot, 45_000);
     expect(
       result.status,
       `Database check failed — verify .env DATABASE_URL, migrations and seed.\n\nSTDOUT:\n${result.stdout}\n\nSTDERR:\n${result.stderr}`,

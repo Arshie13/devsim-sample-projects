@@ -53,7 +53,7 @@ TO_DO_LIST/
 1. Install dependencies:
 
 ```bash
-npm install
+pnpm install
 ```
 
 2. Create environment file:
@@ -65,19 +65,19 @@ cp .env.example .env
 3. Run Prisma migration:
 
 ```bash
-npm run prisma:migrate
+pnpm run prisma:migrate
 ```
 
 4. Seed starter todos:
 
 ```bash
-npm run db:seed
+pnpm run db:seed
 ```
 
 5. Start the server:
 
 ```bash
-npm run dev
+pnpm run dev
 ```
 
 ## API Endpoints

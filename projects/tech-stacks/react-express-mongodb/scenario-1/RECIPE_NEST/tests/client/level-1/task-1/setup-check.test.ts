@@ -36,8 +36,8 @@ const SERVER_PORT = process.env.DEVSIM_SERVER_PORT ?? "5000";
 const CLIENT_HOST = process.env.DEVSIM_CLIENT_HOST ?? "127.0.0.1";
 const CLIENT_PORT = process.env.DEVSIM_CLIENT_PORT ?? "5173";
 
-const npmCmd = process.platform === "win32" ? "npm.cmd" : "npm";
-const npxCmd = process.platform === "win32" ? "npx.cmd" : "npx";
+const pnpmCmd = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
+const pnpmExecCmd = "pnpm exec";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -103,9 +103,7 @@ const httpGet = (url: string): Promise<{ statusCode: number; body: string }> =>
       res.on("data", (chunk: Buffer | string) => {
         body += String(chunk);
       });
-      res.on("end", () =>
-        resolve({ statusCode: res.statusCode ?? 0, body }),
-      );
+      res.on("end", () => resolve({ statusCode: res.statusCode ?? 0, body }));
     });
     req.on("error", reject);
     req.end();
@@ -223,20 +221,17 @@ describe("Level 1 Task 1: Environment Setup", () => {
     ).toBe(true);
   });
 
-
   // -------------------------------------------------------------------------
   // Test 4 — MongoDB connectivity (in-memory, isolated from local Mongo)
   // -------------------------------------------------------------------------
-  it(
-    "should be able to connect to MongoDB via mongoose",
-    () => {
-      /**
-       * We use mongodb-memory-server (already a server devDependency) to spin
-       * up an isolated Mongo instance and verify mongoose can connect. This
-       * avoids depending on a locally-running mongod and proves the server's
-       * Mongo stack is wired up correctly.
-       */
-      const script = `
+  it("should be able to connect to MongoDB via mongoose", () => {
+    /**
+     * We use mongodb-memory-server (already a server devDependency) to spin
+     * up an isolated Mongo instance and verify mongoose can connect. This
+     * avoids depending on a locally-running mongod and proves the server's
+     * Mongo stack is wired up correctly.
+     */
+    const script = `
         import mongoose from 'mongoose';
         import { MongoMemoryServer } from 'mongodb-memory-server';
         (async () => {
@@ -249,97 +244,92 @@ describe("Level 1 Task 1: Environment Setup", () => {
         })().catch((err) => { console.error(err); process.exit(1); });
       `;
 
-      const tmpFile = join(serverRoot, ".db-check.tmp.mjs");
-      fs.writeFileSync(tmpFile, script);
+    const tmpFile = join(serverRoot, ".db-check.tmp.mjs");
+    fs.writeFileSync(tmpFile, script);
 
+    try {
+      const result = runCommand(
+        pnpmExecCmd,
+        ["tsx", ".db-check.tmp.mjs"],
+        serverRoot,
+        60_000,
+      );
+
+      expect(
+        result.status,
+        `MongoDB connectivity check failed.\n\nSTDOUT:\n${result.stdout}\n\nSTDERR:\n${result.stderr}`,
+      ).toBe(0);
+
+      expect(
+        result.stdout.trim(),
+        "Expected DB_OK signal from connectivity check",
+      ).toContain("DB_OK");
+    } finally {
       try {
-        const result = runCommand(
-          npxCmd,
-          ["tsx", ".db-check.tmp.mjs"],
-          serverRoot,
-          60_000,
-        );
-
-        expect(
-          result.status,
-          `MongoDB connectivity check failed.\n\nSTDOUT:\n${result.stdout}\n\nSTDERR:\n${result.stderr}`,
-        ).toBe(0);
-
-        expect(
-          result.stdout.trim(),
-          "Expected DB_OK signal from connectivity check",
-        ).toContain("DB_OK");
-      } finally {
-        try {
-          fs.unlinkSync(tmpFile);
-        } catch {
-          /* ignore */
-        }
+        fs.unlinkSync(tmpFile);
+      } catch {
+        /* ignore */
       }
-    },
-    90_000,
-  );
+    }
+  }, 90_000);
 
   // -------------------------------------------------------------------------
   // Test 5 — Backend server starts and responds on /api/health
   // -------------------------------------------------------------------------
-  it(
-    "should start the backend server and respond on the /api/health endpoint",
-    async () => {
-      let serverProcess: ChildProcess | null = null;
-      let logs = "";
+  it("should start the backend server and respond on the /api/health endpoint", async () => {
+    let serverProcess: ChildProcess | null = null;
+    let logs = "";
 
-      try {
-        serverProcess = spawn(npmCmd, ["run", "dev"], {
-          cwd: serverRoot,
-          env: {
-            ...safeEnv,
-            PORT: SERVER_PORT,
-            JWT_SECRET: safeEnv.JWT_SECRET ?? "test-secret-change-me",
-          },
-          stdio: ["ignore", "pipe", "pipe"],
-          shell: true,
-          windowsHide: true,
-        });
-        spawnedProcesses.push(serverProcess);
+    try {
+      serverProcess = spawn(pnpmCmd, ["run", "dev"], {
+        cwd: serverRoot,
+        env: {
+          ...safeEnv,
+          PORT: SERVER_PORT,
+          JWT_SECRET: safeEnv.JWT_SECRET ?? "test-secret-change-me",
+        },
+        stdio: ["ignore", "pipe", "pipe"],
+        shell: true,
+        windowsHide: true,
+      });
+      spawnedProcesses.push(serverProcess);
 
-        serverProcess.stdout?.on("data", (c: Buffer | string) => {
-          logs += String(c);
-        });
-        serverProcess.stderr?.on("data", (c: Buffer | string) => {
-          logs += String(c);
-        });
+      serverProcess.stdout?.on("data", (c: Buffer | string) => {
+        logs += String(c);
+      });
+      serverProcess.stderr?.on("data", (c: Buffer | string) => {
+        logs += String(c);
+      });
 
-        const url = `http://${SERVER_HOST}:${SERVER_PORT}/api/health`;
-        const { healthy, lastError } = await waitForHttp(url, {
-          bodyIncludes: "ok",
-          process: serverProcess,
-          maxAttempts: 40,
-          intervalMs: 500,
-        });
+      const url = `http://${SERVER_HOST}:${SERVER_PORT}/api/health`;
+      const { healthy, lastError } = await waitForHttp(url, {
+        bodyIncludes: "ok",
+        process: serverProcess,
+        maxAttempts: 40,
+        intervalMs: 500,
+      });
 
-        expect(
-          healthy,
-          `Backend did not become healthy at ${url}.\nLast HTTP error: ${lastError}\n\nServer logs:\n${logs}`,
-        ).toBe(true);
-      } finally {
-        if (serverProcess) killTree(serverProcess);
-      }
-    },
-    60_000,
-  );
+      expect(
+        healthy,
+        `Backend did not become healthy at ${url}.\nLast HTTP error: ${lastError}\n\nServer logs:\n${logs}`,
+      ).toBe(true);
+    } finally {
+      if (serverProcess) killTree(serverProcess);
+    }
+  }, 60_000);
 
   // -------------------------------------------------------------------------
   // Test 6 — Frontend dev server
   // -------------------------------------------------------------------------
-  it(
-    "should start the client dev server and serve the application",
-    async () => {
-      let clientProcess: ChildProcess | null = null;
-      let logs = "";
+  it("should start the client dev server and serve the application", async () => {
+    let clientProcess: ChildProcess | null = null;
+    let logs = "";
 
-      try {
-        clientProcess = spawn(npmCmd, ["run", "dev", "--", "--port", CLIENT_PORT], {
+    try {
+      clientProcess = spawn(
+        pnpmCmd,
+        ["run", "dev", "--", "--port", CLIENT_PORT],
+        {
           cwd: clientRoot,
           env: {
             ...safeEnv,
@@ -349,32 +339,31 @@ describe("Level 1 Task 1: Environment Setup", () => {
           stdio: ["ignore", "pipe", "pipe"],
           shell: true,
           windowsHide: true,
-        });
-        spawnedProcesses.push(clientProcess);
+        },
+      );
+      spawnedProcesses.push(clientProcess);
 
-        clientProcess.stdout?.on("data", (c: Buffer | string) => {
-          logs += String(c);
-        });
-        clientProcess.stderr?.on("data", (c: Buffer | string) => {
-          logs += String(c);
-        });
+      clientProcess.stdout?.on("data", (c: Buffer | string) => {
+        logs += String(c);
+      });
+      clientProcess.stderr?.on("data", (c: Buffer | string) => {
+        logs += String(c);
+      });
 
-        const url = `http://${CLIENT_HOST}:${CLIENT_PORT}`;
-        const { healthy, lastError } = await waitForHttp(url, {
-          bodyIncludes: '<div id="root">',
-          process: clientProcess,
-          maxAttempts: 40,
-          intervalMs: 500,
-        });
+      const url = `http://${CLIENT_HOST}:${CLIENT_PORT}`;
+      const { healthy, lastError } = await waitForHttp(url, {
+        bodyIncludes: '<div id="root">',
+        process: clientProcess,
+        maxAttempts: 40,
+        intervalMs: 500,
+      });
 
-        expect(
-          healthy,
-          `Client dev server did not become healthy at ${url}.\nLast HTTP error: ${lastError}\n\nClient logs:\n${logs}`,
-        ).toBe(true);
-      } finally {
-        if (clientProcess) killTree(clientProcess);
-      }
-    },
-    60_000,
-  );
+      expect(
+        healthy,
+        `Client dev server did not become healthy at ${url}.\nLast HTTP error: ${lastError}\n\nClient logs:\n${logs}`,
+      ).toBe(true);
+    } finally {
+      if (clientProcess) killTree(clientProcess);
+    }
+  }, 60_000);
 });
