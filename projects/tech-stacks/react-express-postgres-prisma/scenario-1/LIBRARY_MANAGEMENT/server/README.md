@@ -42,7 +42,7 @@ This will create all necessary tables in your database.
 ### 4. Seed Database (Optional)
 
 ```bash
-npm run db:seed
+npm run prisma:seed
 ```
 
 This will populate the database with sample data for testing.
@@ -322,7 +322,7 @@ npm run prisma:push     # Push schema without migrations
 npm run prisma:reset    # Reset database
 
 # Database
-npm run db:seed         # Seed database with sample data
+npm run prisma:seed     # Seed database with sample data
 ```
 
 ## 🚨 Error Handling
