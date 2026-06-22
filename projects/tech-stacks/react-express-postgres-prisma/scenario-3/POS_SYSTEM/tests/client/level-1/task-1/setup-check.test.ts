@@ -34,7 +34,7 @@ const serverRoot =
 const SERVER_HOST = process.env.DEVSIM_SERVER_HOST ?? "127.0.0.1";
 const SERVER_PORT = process.env.DEVSIM_SERVER_PORT ?? "5051";
 const CLIENT_HOST = process.env.DEVSIM_CLIENT_HOST ?? "127.0.0.1";
-const CLIENT_PORT = process.env.DEVSIM_CLIENT_PORT ?? "5173";
+const CLIENT_PORT = process.env.DEVSIM_CLIENT_PORT ?? "3000";
 
 const pnpmCmd = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 const pnpmExecCmd = "pnpm exec";
