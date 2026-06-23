@@ -2,7 +2,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Candidate creates: src/app/actions/payroll.ts
+// Candidate creates: src/lib/actions/payroll.ts
 //
 // Must export an async server action:
 //   computeGrossPayForEmployee(
@@ -25,7 +25,7 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-const load = () => import('../../../src/app/actions/payroll');
+const load = () => import('../../../src/lib/actions/payroll');
 
 describe('L4T2: computeGrossPayForEmployee (server action)', () => {
   beforeEach(() => {

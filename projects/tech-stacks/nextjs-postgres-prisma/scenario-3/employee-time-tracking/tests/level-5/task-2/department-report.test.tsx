@@ -2,7 +2,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Candidate creates: src/app/actions/reports.ts
+// Candidate creates: src/lib/actions/reports.ts
 //
 // Must export an async server action:
 //   getDepartmentReport(): Promise<{
@@ -39,7 +39,7 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-const load = () => import('../../../src/app/actions/reports');
+const load = () => import('../../../src/lib/actions/reports');
 
 const records = [
   { employee_id: 1, total_hours: 45, gross_pay: 3375,

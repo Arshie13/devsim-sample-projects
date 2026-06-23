@@ -2,7 +2,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Candidate creates: src/app/actions/membership.ts (add to file from Task 2.1)
+// Candidate creates: src/lib/actions/membership.ts (add to file from Task 2.1)
 //
 // Must export an async server action:
 //   getDaysUntilExpiry(userId: string, now?: Date): Promise<number | null>
@@ -21,7 +21,7 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-const load = () => import('../../../src/app/actions/membership');
+const load = () => import('../../../src/lib/actions/membership');
 
 const now = new Date('2026-06-01T00:00:00Z');
 

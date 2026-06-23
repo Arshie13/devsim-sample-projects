@@ -2,7 +2,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Candidate creates: src/app/actions/attendance.ts
+// Candidate creates: src/lib/actions/attendance.ts
 //
 // Must export an async server action:
 //   getAttendanceByMonth(userId: string):
@@ -22,7 +22,7 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-const load = () => import('../../../src/app/actions/attendance');
+const load = () => import('../../../src/lib/actions/attendance');
 
 describe('L4T2: getAttendanceByMonth (server action)', () => {
   beforeEach(() => {

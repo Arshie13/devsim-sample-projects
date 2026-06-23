@@ -2,7 +2,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Candidate creates: src/app/actions/cart.ts
+// Candidate creates: src/lib/actions/cart.ts
 //
 // Must export an async server action:
 //   getCartTotals(input: {
@@ -24,7 +24,7 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-const load = () => import('../../../src/app/actions/cart');
+const load = () => import('../../../src/lib/actions/cart');
 
 describe('L2T2: getCartTotals (server action)', () => {
   beforeEach(() => {
