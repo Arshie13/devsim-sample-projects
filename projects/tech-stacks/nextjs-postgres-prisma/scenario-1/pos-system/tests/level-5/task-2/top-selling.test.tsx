@@ -2,7 +2,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Candidate creates: src/app/actions/reports.ts
+// Candidate creates: src/lib/actions/reports.ts
 //
 // Must export an async server action:
 //   getTopSellingProducts(limit: number): Promise<{
@@ -29,7 +29,7 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-const load = () => import('../../../src/app/actions/reports');
+const load = () => import('../../../src/lib/actions/reports');
 
 const items = [
   { product_id: 'p1', quantity: 5, subtotal: 600, product: { product_name: 'Espresso' } },

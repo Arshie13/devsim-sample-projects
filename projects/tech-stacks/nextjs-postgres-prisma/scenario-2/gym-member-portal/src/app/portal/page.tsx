@@ -1,9 +1,9 @@
 import { prisma } from '@/lib/prisma';
-import MembershipDetails from './membership-details';
-import AttendanceHistory from './attendance-history';
-import { BookedClassesProvider } from './booked-classes-context';
-import MyBookedClasses from './my-booked-classes';
-import ClassBooking from './class-booking';
+import MembershipDetails from '@/components/membership-details';
+import AttendanceHistory from '@/components/attendance-history';
+import { BookedClassesProvider } from '@/components/booked-classes-context';
+import MyBookedClasses from '@/components/my-booked-classes';
+import ClassBooking from '@/components/class-booking';
 
 export default async function Portal() {
   // Authentication has been removed — the portal loads the first seeded member.

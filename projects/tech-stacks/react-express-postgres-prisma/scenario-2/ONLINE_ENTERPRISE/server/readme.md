@@ -51,7 +51,7 @@ pnpm run db:generate
 pnpm run db:migrate
 
 # (Optional) Seed the database
-pnpm run db:seed
+npm run prisma:seed
 
 # Start development server
 pnpm run dev
@@ -61,13 +61,13 @@ The server will run on `http://localhost:5000`.
 
 ### Available Scripts
 
-- `pnpm run dev` - Start development server with hot reload
-- `pnpm run build` - Compile TypeScript to JavaScript
-- `pnpm start` - Start production server
-- `pnpm run db:migrate` - Run Prisma migrations
-- `pnpm run db:generate` - Generate Prisma client
-- `pnpm run db:studio` - Open Prisma Studio
-- `pnpm run db:seed` - Seed database with sample data
+- `npm run dev` - Start development server with hot reload
+- `npm run build` - Compile TypeScript to JavaScript
+- `npm start` - Start production server
+- `npm run db:migrate` - Run Prisma migrations
+- `npm run db:generate` - Generate Prisma client
+- `npm run db:studio` - Open Prisma Studio
+- `npm run prisma:seed` - Seed database with sample data
 
 ## Project Structure
 

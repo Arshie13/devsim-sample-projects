@@ -2,7 +2,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Candidate creates: src/app/actions/leaderboard.ts
+// Candidate creates: src/lib/actions/leaderboard.ts
 //
 // Must export an async server action:
 //   getActiveMembersRanking(): Promise<{
@@ -25,7 +25,7 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-const load = () => import('../../../src/app/actions/leaderboard');
+const load = () => import('../../../src/lib/actions/leaderboard');
 
 describe('L5T2: getActiveMembersRanking (server action)', () => {
   beforeEach(() => {

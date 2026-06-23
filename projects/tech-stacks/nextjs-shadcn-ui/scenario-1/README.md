@@ -24,13 +24,12 @@ For this level, here is a demo user and password that should work on your projec
 
 ```bash
 pnpm install
-cd client && pnpm install && cd ..
 ```
 
 ### 2. Start Development Server
 
 ```bash
-pnpm run dev:client
+pnpm dev
 ```
 
 The application will start on `http://localhost:3000`
@@ -39,33 +38,30 @@ The application will start on `http://localhost:3000`
 
 ```bash
 # Development
-pnpm run dev:client       # Start client dev server
+pnpm dev                   # Start the dev server
 
 # Testing
 pnpm run test:run                  # Run all tests
-pnpm run test:task:client:l1:t1     # Run specific task test
-pnpm run test:task:client:l1:t2     # Run specific task test
+pnpm run test:task:l1:t1            # Run specific task test
+pnpm run test:task:l1:t2            # Run specific task test
 ```
 
 ## 📁 Project Structure
 
 ```
 library-management/
-├── package.json         # Root orchestrator
-├── client/            # Next.js application
-│   ├── package.json
-│   ├── src/
-│   │   ├── app/
-│   │   │   ├── page.tsx
-│   │   │   ├── login/
-│   │   │   ├── signup/
-│   │   │   └── books/
-│   │   └── components/
-│   └── tests/
+├── package.json         # Next.js application
+├── src/
+│   ├── app/
+│   │   ├── page.tsx
+│   │   ├── login/
+│   │   ├── signup/
+│   │   └── dashboard/
+│   ├── components/
+│   └── lib/
 └── tests/
-    └── client/
-        └── level-1/
-            └── task-1/        # Test files
+    └── level-1/
+        └── task-1/        # Test files
 ```
 
 ## 📄 License

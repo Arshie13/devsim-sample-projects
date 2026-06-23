@@ -2,7 +2,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Candidate creates: src/app/actions/coupons.ts
+// Candidate creates: src/lib/actions/coupons.ts
 //
 // Must export an async server action:
 //   applyBestCoupon(subtotal: number, now?: Date):
@@ -24,7 +24,7 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-const load = () => import('../../../src/app/actions/coupons');
+const load = () => import('../../../src/lib/actions/coupons');
 
 const now = new Date('2026-06-01T00:00:00Z');
 

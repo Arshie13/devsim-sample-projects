@@ -2,7 +2,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Candidate creates: src/app/actions/inventory.ts
+// Candidate creates: src/lib/actions/inventory.ts
 //
 // Must export an async server action:
 //   getStockStatusForProduct(productId: string):
@@ -24,7 +24,7 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-const load = () => import('../../../src/app/actions/inventory');
+const load = () => import('../../../src/lib/actions/inventory');
 
 describe('L2T1: getStockStatusForProduct (server action)', () => {
   beforeEach(() => {

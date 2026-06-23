@@ -2,7 +2,7 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Candidate creates: src/app/actions/membership.ts
+// Candidate creates: src/lib/actions/membership.ts
 //
 // Must export an async server action:
 //   getMembershipStatusForUser(userId: string, now?: Date):
@@ -25,7 +25,7 @@ vi.mock('@/lib/prisma', () => ({
   },
 }));
 
-const load = () => import('../../../src/app/actions/membership');
+const load = () => import('../../../src/lib/actions/membership');
 
 const now = new Date('2026-06-01T00:00:00Z');
 

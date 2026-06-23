@@ -76,7 +76,7 @@ pnpm run prisma:migrate
 4. Seed starter todos:
 
 ```bash
-pnpm run db:seed
+npm run prisma:seed
 ```
 
 5. Start both apps from project root:
