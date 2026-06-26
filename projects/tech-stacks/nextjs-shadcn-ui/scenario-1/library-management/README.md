@@ -1,30 +1,94 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Library Management - Next.js + Shadcn UI Scenario
 
-## Getting Started
+## Project Overview
 
-First, run the development server:
+**Goal:** Build a frontend page for a library book management system. Track borrowed books, label overdue items, and manage librarian login/signup.
+
+## Tech Stack
+
+- Next.js 16 (App Router)
+- Shadcn UI + Tailwind CSS v4
+- TypeScript
+- Vitest + React Testing Library
+
+## Features
+
+- View all books in the library with their status
+- See borrowed and overdue books at a glance
+- Track who borrowed each book
+- Librarian login and signup pages
+- Demo credentials: `admin` / `admin123`
+
+## Quick Start
+
+1. Install dependencies:
+
+```bash
+pnpm install
+```
+
+2. Add the required Shadcn UI components using the CLI. Since `@radix-ui/*` packages are already declared in `package.json`, the CLI will skip installing them and only scaffold the component files:
+
+```bash
+pnpm dlx shadcn@latest add button
+pnpm dlx shadcn@latest add card
+pnpm dlx shadcn@latest add input
+pnpm dlx shadcn@latest add label
+pnpm dlx shadcn@latest add badge
+pnpm dlx shadcn@latest add table
+pnpm dlx shadcn@latest add tabs
+pnpm dlx shadcn@latest add dialog
+```
+
+3. Start the development server:
 
 ```bash
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Available Commands
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# Development
+pnpm dev                   # Start the dev server
+pnpm build                 # Build for production
+```
 
-## Learn More
+## Folder Structure
 
-To learn more about Next.js, take a look at the following resources:
+```text
+library-management/
+├── src/
+│   ├── app/
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   ├── page.tsx
+│   │   ├── login/
+│   │   ├── signup/
+│   │   └── dashboard/
+│   ├── components/
+│   │   └── ui/          ← created by `npx shadcn add`
+│   └── lib/
+│       ├── mockData.ts
+│       └── utils.ts
+├── tests/
+│   ├── level-1/
+│   │   ├── task-1/
+│   │   └── task-2/
+│   ├── level-2/
+│   ├── level-3/
+│   ├── level-4/
+│   └── level-5/
+├── components.json      ← Shadcn UI configuration
+├── package.json
+└── tsconfig.json
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Notes
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- Mock data is defined in `src/lib/mockData.ts` with sample books, borrow records, and librarian credentials.
+- Radix UI primitives are pre-declared in `package.json` so there is no need to run `shadcn init`.
+- Shadcn UI components are added via the CLI (`pnpm dlx shadcn@latest add`) and live in `src/components/ui/`.
+- The test suite is organized in `tests/` by level and task.

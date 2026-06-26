@@ -20,6 +20,32 @@ This sample is intentionally surface-level and includes only essential frontend 
 - Delete a todo item
 - Start with seeded mock todos
 
+## Quick Start
+
+1. Install dependencies:
+
+```bash
+pnpm install
+```
+
+2. Add the required Shadcn UI components using the CLI. Since `@radix-ui/*` packages are already declared in `package.json`, the CLI will skip installing them and only scaffold the component files:
+
+```bash
+pnpm dlx shadcn@latest add button
+pnpm dlx shadcn@latest add card
+pnpm dlx shadcn@latest add input
+pnpm dlx shadcn@latest add checkbox
+pnpm dlx shadcn@latest add badge
+```
+
+3. Start the development server:
+
+```bash
+pnpm run dev
+```
+
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
+
 ## Folder Structure
 
 ```text
@@ -30,16 +56,12 @@ TO_DO_LIST/
 │   │   ├── layout.tsx
 │   │   └── page.tsx
 │   ├── components/
-│   │   └── ui/
-│   │       ├── badge.tsx
-│   │       ├── button.tsx
-│   │       ├── card.tsx
-│   │       ├── checkbox.tsx
-│   │       └── input.tsx
+│   │   └── ui/          ← created by `npx shadcn add`
 │   └── lib/
 │       ├── mockData.ts
 │       └── utils.ts
 ├── .gitignore
+├── components.json      ← Shadcn UI configuration
 ├── eslint.config.mjs
 ├── next.config.ts
 ├── package.json
@@ -47,24 +69,9 @@ TO_DO_LIST/
 └── tsconfig.json
 ```
 
-## Quick Start
-
-1. Install dependencies:
-
-```bash
-pnpm install
-```
-
-2. Start the development server:
-
-```bash
-pnpm run dev
-```
-
-3. Open [http://localhost:3000](http://localhost:3000) in your browser.
-
 ## Notes
 
 - Mock data is defined in `src/lib/mockData.ts`.
 - All state is managed in React — refreshing the page resets the list to mock data.
-- Shadcn UI components live in `src/components/ui/` and are customizable.
+- Shadcn UI components are added via the CLI (`pnpm dlx shadcn@latest add`) and live in `src/components/ui/`.
+- Radix UI primitives are pre-declared in `package.json` so there is no need to run `shadcn init`.
