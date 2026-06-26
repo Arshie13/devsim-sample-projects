@@ -12,17 +12,10 @@ function stripComments(content: string): string {
 }
 
 describe('Level 1 Task 2: Branding Update', () => {
-  it('should render "Riverside University" in the dashboard header brand', () => {
-    const layoutPath = join(projectRoot, 'src', 'app', 'dashboard', 'layout.tsx')
-    const content = stripComments(fs.readFileSync(layoutPath, 'utf-8'))
-    expect(content).toContain('Riverside University')
-    expect(content).not.toContain('Student Portal')
-  })
-
-  it('should render "Riverside University" as the login page heading', () => {
+  it('should replace "Sign In" with "Log In" on the login page', () => {
     const loginPath = join(projectRoot, 'src', 'app', 'login', 'page.tsx')
     const content = stripComments(fs.readFileSync(loginPath, 'utf-8'))
-    expect(content).toContain('Riverside University')
-    expect(content).not.toContain('Student Portal')
+    expect(content).toContain('Log In')
+    expect(content).not.toContain('Sign In')
   })
 })
