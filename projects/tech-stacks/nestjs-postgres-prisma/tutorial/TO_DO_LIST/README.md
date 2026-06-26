@@ -90,4 +90,4 @@ pnpm run dev
 ## Prisma Notes
 
 - `DATABASE_URL` is read from the `.env` file.
-- The schema datasource block intentionally omits `url`, matching the Prisma 5 setup with environment variable injection.
+- The schema datasource block declares `url = env("DATABASE_URL")`. Prisma requires `url` in the `datasource` block — the environment variable alone is not enough, and omitting it fails validation with `P1012` ("Argument `url` is missing").
