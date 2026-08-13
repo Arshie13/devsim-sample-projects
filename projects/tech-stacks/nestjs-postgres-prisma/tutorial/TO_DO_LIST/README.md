@@ -41,7 +41,6 @@ TO_DO_LIST/
 │       ├── todos.controller.ts
 │       ├── todos.module.ts
 │       └── todos.service.ts
-├── .env.example
 ├── nest-cli.json
 ├── package.json
 ├── tsconfig.build.json
@@ -56,25 +55,19 @@ TO_DO_LIST/
 pnpm install
 ```
 
-2. Create environment file:
-
-```bash
-cp .env.example .env
-```
-
-3. Run Prisma migration:
+2. Run Prisma migration:
 
 ```bash
 pnpm run prisma:migrate
 ```
 
-4. Seed starter todos:
+3. Seed starter todos:
 
 ```bash
 pnpm run db:seed
 ```
 
-5. Start the server:
+4. Start the server:
 
 ```bash
 pnpm run dev

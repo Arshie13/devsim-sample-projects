@@ -60,26 +60,19 @@ cd client && pnpm install
 cd ../server && pnpm install
 ```
 
-2. Create environment file:
-
-```bash
-cd server
-copy .env.example .env
-```
-
-3. Run Prisma migration:
+2. Run Prisma migration:
 
 ```bash
 pnpm run prisma:migrate
 ```
 
-4. Seed starter todos:
+3. Seed starter todos:
 
 ```bash
 npm run prisma:seed
 ```
 
-5. Start both apps from project root:
+4. Start both apps from project root:
 
 ```bash
 cd ..

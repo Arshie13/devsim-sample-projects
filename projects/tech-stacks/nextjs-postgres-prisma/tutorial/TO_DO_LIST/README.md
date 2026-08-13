@@ -51,7 +51,6 @@ TO_DO_LIST/
 │       │   └── setup-check.test.tsx
 │       └── task-2/
 │           └── format.test.tsx
-├── .env.example
 ├── .gitignore
 ├── eslint.config.mjs
 ├── levels.md
@@ -70,31 +69,25 @@ TO_DO_LIST/
 pnpm install
 ```
 
-2. Create environment file:
-
-```bash
-cp .env.example .env
-```
-
-3. Apply the database migration:
+2. Apply the database migration:
 
 ```bash
 pnpm prisma:migrate deploy
 ```
 
-4. Seed starter todos:
+3. Seed starter todos:
 
 ```bash
 pnpm prisma:seed
 ```
 
-5. Start the app:
+4. Start the app:
 
 ```bash
 pnpm dev
 ```
 
-6. Open [http://localhost:3000](http://localhost:3000) in your browser.
+5. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Running Tests
 

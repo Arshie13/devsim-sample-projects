@@ -23,22 +23,14 @@ cd client && pnpm install
 cd ../server && pnpm install
 ```
 
-### 2. Configure environment
-
-```bash
-cd server
-cp .env.example .env
-# Edit .env and set MONGO_URI to your MongoDB connection string
-```
-
-### 3. Seed the database
+### 2. Seed the database
 
 ```bash
 # From TRIP_WEAVER/
 pnpm run db:seed
 ```
 
-### 4. Start development servers
+### 3. Start development servers
 
 ```bash
 # From TRIP_WEAVER/ — starts both client and server

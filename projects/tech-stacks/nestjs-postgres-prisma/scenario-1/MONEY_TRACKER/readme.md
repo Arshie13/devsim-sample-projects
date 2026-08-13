@@ -16,20 +16,14 @@ A production-ready REST API built with **NestJS + PostgreSQL + Prisma** for trac
    pnpm install
    ```
 
-2. **Configure environment**
-   ```bash
-   cp .env.example .env
-   ```
-   Update the `.env` file with your PostgreSQL credentials.
-
-3. **Set up database**
+2. **Set up database**
    ```bash
    pnpm dlx prisma migrate dev --name init
    pnpm dlx prisma generate
    pnpm dlx prisma db seed
    ```
 
-4. **Start the server**
+3. **Start the server**
    ```bash
    pnpm run start:dev
    ```
@@ -110,7 +104,6 @@ Use this table to find the test file that validates each challenge task.
 | 5 | 1 | Fix Balance Drift, Timezone & Div-by-Zero | `tests/server/level-5/task-1/concurrency-timezone-math.test.ts` |
 | 5 | 2 | Write Postmortem Document | `tests/server/level-5/task-2/postmortem-document.test.ts` |
 
-> **Test DB setup:** Copy `.env.example` to `.env`, set `DATABASE_URL_TEST` to a separate Postgres database, then run `pnpm run test`.
 
 ---
 

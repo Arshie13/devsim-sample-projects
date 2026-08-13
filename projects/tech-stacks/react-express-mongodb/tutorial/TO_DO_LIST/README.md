@@ -75,20 +75,13 @@ cd client && pnpm install
 cd ../server && pnpm install
 ```
 
-2. Create environment file:
-
-```bash
-cd server
-copy .env.example .env
-```
-
-3. Seed starter todos (run from inside `server/`):
+2. Seed starter todos (run from inside `server/`):
 
 ```bash
 pnpm run db:seed
 ```
 
-4. Start both apps from the project root:
+3. Start both apps from the project root:
 
 ```bash
 cd ..

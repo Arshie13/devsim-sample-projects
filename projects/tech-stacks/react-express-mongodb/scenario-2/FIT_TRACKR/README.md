@@ -16,14 +16,10 @@ pnpm install            # root
 cd client && pnpm install
 cd ../server && pnpm install
 
-# 2. Configure environment
-cp server/.env.example server/.env
-# Edit server/.env — set MONGO_URI and JWT_SECRET
-
-# 3. Seed the database
+# 2. Seed the database
 pnpm run db:seed
 
-# 4. Start both dev servers
+# 3. Start both dev servers
 pnpm run dev
 ```
 
