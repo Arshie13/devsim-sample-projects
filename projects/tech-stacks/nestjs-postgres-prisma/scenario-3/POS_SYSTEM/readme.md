@@ -221,4 +221,3 @@ Use this table to find the test file that validates each challenge task.
 | 5 | 1 | Fix Oversell, Decimal Drift & Timezone | `tests/server/level-5/task-1/concurrency-decimals-timezone.test.ts` |
 | 5 | 2 | Write Postmortem Document | `tests/server/level-5/task-2/postmortem-document.test.ts` |
 
-> **Test DB setup:** Copy `.env.example` to `.env`, set `DATABASE_URL_TEST` to a separate Postgres database, then run `pnpm run test`.
