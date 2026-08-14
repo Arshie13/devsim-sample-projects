@@ -20,17 +20,6 @@ NestJS + PostgreSQL + Prisma backend for the POS System.
 - Node.js 18+
 - PostgreSQL installed and running
 
-### Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
-
-```env
-DATABASE_URL="postgresql://postgres:password@localhost:5432/pos_system?schema=public"
-JWT_SECRET="your-super-secret-jwt-key-change-me"
-JWT_EXPIRES_IN="1d"
-PORT=3000
-```
-
 ### Installation
 
 ```bash
@@ -50,7 +39,7 @@ pnpm run prisma:seed
 pnpm run start:dev
 ```
 
-The server will run on `http://localhost:3000/api` (or the port specified in .env).
+The server will run on `http://localhost:3000/api` .
 
 ### Available Scripts
 
@@ -99,7 +88,7 @@ POS_SYSTEM/
 │   ├── users/          # User management module
 │   ├── app.module.ts   # Root application module
 │   └── main.ts         # Application entry point
-├── .env                # Environment variables
+├── 
 ├── package.json
 └── tsconfig.json
 ```

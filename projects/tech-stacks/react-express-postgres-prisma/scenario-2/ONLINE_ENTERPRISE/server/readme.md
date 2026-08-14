@@ -21,23 +21,6 @@ Node.js + Express + TypeScript backend for the UrbanPottery E-Commerce Platform.
 - Node.js 18+
 - PostgreSQL installed and running
 
-### Environment Variables
-
-Create a `.env` file in the server directory:
-
-```env
-# Database
-DATABASE_URL="postgresql://username:password@localhost:5432/urbanpottery?schema=public"
-
-# JWT
-JWT_SECRET="your_super_secret_jwt_key_here"
-JWT_EXPIRES_IN="7d"
-
-# Server
-PORT=5000
-NODE_ENV=development
-```
-
 ### Installation
 
 ```bash
@@ -96,7 +79,7 @@ server/
 │   │
 │   └── index.ts            # Entry point
 │
-├── .env                    # Environment variables
+├── 
 ├── package.json
 └── tsconfig.json
 ```
