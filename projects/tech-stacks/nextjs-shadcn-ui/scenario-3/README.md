@@ -66,7 +66,3 @@ student-portal/
     └── level-1/
         └── task-1/        # Test files
 ```
-
-## 📄 License
-
-ISC
