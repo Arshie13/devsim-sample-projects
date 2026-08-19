@@ -158,10 +158,3 @@ See [levels.md](levels.md) for detailed requirements.
 
 ---
 
-## 📝 License
-
-MIT — © 2026 IPPO Software Solutions
-
----
-
-Built with ❤️ using NestJS

@@ -200,7 +200,3 @@ employee-time-tracking/
 │       └── task-1/        # Test files
 └── package.json
 ```
-
-## 📄 License
-
-ISC

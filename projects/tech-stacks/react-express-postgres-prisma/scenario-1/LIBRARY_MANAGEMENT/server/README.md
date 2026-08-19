@@ -354,17 +354,4 @@ Status codes:
 3. **RETURNED** - Set when book is returned
 
 
-## 🔄 Future Enhancements
-
-- [ ] Email notifications for overdue books
-- [ ] Rate limiting
-- [ ] API documentation with Swagger
-- [ ] Unit and integration tests
-
-## 📄 License
-
-ISC
-
----
-
 **Note:** This API is ready to connect to the frontend but is currently running independently. Update the client's service layer to point to `http://localhost:5000/api` when ready to integrate.
