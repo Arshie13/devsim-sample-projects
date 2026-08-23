@@ -20,17 +20,6 @@ Node.js + Express + TypeScript backend for the POS System.
 - Node.js 18+
 - PostgreSQL installed and running
 
-### Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
-
-```env
-DATABASE_URL="postgresql://username:password@localhost:5432/pos_db?schema=public"
-JWT_SECRET="your_super_secret_key"
-JWT_EXPIRES_IN="7d"
-PORT=5000
-```
-
 ### Installation
 
 ```bash
@@ -47,7 +36,7 @@ pnpm run db:migrate
 pnpm run dev
 ```
 
-The server will run on `http://localhost:5000` (or the port specified in .env).
+The server will run on `http://localhost:5000`.
 
 ### Available Scripts
 
@@ -78,7 +67,6 @@ server/
 │   │   ├── products.ts # Product management
 │   │   └── settings.ts # System settings
 │   ├── index.ts        # Entry point and app configuration
-├── .env                # Environment variables
 ├── package.json
 └── tsconfig.json
 ```

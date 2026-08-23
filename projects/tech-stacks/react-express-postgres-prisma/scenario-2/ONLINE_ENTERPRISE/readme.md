@@ -184,7 +184,6 @@ ONLINE_ENTERPRISE/
 │   │   ├── middleware/     # Auth, Error handling
 │   │   ├── routes/         # API routes
 │   │   └── index.ts
-│   ├── .env
 │   ├── package.json
 │   └── tsconfig.json
 │

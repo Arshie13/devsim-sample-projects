@@ -187,7 +187,3 @@ gym-member-portal/
 │       └── task-1/        # Test files
 └── package.json
 ```
-
-## 📄 License
-
-ISC

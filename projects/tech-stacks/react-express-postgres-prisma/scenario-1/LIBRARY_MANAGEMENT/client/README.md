@@ -1,73 +1,87 @@
-# React + TypeScript + Vite
+# Library Management System - Client
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React + TypeScript + Vite frontend for the Library Management System.
 
-Currently, two official plugins are available:
+## Tech Stack
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+- **React 18** - UI library
+- **TypeScript** - Type safety
+- **Vite** - Build tool & dev server
+- **Tailwind CSS** - Styling
+- **React Router** - Client-side routing
+- **Axios** - HTTP client
 
-## React Compiler
+## Getting Started
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### Prerequisites
 
-## Expanding the ESLint configuration
+- Node.js 18+
+- pnpm
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### Installation
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+```bash
+# From the client directory
+pnpm install
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
-
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+# Start development server
+pnpm run dev
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The client will run on `http://localhost:3000` and proxy API requests to `http://localhost:5000`.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+### Available Scripts
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- `pnpm run dev` - Start development server
+- `pnpm run build` - Build for production
+- `pnpm run preview` - Preview production build
+- `pnpm run lint` - Run ESLint
+
+## Project Structure
+
 ```
+client/
+├── public/             # Static assets
+├── src/
+│   ├── components/     # Reusable UI components
+│   │   ├── layout/     # Layout components (Sidebar, Layout)
+│   │   └── ui/         # Base UI components (Button, Input, Modal, etc.)
+│   ├── context/        # React Context providers
+│   │   ├── AuthContext.tsx   # Authentication state
+│   │   └── CartContext.tsx   # Shopping cart state
+│   ├── pages/          # Page components
+│   │   ├── auth/       # Login & Register
+│   │   ├── dashboard/  # Dashboard
+│   │   ├── pos/        # POS/Checkout
+│   │   ├── products/   # Product management
+│   │   ├── categories/ # Category management
+│   │   ├── orders/     # Order history
+│   │   ├── inventory/  # Inventory management
+│   │   ├── reports/    # Sales reports
+│   │   └── settings/   # Store settings
+│   ├── services/       # API service layer
+│   ├── types/          # TypeScript type definitions
+│   ├── App.tsx         # Main app component with routing
+│   ├── main.tsx        # Entry point
+│   └── index.css       # Global styles
+├── index.html
+├── package.json
+├── tailwind.config.js
+├── tsconfig.json
+└── vite.config.ts
+```
+
+## Features
+
+1. **Authentication** - Admin and cashier login with role-based access
+2. **Product Catalog** - CRUD operations for products with categories
+3. **Inventory** - Stock tracking with low-stock alerts
+4. **POS/Checkout** - Add items to cart, apply discounts, process payments
+5. **Orders** - View daily sales history with details
+6. **Receipts** - Printable receipt view
+7. **Reports** - Daily totals and top-selling products
+8. **Settings** - Store configuration (admin only)
+
+## Environment
+
+The client uses Vite's proxy configuration to forward `/api` requests to the backend server running on port 5000.

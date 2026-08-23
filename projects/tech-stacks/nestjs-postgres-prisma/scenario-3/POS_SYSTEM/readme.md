@@ -20,17 +20,6 @@ NestJS + PostgreSQL + Prisma backend for the POS System.
 - Node.js 18+
 - PostgreSQL installed and running
 
-### Environment Variables
-
-Create a `.env` file in the root directory with the following variables:
-
-```env
-DATABASE_URL="postgresql://postgres:password@localhost:5432/pos_system?schema=public"
-JWT_SECRET="your-super-secret-jwt-key-change-me"
-JWT_EXPIRES_IN="1d"
-PORT=3000
-```
-
 ### Installation
 
 ```bash
@@ -50,7 +39,7 @@ pnpm run prisma:seed
 pnpm run start:dev
 ```
 
-The server will run on `http://localhost:3000/api` (or the port specified in .env).
+The server will run on `http://localhost:3000/api` .
 
 ### Available Scripts
 
@@ -99,7 +88,7 @@ POS_SYSTEM/
 │   ├── users/          # User management module
 │   ├── app.module.ts   # Root application module
 │   └── main.ts         # Application entry point
-├── .env                # Environment variables
+├── 
 ├── package.json
 └── tsconfig.json
 ```
@@ -221,4 +210,3 @@ Use this table to find the test file that validates each challenge task.
 | 5 | 1 | Fix Oversell, Decimal Drift & Timezone | `tests/server/level-5/task-1/concurrency-decimals-timezone.test.ts` |
 | 5 | 2 | Write Postmortem Document | `tests/server/level-5/task-2/postmortem-document.test.ts` |
 
-> **Test DB setup:** Copy `.env.example` to `.env`, set `DATABASE_URL_TEST` to a separate Postgres database, then run `pnpm run test`.
