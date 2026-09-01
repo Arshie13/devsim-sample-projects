@@ -6,6 +6,15 @@ const prisma = new PrismaClient();
 async function main() {
   console.log('🌱 Seeding database...');
 
+  // Clear existing data in dependency order so re-seeds don't conflict
+  // with existing rows (unique constraints, FK targets, etc.).
+  console.log('Clearing existing data...');
+  await prisma.transaction.deleteMany();
+  await prisma.budget.deleteMany();
+  await prisma.account.deleteMany();
+  await prisma.category.deleteMany();
+  await prisma.user.deleteMany();
+
   // Hash password
   const hashedPassword = await bcrypt.hash('password123', 10);
 
