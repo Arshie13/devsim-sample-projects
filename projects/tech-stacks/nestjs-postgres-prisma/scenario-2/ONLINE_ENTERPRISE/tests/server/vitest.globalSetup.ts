@@ -5,7 +5,7 @@ export async function setup() {
   const testUrl = process.env.DATABASE_URL_TEST
     || process.env.DATABASE_URL
     || "postgresql://postgres:bambam073004@localhost:5432/brewhaven_test?schema=public";
-  execSync("npx prisma db push --force-reset", {
+  execSync("pnpm exec prisma db push --force-reset", {
     env: { ...process.env, DATABASE_URL: testUrl },
     stdio: "inherit",
   });

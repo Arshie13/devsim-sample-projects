@@ -82,7 +82,7 @@ customer-support-city-hall/
 │   │   └── agent/
 │   │       └── login/
 │   ├── components/
-│   │   └── ui/          ← created by `npx shadcn add`
+│   │   └── ui/          ← created by `pnpm dlx shadcn add`
 │   └── lib/
 │       └── utils.ts
 ├── tests/

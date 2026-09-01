@@ -69,7 +69,7 @@ library-management/
 │   │   ├── signup/
 │   │   └── dashboard/
 │   ├── components/
-│   │   └── ui/          ← created by `npx shadcn add`
+│   │   └── ui/          ← created by `pnpm dlx shadcn add`
 │   └── lib/
 │       ├── mockData.ts
 │       └── utils.ts
