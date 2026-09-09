@@ -222,23 +222,24 @@ describe("Level 1 Task 1: Environment Setup", () => {
   });
 
   // -------------------------------------------------------------------------
-  // Test 4 — MongoDB connectivity (in-memory, isolated from local Mongo)
+  // Test 4 — MongoDB connectivity (uses the configured MONGO_URI)
   // -------------------------------------------------------------------------
   it("should be able to connect to MongoDB via mongoose", () => {
     /**
-     * We use mongodb-memory-server (already a server devDependency) to spin
-     * up an isolated Mongo instance and verify mongoose can connect. This
-     * avoids depending on a locally-running mongod and proves the server's
-     * Mongo stack is wired up correctly.
+     * Verify mongoose can connect to the configured MongoDB instance. In the
+     * DevSim workspace a shared Mongo sidecar is available via MONGO_URI.
+     * mongodb-memory-server is intentionally NOT used here: MongoDB provides
+     * no official Alpine/musl binary, so memory-server fails on the workspace
+     * image with "UnknownLinuxDistro".
      */
     const script = `
+        import 'dotenv/config';
         import mongoose from 'mongoose';
-        import { MongoMemoryServer } from 'mongodb-memory-server';
         (async () => {
-          const mem = await MongoMemoryServer.create();
-          await mongoose.connect(mem.getUri());
+          const uri = process.env.MONGO_URI;
+          if (!uri) throw new Error('MONGO_URI is not set. Start MongoDB and set MONGO_URI (or use server/.env).');
+          await mongoose.connect(uri);
           await mongoose.disconnect();
-          await mem.stop();
           console.log('DB_OK');
           process.exit(0);
         })().catch((err) => { console.error(err); process.exit(1); });
