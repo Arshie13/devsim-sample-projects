@@ -10,6 +10,8 @@
 
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
+import fs from 'fs'
+import { resolve } from 'path'
 import * as BookRowModule from '@/components/BookRow'
 import DashboardPage from '@/app/dashboard/page'
 import { mockBooks, Book } from '@/lib/mockData'
@@ -17,6 +19,7 @@ import { mockBooks, Book } from '@/lib/mockData'
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const BookRow: any =
   (BookRowModule as any).default ?? (BookRowModule as any).BookRow
+const dashboardPath = resolve(__dirname, '../../../src/app/dashboard/page.tsx')
 
 const mockLibrarian = {
   id: '1',
@@ -39,6 +42,13 @@ function renderBookRow(book: Book) {
 describe('Level 2 - Task 2.2: Refactored Book Filtering', () => {
   beforeEach(() => {
     localStorage.setItem('librarian', JSON.stringify(mockLibrarian))
+  })
+
+  it('should memoize the derived book collections with useMemo', () => {
+    const source = fs.readFileSync(dashboardPath, 'utf-8')
+
+    expect(source).toMatch(/import\s+\{[^}]*\buseMemo\b[^}]*\}\s+from\s+['"]react['"]/s)
+    expect(source).toMatch(/const\s+(availableBooks|borrowedBooks|overdueBooks)\s*=\s*useMemo\s*\(/)
   })
 
   describe('BookRow component', () => {
