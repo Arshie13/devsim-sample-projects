@@ -75,7 +75,7 @@ describe('Level 5 - Task 5.2: Utilities & Documentation', () => {
       const fs = require('fs');
       const path = require('path');
       
-      const readmePath = path.resolve(__dirname, '../../../../README.md');
+      const readmePath = path.resolve(__dirname, '../../../README.md');
       expect(fs.existsSync(readmePath)).toBe(true);
       
       const readmeContent = fs.readFileSync(readmePath, 'utf8');
