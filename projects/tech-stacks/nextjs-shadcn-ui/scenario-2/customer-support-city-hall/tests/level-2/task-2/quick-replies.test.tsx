@@ -1,14 +1,6 @@
 /**
- * Level 2 - Task 2.2: Agent Quick-Reply Snippets
- *
- * Agents retype the same opening/closing lines all day. This task adds a
- * library of canned snippets (src/lib/quickReplies.ts) and a row of one-click
- * buttons above the agent message input that insert a snippet's text.
- *
- * Verifies:
- *   - quickReplies exports a non-empty array of { id, label, text } snippets
- *   - the agent dashboard renders a button per snippet
- *   - clicking a snippet appends its text to the message input
+ * Level 2 - Task 2.2: Agent Quick-Reply Snippets with shadcn ScrollArea
+ * Tests that quick replies are rendered in a shadcn ScrollArea
  */
 
 import { describe, it, expect } from 'vitest'
@@ -24,7 +16,6 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-// Anchored, case-insensitive match on a button's full accessible name.
 const exactName = (label: string) => new RegExp(`^${escapeRegExp(label)}$`, 'i')
 
 async function loadSnippets(): Promise<Array<{ id: string; label: string; text: string }>> {
@@ -54,10 +45,37 @@ describe('Level 2 - Task 2.2: quickReplies module', () => {
   })
 })
 
-describe('Level 2 - Task 2.2: quick replies on the agent dashboard', () => {
-  it('should render a button for each quick-reply snippet', async () => {
+describe('Level 2 - Task 2.2: quick replies on the agent dashboard with shadcn ScrollArea', () => {
+  it('should have ScrollArea component installed from shadcn', () => {
+    const scrollAreaPath = join(clientRoot, 'src', 'components', 'ui', 'scroll-area.tsx')
+    expect(fs.existsSync(scrollAreaPath)).toBe(true)
+    const content = fs.readFileSync(scrollAreaPath, 'utf-8')
+    expect(content).toMatch(/\bScrollArea\b/)
+    expect(content).toMatch(/\bScrollBar\b/)
+    expect(content).toMatch(/\bScrollAreaViewport\b/)
+  })
+
+  it('should render quick-reply buttons inside a ScrollArea', async () => {
     const list = await loadSnippets()
     render(<AgentPage />)
+
+    // Find the ScrollArea viewport
+    const scrollArea = screen.getByRole('region', { name: /quick replies|quick replies/i })
+    expect(scrollArea).toBeInTheDocument()
+
+    // ScrollArea should have proper shadcn classes
+    const viewport = scrollArea.querySelector('[data-radix-scroll-area-viewport]') || scrollArea
+    expect(viewport).toBeInTheDocument()
+
+    // ScrollBar should be present
+    const scrollBar = scrollArea.querySelector('[data-radix-scroll-area-scrollbar]')
+    expect(scrollBar).toBeInTheDocument()
+  })
+
+  it('should render a button for each quick-reply snippet inside ScrollArea', async () => {
+    const list = await loadSnippets()
+    render(<AgentPage />)
+
     for (const snippet of list) {
       expect(
         screen.getByRole('button', { name: exactName(snippet.label) }),
@@ -91,4 +109,23 @@ describe('Level 2 - Task 2.2: quick replies on the agent dashboard', () => {
     expect(input.value).toContain('Hi there.')
     expect(input.value).toContain(first.text)
   })
+
+  it('should import ScrollArea from @/components/ui/scroll-area in agent page', () => {
+    const agentPagePath = join(clientRoot, 'src', 'app', 'agent', 'page.tsx')
+    expect(fs.existsSync(agentPagePath)).toBe(true)
+    const source = fs.readFileSync(agentPagePath, 'utf-8')
+    expect(source).toMatch(/from\s+['"]@\/components\/ui\/scroll-area['"]/)
+    expect(source).toMatch(/ScrollArea(?:Viewport|ScrollBar)?/)
+  })
 })
+
+function escapeRegExp(value: string): string {
+  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+}
+
+const exactName = (label: string) => new RegExp(`^${escapeRegExp(label)}$`, 'i')
+
+async function loadSnippets(): Promise<Array<{ id: string; label: string; text: string }>> {
+  const mod = (await import('@/lib/quickReplies')) as Record<string, unknown>
+  return (mod.quickReplies ?? mod.default) as Array<{ id: string; label: string; text: string }>
+}

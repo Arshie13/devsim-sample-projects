@@ -91,4 +91,47 @@ describe('Level 1 Task 1: Project Setup', () => {
     expect(content).toMatch(/\bAlertTitle\b/)
     expect(content).toMatch(/\bAlertDescription\b/)
   })
+
+  it('should have the toast component from shadcn', () => {
+    const toastPath = join(projectRoot, 'src', 'components', 'ui', 'toast.tsx')
+    expect(
+      fs.existsSync(toastPath),
+      'toast.tsx not found. Run "pnpm dlx shadcn@latest add toast" to add it.'
+    ).toBe(true)
+
+    const content = fs.readFileSync(toastPath, 'utf-8')
+    expect(content).toMatch(/\bToast\b/)
+    expect(content).toMatch(/\bToastProvider\b/)
+    expect(content).toMatch(/\bToastViewport\b/)
+    expect(content).toMatch(/\bToastTitle\b/)
+    expect(content).toMatch(/\bToastDescription\b/)
+    expect(content).toMatch(/\bToastAction\b/)
+    expect(content).toMatch(/\buseToast\b/)
+  })
+
+  it('should have the scroll-area component from shadcn', () => {
+    const scrollAreaPath = join(projectRoot, 'src', 'components', 'ui', 'scroll-area.tsx')
+    expect(
+      fs.existsSync(scrollAreaPath),
+      'scroll-area.tsx not found. Run "pnpm dlx shadcn@latest add scroll-area" to add it.'
+    ).toBe(true)
+
+    const content = fs.readFileSync(scrollAreaPath, 'utf-8')
+    expect(content).toMatch(/\bScrollArea\b/)
+    expect(content).toMatch(/\bScrollBar\b/)
+    expect(content).toMatch(/\bScrollAreaViewport\b/)
+  })
+
+  it('should have the badge component from shadcn', () => {
+    const badgePath = join(projectRoot, 'src', 'components', 'ui', 'badge.tsx')
+    expect(
+      fs.existsSync(badgePath),
+      'badge.tsx not found. Run "pnpm dlx shadcn@latest add badge" to add it.'
+    ).toBe(true)
+
+    const content = fs.readFileSync(badgePath, 'utf-8')
+    expect(content).toMatch(/\bBadge\b/)
+    expect(content).toMatch(/variant/)
+    expect(content).toMatch(/forwardRef/)
+  })
 })

@@ -1,17 +1,14 @@
 /**
- * Level 5 - Task 5.2: Dashboard Accessibility Sweep
+ * Level 5 - Task 5.2: Dashboard Accessibility Sweep & DropdownMenu Component
+ * Tests for accessibility landmarks and shadcn/ui DropdownMenu component
  *
- * Verifies:
- *   - Skip link is the first focusable element and targets #main-content
- *   - <main> has id="main-content" and tabIndex={-1}
- *   - Sidebar <nav> exposes role="navigation" + aria-label="Primary"
- *   - Active sidebar item exposes aria-current="page"
- *   - Icon-only buttons have aria-label
- *   - Header includes an sr-only <h1> with the school name
+ * This task uses the DropdownMenu component installed in Level 1.
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { join, resolve } from 'path'
+import fs from 'fs'
 
 vi.mock('next/navigation', async () => {
   const actual = await vi.importActual<typeof import('next/navigation')>('next/navigation')
@@ -140,5 +137,62 @@ describe('Level 5 - Task 5.2: Screen-reader-only <h1> with school name', () => {
       '<h1> in header must have `sr-only` so it is not visually duplicated.'
     ).toBe(true)
     expect(srH1!.textContent).toMatch(/riverside university/i)
+  })
+})
+
+describe('Level 5 - Task 5.2: shadcn/ui DropdownMenu Component (installed in Level 1)', () => {
+  it('should use the DropdownMenu component installed in Level 1', () => {
+    const dropdownPath = join(
+      process.cwd(),
+      'src',
+      'components',
+      'ui',
+      'dropdown-menu.tsx'
+    )
+    expect(fs.existsSync(dropdownPath)).toBe(true)
+    const content = fs.readFileSync(dropdownPath, 'utf-8')
+    expect(content).toMatch(/\bDropdownMenu\b/)
+    expect(content).toMatch(/\bDropdownMenuTrigger\b/)
+    expect(content).toMatch(/\bDropdownMenuContent\b/)
+    expect(content).toMatch(/\bDropdownMenuItem\b/)
+    expect(content).toMatch(/\bDropdownMenuSeparator\b/)
+    expect(content).toMatch(/\bDropdownMenuLabel\b/)
+    expect(content).toMatch(/\bDropdownMenuGroup\b/)
+  })
+
+  it('should render a user DropdownMenu in the dashboard header', async () => {
+    const DashboardLayout = (await import('@/app/dashboard/layout')).default
+    render(
+      <DashboardLayout>
+        <div>child</div>
+      </DashboardLayout>
+    )
+
+    // Click the user avatar/button to open dropdown
+    const userButton = screen.getByRole('button', { name: /user|profile|account/i })
+    fireEvent.click(userButton)
+
+    // Dropdown should open
+    const dropdownContent = screen.getByRole('menu')
+    expect(dropdownContent).toBeInTheDocument()
+
+    // Should have profile and logout items
+    expect(screen.getByRole('menuitem', { name: /profile/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /settings|preferences/i })).toBeInTheDocument()
+    expect(screen.getByRole('menuitem', { name: /sign out|logout/i })).toBeInTheDocument()
+  })
+
+  it('should import DropdownMenu from @/components/ui/dropdown-menu in dashboard layout', async () => {
+    const layoutPath = join(
+      process.cwd(),
+      'src',
+      'app',
+      'dashboard',
+      'layout.tsx'
+    )
+    expect(fs.existsSync(layoutPath)).toBe(true)
+    const source = fs.readFileSync(layoutPath, 'utf-8')
+    expect(source).toMatch(/from\s+['"]@\/components\/ui\/dropdown-menu['"]/)
+    expect(source).toMatch(/DropdownMenu(?:Trigger|Content|Item|Separator|Label|Group)?/)
   })
 })

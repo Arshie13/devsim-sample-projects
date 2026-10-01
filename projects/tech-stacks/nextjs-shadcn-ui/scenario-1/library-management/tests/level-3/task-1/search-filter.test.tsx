@@ -1,14 +1,17 @@
 /**
- * Level 3 - Task 3.1: Add Book Search & Filter
- * Tests that search functionality filters books correctly
+ * Level 3 - Task 3.1: Add Book Search & Filter with shadcn Input
+ * Tests that search functionality uses shadcn/ui Input component
+ * and filters books correctly
  */
 
 import { describe, it, expect, beforeEach } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import DashboardPage from '@/app/dashboard/page'
 import { mockBooks } from '@/lib/mockData'
+import { join, resolve } from 'path'
+import fs from 'fs'
 
-describe('Level 3 - Task 3.1: Book Search & Filter', () => {
+describe('Level 3 - Task 3.1: Book Search & Filter with shadcn Input', () => {
   beforeEach(() => {
     const mockLibrarian = {
       id: '1',
@@ -19,27 +22,45 @@ describe('Level 3 - Task 3.1: Book Search & Filter', () => {
     localStorage.setItem('librarian', JSON.stringify(mockLibrarian))
   })
 
-  it('should render a search input field', () => {
+  it('should use shadcn Input component for search', () => {
     render(<DashboardPage />)
+
     const searchInput = screen.getByPlaceholderText(/search books/i)
     expect(searchInput).toBeInTheDocument()
+
+    // Input should have shadcn Input classes
+    expect(searchInput).toHaveClass('h-10')
+    expect(searchInput).toHaveClass('px-3')
+    expect(searchInput).toHaveClass('rounded-md')
+    expect(searchInput).toHaveClass('border')
+    expect(searchInput).toHaveClass('focus:outline-none')
+    expect(searchInput).toHaveClass('focus:ring-2')
+  })
+
+  it('should import Input from @/components/ui/input in dashboard', () => {
+    const dashboardPath = join(
+      process.cwd(),
+      'src',
+      'app',
+      'dashboard',
+      'page.tsx'
+    )
+    expect(fs.existsSync(dashboardPath)).toBe(true)
+    const source = fs.readFileSync(dashboardPath, 'utf-8')
+    expect(source).toMatch(/from\s+['"]@\/components\/ui\/input['"]/)
   })
 
   it('should filter books by title when searching', () => {
     render(<DashboardPage />)
     const searchInput = screen.getByPlaceholderText(/search books/i)
 
-    // Find a book to search for
     const bookToSearch = mockBooks.find(book => book.title.includes('Gatsby')) || mockBooks[0]
-    const searchTerm = bookToSearch.title.split(' ')[0] // Use first word of title
+    const searchTerm = bookToSearch.title.split(' ')[0]
 
-    // Type search term in the search field
     fireEvent.change(searchInput, { target: { value: searchTerm } })
 
-    // Should show the searched book
     expect(screen.getByText(bookToSearch.title)).toBeInTheDocument()
 
-    // Should not show other books (assuming search works correctly)
     const otherBook = mockBooks.find(book => book.id !== bookToSearch.id)
     if (otherBook && !otherBook.title.toLowerCase().includes(searchTerm.toLowerCase())) {
       expect(screen.queryByText(otherBook.title)).not.toBeInTheDocument()
@@ -50,12 +71,10 @@ describe('Level 3 - Task 3.1: Book Search & Filter', () => {
     render(<DashboardPage />)
     const searchInput = screen.getByPlaceholderText(/search books/i)
 
-    // Find books by the same author
     const orwellBooks = mockBooks.filter(book => book.author.includes('Orwell'))
     if (orwellBooks.length > 0) {
       fireEvent.change(searchInput, { target: { value: 'Orwell' } })
 
-      // Should show books by George Orwell
       orwellBooks.forEach(book => {
         expect(screen.getByText(book.title)).toBeInTheDocument()
       })
@@ -85,7 +104,6 @@ describe('Level 3 - Task 3.1: Book Search & Filter', () => {
     render(<DashboardPage />)
     const searchInput = screen.getByPlaceholderText(/search books/i)
 
-    // Initially all books should be visible
     mockBooks.forEach(book => {
       expect(screen.getByText(book.title)).toBeInTheDocument()
     })

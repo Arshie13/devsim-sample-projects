@@ -1,23 +1,21 @@
 /**
- * Level 5 - Task 5.2: Transcript Export & Documentation
+ * Level 5 - Task 5.2: Transcript Export & Toast Component
+ * Tests for transcript module, export affordance, and shadcn/ui Toast component
  *
- * Verifies:
- *   - src/lib/transcript.ts exports formatTranscript
- *   - formatTranscript renders a readable transcript and never throws
- *   - the agent dashboard exposes an "Export Transcript" affordance
- *   - README.md is populated with project documentation
+ * This task uses the Toast component installed in Level 1.
  */
 
 import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
 import { join, resolve } from 'path'
 import fs from 'fs'
 import AgentPage from '@/app/agent/page'
+import SupportPage from '@/app/support/page'
 
 const clientRoot = process.env.DEVSIM_CLIENT_ROOT ?? resolve(__dirname, '../../../')
 const transcriptPath = join(clientRoot, 'src', 'lib', 'transcript.ts')
 const agentPagePath = join(clientRoot, 'src', 'app', 'agent', 'page.tsx')
-const readmePath = join(clientRoot, 'README.md')
+const supportPagePath = join(clientRoot, 'src', 'app', 'support', 'page.tsx')
 
 const sampleConversation = {
   customer: { fullName: 'Jane Tester' },
@@ -74,6 +72,7 @@ describe('Level 5 - Task 5.2: transcript export on the agent dashboard', () => {
     expect(fs.existsSync(agentPagePath)).toBe(true)
     const source = fs.readFileSync(agentPagePath, 'utf-8')
     expect(source).toMatch(/from\s+['"][^'"]*transcript['"]/)
+    expect(source).toMatch(/formatTranscript/)
   })
 
   it('should render an "Export Transcript" affordance', () => {
@@ -82,7 +81,43 @@ describe('Level 5 - Task 5.2: transcript export on the agent dashboard', () => {
   })
 })
 
+describe('Level 5 - Task 5.2: shadcn/ui Toast Component (installed in Level 1)', () => {
+  it('should use the Toast component installed in Level 1', () => {
+    const toastPath = join(clientRoot, 'src', 'components', 'ui', 'toast.tsx')
+    expect(fs.existsSync(toastPath)).toBe(true)
+    const content = fs.readFileSync(toastPath, 'utf-8')
+    expect(content).toMatch(/\bToast\b/)
+    expect(content).toMatch(/\bToastProvider\b/)
+    expect(content).toMatch(/\bToastViewport\b/)
+    expect(content).toMatch(/\bToastTitle\b/)
+    expect(content).toMatch(/\bToastDescription\b/)
+    expect(content).toMatch(/\bToastAction\b/)
+    expect(content).toMatch(/\buseToast\b/)
+  })
+
+  it('should show a toast when transcript is exported', () => {
+    render(<AgentPage />)
+
+    const exportButton = screen.getByRole('button', { name: /export transcript/i })
+    fireEvent.click(exportButton)
+
+    // Toast should appear
+    const toast = screen.getByRole('status', { name: /exported|complete|success/i })
+    expect(toast).toBeInTheDocument()
+  })
+
+  it('should import Toast from @/components/ui/toast in agent page', () => {
+    expect(fs.existsSync(agentPagePath)).toBe(true)
+    const source = fs.readFileSync(agentPagePath, 'utf-8')
+    expect(source).toMatch(/from\s+['"]@\/components\/ui\/toast['"]/)
+    expect(source).toMatch(/Toast(?:Provider|Viewport|Title|Description|Action)?/)
+    expect(source).toMatch(/useToast/)
+  })
+})
+
 describe('Level 5 - Task 5.2: README documentation', () => {
+  const readmePath = join(clientRoot, 'README.md')
+
   it('should populate README.md with project documentation', () => {
     expect(
       fs.existsSync(readmePath),

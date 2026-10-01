@@ -1,38 +1,18 @@
 /**
- * Level 5 - Task 5.2: Date Utilities & Documentation
- * Tests for date utility functions and documentation completeness
+ * Level 5 - Task 5.2: Date Utilities & Dialog Component
+ * Tests for date utility functions and shadcn/ui Dialog component usage
+ *
+ * This task uses the Dialog component installed in Level 1.
  */
 
 import { describe, it, expect, beforeEach } from 'vitest'
-// Import the candidate's own date utilities, not the test helper.
 import { formatDate, isOverdue } from '@/lib/dateUtils'
+import { render, screen, fireEvent } from '@testing-library/react'
+import DashboardPage from '@/app/dashboard/page'
+import { join, resolve } from 'path'
+import fs from 'fs'
 
-// Helper function to get all files recursively with specific extensions
-function getAllFiles(dir: string, extensions: string[]): string[] {
-  const fs = require('fs');
-  const path = require('path');
-  
-  let results: string[] = [];
-  
-  const files = fs.readdirSync(dir);
-  
-  for (const file of files) {
-    const filePath = path.join(dir, file);
-    const stat = fs.statSync(filePath);
-    
-    if (stat.isDirectory()) {
-      results = results.concat(getAllFiles(filePath, extensions));
-    } else {
-      if (extensions.some(ext => filePath.endsWith(ext))) {
-        results.push(filePath);
-      }
-    }
-  }
-  
-  return results;
-}
-
-describe('Level 5 - Task 5.2: Utilities & Documentation', () => {
+describe('Level 5 - Task 5.2: Utilities & Dialog Component', () => {
   describe('Date Utilities', () => {
     it('should format date string to readable format', () => {
       const formatted = formatDate('2026-01-15')
@@ -60,7 +40,7 @@ describe('Level 5 - Task 5.2: Utilities & Documentation', () => {
     })
   })
 
-  describe('Documentation', () => {
+  describe('shadcn/ui Dialog Component (installed in Level 1)', () => {
     beforeEach(() => {
       const mockLibrarian = {
         id: '1',
@@ -71,45 +51,57 @@ describe('Level 5 - Task 5.2: Utilities & Documentation', () => {
       localStorage.setItem('librarian', JSON.stringify(mockLibrarian))
     })
 
-    it('should have README.md with feature documentation', () => {
-      const fs = require('fs');
-      const path = require('path');
-      
-      const readmePath = path.resolve(__dirname, '../../../README.md');
-      expect(fs.existsSync(readmePath)).toBe(true);
-      
-      const readmeContent = fs.readFileSync(readmePath, 'utf8');
-      // The default create-next-app README is generic boilerplate. The task
-      // requires documenting THIS project's own features, so check for
-      // library-management-specific documentation the candidate must add.
-      expect(readmeContent).toMatch(/library management/i);
-      expect(readmeContent).toMatch(/\bbook/i);
-      expect(readmeContent).toMatch(/feature/i);
-      expect(readmeContent.length).toBeGreaterThan(100); // Reasonable length
+    it('should use the Dialog component installed in Level 1', () => {
+      const dialogPath = join(
+        process.cwd(),
+        'src',
+        'components',
+        'ui',
+        'dialog.tsx'
+      )
+      expect(fs.existsSync(dialogPath)).toBe(true)
+      const content = fs.readFileSync(dialogPath, 'utf-8')
+      expect(content).toMatch(/\bDialog\b/)
+      expect(content).toMatch(/\bDialogTrigger\b/)
+      expect(content).toMatch(/\bDialogContent\b/)
+      expect(content).toMatch(/\bDialogHeader\b/)
+      expect(content).toMatch(/\bDialogTitle\b/)
+      expect(content).toMatch(/\bDialogDescription\b/)
     })
 
-    it('should have code comments in source files', () => {
-      const fs = require('fs');
-      const path = require('path');
-      
-      const srcDir = path.resolve(__dirname, '../../../src');
-      const files = getAllFiles(srcDir, ['.tsx', '.ts']);
-      
-      let totalFiles = 0;
-      let filesWithComments = 0;
-      
-      for (const file of files) {
-        const content = fs.readFileSync(file, 'utf8');
-        totalFiles++;
-        
-        // Check for JSDoc comments (/**) or regular comments (// or /*)
-        if (content.includes('/**') || content.includes('//') || content.includes('/*')) {
-          filesWithComments++;
-        }
-      }
-      
-      // At least 80% of files should have some form of comments
-      expect(filesWithComments / totalFiles).toBeGreaterThanOrEqual(0.8);
+    it('should render a Dialog for book details on the dashboard', () => {
+      render(<DashboardPage />)
+
+      // Click on a book row to open the dialog
+      const firstBookRow = screen.getByRole('row', { name: /book/i })
+      fireEvent.click(firstBookRow)
+
+      // Dialog should open
+      const dialogContent = screen.getByRole('dialog')
+      expect(dialogContent).toBeInTheDocument()
+
+      // Dialog should have title
+      const dialogTitle = screen.getByRole('heading', { level: 2 })
+      expect(dialogTitle).toBeInTheDocument()
+      expect(dialogTitle.textContent).toMatch(/book details/i)
+
+      // Dialog should have close button
+      const closeButton = screen.getByRole('button', { name: /close/i })
+      expect(closeButton).toBeInTheDocument()
+    })
+
+    it('should import Dialog from @/components/ui/dialog in dashboard page', () => {
+      const dashboardPath = join(
+        process.cwd(),
+        'src',
+        'app',
+        'dashboard',
+        'page.tsx'
+      )
+      expect(fs.existsSync(dashboardPath)).toBe(true)
+      const source = fs.readFileSync(dashboardPath, 'utf-8')
+      expect(source).toMatch(/from\s+['"]@\/components\/ui\/dialog['"]/)
+      expect(source).toMatch(/Dialog(?:Trigger|Content|Header|Title|Description)?/)
     })
   })
 })

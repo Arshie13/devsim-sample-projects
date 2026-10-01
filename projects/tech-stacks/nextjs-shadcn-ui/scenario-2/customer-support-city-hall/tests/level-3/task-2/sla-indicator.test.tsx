@@ -1,10 +1,6 @@
 /**
- * Level 3 - Task 3.2: First-Response SLA Indicator
- *
- * Verifies:
- *   - hasAgentReplied detects whether any agent message exists
- *   - getServiceState classifies a conversation's service state
- *   - the agent dashboard badges conversations awaiting a first reply
+ * Level 3 - Task 3.2: First-Response SLA Indicator with shadcn Badge
+ * Tests that SLA badges use shadcn Badge component
  */
 
 import { describe, it, expect } from 'vitest'
@@ -65,8 +61,23 @@ describe('Level 3 - Task 3.2: sla module', () => {
   })
 })
 
-describe('Level 3 - Task 3.2: SLA badges on the agent dashboard', () => {
-  it('should badge conversations that have no agent reply', () => {
+describe('Level 3 - Task 3.2: SLA Badges with shadcn Badge component', () => {
+  it('should have Badge component installed from shadcn', () => {
+    const badgePath = join(
+      process.cwd(),
+      'src',
+      'components',
+      'ui',
+      'badge.tsx'
+    )
+    expect(fs.existsSync(badgePath)).toBe(true)
+    const content = fs.readFileSync(badgePath, 'utf-8')
+    expect(content).toMatch(/\bBadge\b/)
+    expect(content).toMatch(/variant/)
+    expect(content).toMatch(/forwardRef/)
+  })
+
+  it('should render SLA badges using shadcn Badge component', () => {
     render(<AgentPage />)
 
     // Seed: John & Maria have only system/customer messages; Robert (resolved)
@@ -75,13 +86,53 @@ describe('Level 3 - Task 3.2: SLA badges on the agent dashboard', () => {
     const mariaRow = screen.getByRole('button', { name: /maria garcia/i })
     const robertRow = screen.getByRole('button', { name: /robert johnson/i })
 
-    expect(within(johnRow).getByText(/awaiting first reply/i)).toBeInTheDocument()
-    expect(within(mariaRow).getByText(/awaiting first reply/i)).toBeInTheDocument()
+    // John & Maria should have "Awaiting First Reply" badge
+    const johnBadge = within(johnRow).getByText(/awaiting first reply/i)
+    expect(johnBadge).toBeInTheDocument()
+    expect(johnBadge.closest('[data-badge]') || johnBadge.closest('[class*="badge"]') || johnBadge.parentElement).toBeInTheDocument()
+
+    const mariaBadge = within(mariaRow).getByText(/awaiting first reply/i)
+    expect(mariaBadge).toBeInTheDocument()
+
+    // Robert (resolved) should not have the badge
     expect(within(robertRow).queryByText(/awaiting first reply/i)).toBeNull()
+  })
+
+  it('should use Badge component with proper variant classes', () => {
+    render(<AgentPage />)
+
+    const johnRow = screen.getByRole('button', { name: /john smith/i })
+    const badge = within(johnRow).getByText(/awaiting first reply/i)
+
+    // Badge should have shadcn classes
+    expect(badge).toHaveClass('inline-flex')
+    expect(badge).toHaveClass('items-center')
+    expect(badge).toHaveClass('rounded-full')
+    expect(badge).toHaveClass('px-2.5')
+    expect(badge).toHaveClass('py-0.5')
+    expect(badge).toHaveClass('text-xs')
+    expect(badge).toHaveClass('font-medium')
+    expect(badge).toHaveClass('transition-colors')
   })
 
   it('should surface more than one conversation awaiting a first reply', () => {
     render(<AgentPage />)
     expect(screen.getAllByText(/awaiting first reply/i).length).toBeGreaterThanOrEqual(2)
   })
+
+  it('should import Badge from @/components/ui/badge in agent page', () => {
+    const agentPagePath = join(
+      process.env.DEVSIM_CLIENT_ROOT ?? resolve(__dirname, '../../../'),
+      'src',
+      'app',
+      'agent',
+      'page.tsx'
+    )
+    expect(fs.existsSync(agentPagePath)).toBe(true)
+    const source = fs.readFileSync(agentPagePath, 'utf-8')
+    expect(source).toMatch(/from\s+['"]@\/components\/ui\/badge['"]/)
+    expect(source).toMatch(/Badge/)
+  })
 })
+
+const msgs = (...roles: string[]) => roles.map((role) => ({ role }))

@@ -1,89 +1,61 @@
 /**
- * Level 2 - Task 2.1: InfoTooltip Primitive on Standing Badges
+ * Level 2 - Task 2.1: Academic Probation Alert Banner
  *
- * Verifies:
- *   - src/components/InfoTooltip.tsx exists and renders a role="tooltip" element
- *   - The tooltip's `label` is exposed in the DOM
- *   - The standing page wraps each status badge with InfoTooltip + the spec text
+ * The standing page shows status badges but no immediate visual warning
+ * when a student is on academic probation. This task adds a prominent
+ * Alert banner at the top of the standing page when probation status
+ * is detected.
+ *
+ * Implementation requirements:
+ * - Use the shadcn/ui Alert component (destructive variant)
+ * - Show the alert only when academic status is "probation"
+ * - Display the current GPA and the minimum required GPA
+ * - Include a link to schedule an advisor meeting
+ * - Alert should be visually prominent at the top of the page
  */
 
 import { describe, it, expect } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import StandingPage from '@/app/dashboard/standing/page'
 
-describe('Level 2 - Task 2.1: InfoTooltip primitive', () => {
-  it('should expose role="tooltip" with the passed label', async () => {
-    const { InfoTooltip } = await import('@/components/InfoTooltip')
-    render(
-      <InfoTooltip label="hello tooltip">
-        <span>trigger</span>
-      </InfoTooltip>
-    )
-
-    const tooltip = screen.getByRole('tooltip', { hidden: true })
-    expect(tooltip).toBeInTheDocument()
-    expect(tooltip.textContent).toMatch(/hello tooltip/i)
-  })
-
-  it('should keep the tooltip hidden by default via opacity-0 / pointer-events-none', async () => {
-    const { InfoTooltip } = await import('@/components/InfoTooltip')
-    const { container } = render(
-      <InfoTooltip label="initially hidden">
-        <span>trigger</span>
-      </InfoTooltip>
-    )
-
-    const tooltip = container.querySelector('[role="tooltip"]') as HTMLElement | null
-    expect(tooltip, 'role="tooltip" element missing').not.toBeNull()
-    expect(
-      /opacity-0/.test(tooltip!.className),
-      'InfoTooltip should be hidden by default (expected class `opacity-0`).'
-    ).toBe(true)
-    expect(
-      /pointer-events-none/.test(tooltip!.className),
-      'InfoTooltip default state should include `pointer-events-none`.'
-    ).toBe(true)
-  })
-
-  it('should reveal the tooltip on group-hover via Tailwind classes', async () => {
-    const { InfoTooltip } = await import('@/components/InfoTooltip')
-    const { container } = render(
-      <InfoTooltip label="reveal on hover">
-        <span>trigger</span>
-      </InfoTooltip>
-    )
-
-    const wrapper = container.firstElementChild as HTMLElement | null
-    expect(wrapper, 'wrapper element missing').not.toBeNull()
-    expect(
-      /\bgroup\b/.test(wrapper!.className),
-      'InfoTooltip wrapper should expose Tailwind `group` class.'
-    ).toBe(true)
-
-    const tooltip = container.querySelector('[role="tooltip"]') as HTMLElement | null
-    expect(
-      /group-hover:opacity-100/.test(tooltip!.className),
-      'Tooltip should become visible on group-hover (expected class `group-hover:opacity-100`).'
-    ).toBe(true)
-  })
-})
-
-describe('Level 2 - Task 2.1: Standing page wires tooltips around status badges', () => {
-  it('should wrap the academic status badge with an InfoTooltip whose label matches the status', () => {
+describe('Level 2 - Task 2.1: Academic Probation Alert Banner', () => {
+  it('shows a probation alert banner when status is probation', () => {
     render(<StandingPage />)
 
-    // The mockData currentStanding.academicStatus is "good" so the "Good Standing" tooltip text must appear.
-    const goodTooltip = screen.getByRole('tooltip', {
-      hidden: true,
-      name: /good standing.*cumulative gpa.*3\.0/i,
-    })
-    expect(goodTooltip).toBeInTheDocument()
+    // Alert banner should be present
+    const alert = screen.getByRole('alert')
+    expect(alert).toBeInTheDocument()
+
+    // Uses destructive variant for probation warning
+    expect(alert).toHaveClass('border-l-4')
+    expect(alert).toHaveClass('border-red-500')
+    expect(alert).toHaveClass('bg-red-50')
+    expect(alert).toHaveClass('text-red-900')
+
+    // AlertTitle mentions academic probation
+    const title = screen.getByRole('heading', { level: 5 })
+    expect(title).toBeInTheDocument()
+    expect(title.textContent).toMatch(/probation|academic standing/i)
   })
 
-  it('should document the three status-tier tooltip strings in standing/page.tsx', async () => {
-    // We accept either: all three tooltip strings rendered through getStatusBadge,
-    // or all three present as static strings in the source. The static-string check
-    // is a strong proxy for the spec compliance even when only one status is rendered.
+  it('displays current GPA and minimum required GPA', () => {
+    render(<StandingPage />)
+
+    const alertDesc = screen.getByText(/gpa|grade point/i)
+    expect(alertDesc).toBeInTheDocument()
+    // Should mention the threshold (typically 2.0)
+    expect(alertDesc.textContent).toMatch(/2\.0|minimum|required/i)
+  })
+
+  it('includes a link to schedule an advisor meeting', () => {
+    render(<StandingPage />)
+
+    const advisorLink = screen.getByRole('link', { name: /advisor|schedule|meeting/i })
+    expect(advisorLink).toBeInTheDocument()
+    expect(advisorLink).toHaveAttribute('href', expect.stringMatching(/advisor|schedule/))
+  })
+
+  it('imports Alert from @/components/ui/alert in standing page', async () => {
     const fs = await import('fs')
     const path = await import('path')
     const standingPath = path.resolve(
@@ -98,17 +70,7 @@ describe('Level 2 - Task 2.1: Standing page wires tooltips around status badges'
     )
     const contents = fs.readFileSync(standingPath, 'utf-8')
 
-    expect(
-      /good standing[^"']*cumulative gpa[^"']*3\.0/i.test(contents),
-      'standing/page.tsx must include the "Good Standing" tooltip copy.'
-    ).toBe(true)
-    expect(
-      /warning[^"']*gpa[^"']*2\.0[^"']*2\.99/i.test(contents),
-      'standing/page.tsx must include the "Warning" tooltip copy.'
-    ).toBe(true)
-    expect(
-      /probation[^"']*gpa below 2\.0[^"']*advisor/i.test(contents),
-      'standing/page.tsx must include the "Probation" tooltip copy.'
-    ).toBe(true)
+    expect(contents).toMatch(/from\s+['"]@\/components\/ui\/alert['"]/)
+    expect(contents).toMatch(/Alert(?:Title|Description)?/)
   })
 })

@@ -92,4 +92,32 @@ describe('Level 1 Task 1: Project Setup', () => {
     expect(content).toMatch(/\bAlertTitle\b/)
     expect(content).toMatch(/\bAlertDescription\b/)
   })
+
+  it('should have the dialog component from shadcn', () => {
+    const dialogPath = join(projectRoot, 'src', 'components', 'ui', 'dialog.tsx')
+    expect(
+      fs.existsSync(dialogPath),
+      'dialog.tsx not found. Run "pnpm dlx shadcn@latest add dialog" to add it.'
+    ).toBe(true)
+
+    const content = fs.readFileSync(dialogPath, 'utf-8')
+    expect(content).toMatch(/\bDialog\b/)
+    expect(content).toMatch(/\bDialogTrigger\b/)
+    expect(content).toMatch(/\bDialogContent\b/)
+    expect(content).toMatch(/\bDialogHeader\b/)
+    expect(content).toMatch(/\bDialogTitle\b/)
+    expect(content).toMatch(/\bDialogDescription\b/)
+  })
+
+  it('should have the input component from shadcn', () => {
+    const inputPath = join(projectRoot, 'src', 'components', 'ui', 'input.tsx')
+    expect(
+      fs.existsSync(inputPath),
+      'input.tsx not found. Run "pnpm dlx shadcn@latest add input" to add it.'
+    ).toBe(true)
+
+    const content = fs.readFileSync(inputPath, 'utf-8')
+    expect(content).toMatch(/\bInput\b/)
+    expect(content).toMatch(/forwardRef/)
+  })
 })
