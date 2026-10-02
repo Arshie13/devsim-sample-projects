@@ -6,7 +6,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import GradesPage from '@/app/dashboard/grades/page'
-import { join, resolve } from 'path'
+import { join } from 'path'
 import fs from 'fs'
 
 function selectTab(name: RegExp) {
@@ -144,9 +144,3 @@ describe('Level 2 - Task 2.2: Grades page uses Collapsible for semester groups',
     expect(source).toMatch(/Collapsible(?:Trigger|Content)?/)
   })
 })
-
-function selectTab(name: RegExp) {
-  const tab = screen.getByRole('tab', { name })
-  fireEvent.mouseDown(tab)
-  fireEvent.focus(tab)
-}

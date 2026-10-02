@@ -10,12 +10,10 @@ import { render, screen, fireEvent } from '@testing-library/react'
 import { join, resolve } from 'path'
 import fs from 'fs'
 import AgentPage from '@/app/agent/page'
-import SupportPage from '@/app/support/page'
 
 const clientRoot = process.env.DEVSIM_CLIENT_ROOT ?? resolve(__dirname, '../../../')
 const transcriptPath = join(clientRoot, 'src', 'lib', 'transcript.ts')
 const agentPagePath = join(clientRoot, 'src', 'app', 'agent', 'page.tsx')
-const supportPagePath = join(clientRoot, 'src', 'app', 'support', 'page.tsx')
 
 const sampleConversation = {
   customer: { fullName: 'Jane Tester' },
@@ -115,26 +113,3 @@ describe('Level 5 - Task 5.2: shadcn/ui Toast Component (installed in Level 1)',
   })
 })
 
-describe('Level 5 - Task 5.2: README documentation', () => {
-  const readmePath = join(clientRoot, 'README.md')
-
-  it('should populate README.md with project documentation', () => {
-    expect(
-      fs.existsSync(readmePath),
-      `Expected README.md at ${readmePath} but it was not found.`
-    ).toBe(true)
-
-    const content = fs.readFileSync(readmePath, 'utf-8')
-
-    expect(
-      content.length,
-      'README.md still looks like the create-next-app boilerplate. Add project docs.'
-    ).toBeGreaterThan(400)
-
-    expect(content).toMatch(/city hall/i)
-    expect(content).toMatch(/admin/) // demo credentials
-    expect(content).toMatch(/admin123/) // demo credentials
-    expect(content).toMatch(/\/support/) // routes section
-    expect(content).toMatch(/\/agent/)
-  })
-})

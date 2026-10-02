@@ -15,6 +15,7 @@
 
 import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
+import { useRouter } from 'next/navigation'
 import SupportPage from '@/app/support/page'
 import { join, resolve } from 'path'
 import fs from 'fs'
@@ -31,7 +32,7 @@ describe('Level 2 - Task 2.1: AI Fallback Alert in Support Chat', () => {
 
     // Uses warning variant for fallback notice
     expect(alert).toHaveClass('border-l-4')
-    expect(alert).toHaveClass('border-amber-500')
+    expect(alert).toHaveClass('border-l-amber-500')
     expect(alert).toHaveClass('bg-amber-50')
     expect(alert).toHaveClass('text-amber-900')
 
@@ -50,12 +51,13 @@ describe('Level 2 - Task 2.1: AI Fallback Alert in Support Chat', () => {
 
   it('button click navigates to handoff/queue page', () => {
     render(<SupportPage />)
+    const router = useRouter()
 
     const escalateBtn = screen.getByRole('button', { name: /escalate|transfer|human agent/i })
     fireEvent.click(escalateBtn)
 
-    // Should navigate to handoff page
-    // (In a real test with router, we'd check the navigation)
+    expect(router.push).toHaveBeenCalledWith('/support/queue')
+    // The banner stays visible so the handoff notice is not lost on navigation.
     expect(escalateBtn).toBeInTheDocument()
   })
 

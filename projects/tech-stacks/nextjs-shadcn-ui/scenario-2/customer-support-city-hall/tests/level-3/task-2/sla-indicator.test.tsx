@@ -134,5 +134,3 @@ describe('Level 3 - Task 3.2: SLA Badges with shadcn Badge component', () => {
     expect(source).toMatch(/Badge/)
   })
 })
-
-const msgs = (...roles: string[]) => roles.map((role) => ({ role }))

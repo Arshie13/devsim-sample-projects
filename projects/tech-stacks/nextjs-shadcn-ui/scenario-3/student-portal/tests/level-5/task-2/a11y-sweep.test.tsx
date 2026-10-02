@@ -7,7 +7,7 @@
 
 import { describe, it, expect, vi } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
-import { join, resolve } from 'path'
+import { join } from 'path'
 import fs from 'fs'
 
 vi.mock('next/navigation', async () => {

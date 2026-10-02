@@ -56,7 +56,6 @@ describe('Level 2 - Task 2.2: quick replies on the agent dashboard with shadcn S
   })
 
   it('should render quick-reply buttons inside a ScrollArea', async () => {
-    const list = await loadSnippets()
     render(<AgentPage />)
 
     // Find the ScrollArea viewport
@@ -118,14 +117,3 @@ describe('Level 2 - Task 2.2: quick replies on the agent dashboard with shadcn S
     expect(source).toMatch(/ScrollArea(?:Viewport|ScrollBar)?/)
   })
 })
-
-function escapeRegExp(value: string): string {
-  return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
-}
-
-const exactName = (label: string) => new RegExp(`^${escapeRegExp(label)}$`, 'i')
-
-async function loadSnippets(): Promise<Array<{ id: string; label: string; text: string }>> {
-  const mod = (await import('@/lib/quickReplies')) as Record<string, unknown>
-  return (mod.quickReplies ?? mod.default) as Array<{ id: string; label: string; text: string }>
-}

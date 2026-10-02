@@ -15,7 +15,8 @@
  */
 
 import { describe, it, expect } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, within } from '@testing-library/react'
+import { resolve } from 'path'
 import StandingPage from '@/app/dashboard/standing/page'
 
 describe('Level 2 - Task 2.1: Academic Probation Alert Banner', () => {
@@ -28,7 +29,7 @@ describe('Level 2 - Task 2.1: Academic Probation Alert Banner', () => {
 
     // Uses destructive variant for probation warning
     expect(alert).toHaveClass('border-l-4')
-    expect(alert).toHaveClass('border-red-500')
+    expect(alert).toHaveClass('border-l-red-500')
     expect(alert).toHaveClass('bg-red-50')
     expect(alert).toHaveClass('text-red-900')
 
@@ -41,7 +42,9 @@ describe('Level 2 - Task 2.1: Academic Probation Alert Banner', () => {
   it('displays current GPA and minimum required GPA', () => {
     render(<StandingPage />)
 
-    const alertDesc = screen.getByText(/gpa|grade point/i)
+    // Scoped to the alert: the page also has a "GPA by Semester" card.
+    const alert = screen.getByRole('alert')
+    const alertDesc = within(alert).getByText(/gpa|grade point/i)
     expect(alertDesc).toBeInTheDocument()
     // Should mention the threshold (typically 2.0)
     expect(alertDesc.textContent).toMatch(/2\.0|minimum|required/i)
@@ -59,9 +62,7 @@ describe('Level 2 - Task 2.1: Academic Probation Alert Banner', () => {
     const fs = await import('fs')
     const path = await import('path')
     const standingPath = path.resolve(
-      __dirname,
-      '../../../..',
-      'client',
+      process.env.DEVSIM_PROJECT_ROOT ?? resolve(__dirname, '../../..'),
       'src',
       'app',
       'dashboard',

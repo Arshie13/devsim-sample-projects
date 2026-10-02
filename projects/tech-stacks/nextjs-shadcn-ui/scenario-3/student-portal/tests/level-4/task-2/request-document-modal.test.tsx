@@ -6,7 +6,7 @@
 import { describe, it, expect } from 'vitest'
 import { render, screen, fireEvent } from '@testing-library/react'
 import DashboardPage from '@/app/dashboard/page'
-import { join, resolve } from 'path'
+import { join } from 'path'
 import fs from 'fs'
 
 describe('Level 4 - Task 4.2: shadcn Dialog for Request Document', () => {
@@ -138,21 +138,22 @@ describe('Level 4 - Task 4.2: RequestDocumentDialog multi-step flow with shadcn 
     // Step 1: Next button
     expect(screen.getByRole('button', { name: /^next$/i })).toBeInTheDocument()
 
-    // Step 2: Back and Next/Submit
+    // Step 2: Back and Submit (the type stays editable until the form is sent)
     fireEvent.click(screen.getByLabelText(/transcript/i))
     fireEvent.click(screen.getByRole('button', { name: /^next$/i }))
 
     expect(screen.getByRole('button', { name: /^back$/i })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: /^next$/i })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /^submit$/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^next$/i })).not.toBeInTheDocument()
 
     // Step 3: Done button
     fireEvent.click(screen.getByLabelText(/enrollment certificate/i))
-    fireEvent.click(screen.getByRole('button', { name: /^next$/i }))
     const purpose = screen.getByRole('textbox')
     fireEvent.change(purpose, { target: { value: 'Visa application requirement.' } })
     fireEvent.click(screen.getByRole('button', { name: /^submit$/i }))
 
     expect(screen.getByRole('button', { name: /^done$/i })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^submit$/i })).not.toBeInTheDocument()
   })
 
   it('should import Dialog from @/components/ui/dialog in RequestDocumentDialog', () => {
