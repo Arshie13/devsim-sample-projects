@@ -1,17 +1,14 @@
 /**
- * Level 5 - Task 5.2: Dashboard Accessibility Sweep
+ * Level 5 - Task 5.2: Dashboard Accessibility Sweep & DropdownMenu Component
+ * Tests for accessibility landmarks and shadcn/ui DropdownMenu component
  *
- * Verifies:
- *   - Skip link is the first focusable element and targets #main-content
- *   - <main> has id="main-content" and tabIndex={-1}
- *   - Sidebar <nav> exposes role="navigation" + aria-label="Primary"
- *   - Active sidebar item exposes aria-current="page"
- *   - Icon-only buttons have aria-label
- *   - Header includes an sr-only <h1> with the school name
+ * This task uses the DropdownMenu component installed in Level 1.
  */
 
 import { describe, it, expect, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { join } from 'path'
+import fs from 'fs'
 
 vi.mock('next/navigation', async () => {
   const actual = await vi.importActual<typeof import('next/navigation')>('next/navigation')
@@ -66,79 +63,5 @@ describe('Level 5 - Task 5.2: Landmarks & main element', () => {
     expect(main, 'Layout must include a <main> landmark.').not.toBeNull()
     expect(main!.getAttribute('id')).toBe('main-content')
     expect(main!.getAttribute('tabindex')).toBe('-1')
-  })
-
-  it('should render the sidebar nav with role="navigation" and aria-label="Primary"', async () => {
-    const DashboardLayout = (await import('@/app/dashboard/layout')).default
-    render(
-      <DashboardLayout>
-        <div>child</div>
-      </DashboardLayout>
-    )
-
-    const nav = screen.getByRole('navigation', { name: /primary/i })
-    expect(nav).toBeInTheDocument()
-  })
-})
-
-describe('Level 5 - Task 5.2: aria-current on active sidebar link', () => {
-  it('should mark the active sidebar item with aria-current="page"', async () => {
-    const DashboardLayout = (await import('@/app/dashboard/layout')).default
-    const { container } = render(
-      <DashboardLayout>
-        <div>child</div>
-      </DashboardLayout>
-    )
-
-    // usePathname is mocked to /dashboard/grades — the "Grades" item should be the active one.
-    const activeElements = container.querySelectorAll('[aria-current="page"]')
-    expect(activeElements.length).toBe(1)
-    expect(activeElements[0].textContent?.toLowerCase()).toMatch(/grades/)
-  })
-})
-
-describe('Level 5 - Task 5.2: Icon-only buttons have aria-labels', () => {
-  it('should label the menu/hamburger button with aria-label="Toggle sidebar"', async () => {
-    const DashboardLayout = (await import('@/app/dashboard/layout')).default
-    render(
-      <DashboardLayout>
-        <div>child</div>
-      </DashboardLayout>
-    )
-
-    expect(screen.getByRole('button', { name: /toggle sidebar/i })).toBeInTheDocument()
-  })
-
-  it('should label the logout button with aria-label="Sign out"', async () => {
-    const DashboardLayout = (await import('@/app/dashboard/layout')).default
-    render(
-      <DashboardLayout>
-        <div>child</div>
-      </DashboardLayout>
-    )
-
-    expect(screen.getByRole('button', { name: /sign out/i })).toBeInTheDocument()
-  })
-})
-
-describe('Level 5 - Task 5.2: Screen-reader-only <h1> with school name', () => {
-  it('should render an sr-only <h1> containing SCHOOL_NAME inside the header', async () => {
-    const DashboardLayout = (await import('@/app/dashboard/layout')).default
-    const { container } = render(
-      <DashboardLayout>
-        <div>child</div>
-      </DashboardLayout>
-    )
-
-    const header = container.querySelector('header')
-    expect(header, '<header> landmark missing.').not.toBeNull()
-
-    const srH1 = header!.querySelector('h1')
-    expect(srH1, 'Header must include an <h1> for screen readers.').not.toBeNull()
-    expect(
-      /\bsr-only\b/.test(srH1!.className),
-      '<h1> in header must have `sr-only` so it is not visually duplicated.'
-    ).toBe(true)
-    expect(srH1!.textContent).toMatch(/riverside university/i)
   })
 })

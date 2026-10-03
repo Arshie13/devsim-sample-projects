@@ -1,84 +1,51 @@
 /**
- * Level 2 - Task 2.1: Intent-Matching AI Engine
+ * Level 2 - Task 2.1: AI Fallback Alert in Support Chat
  *
- * The starter `getAIResponse` helper matches the FIRST keyword that appears
- * anywhere in the input — order-dependent and easily fooled. This task replaces
- * it with a scored intent matcher in src/lib/intentMatcher.ts.
+ * When the AI intent matcher falls back to "unknown" intent, the chat
+ * should show a prominent Alert banner offering to transfer to a human agent,
+ * rather than just showing a generic fallback message inline.
  *
- * Verifies:
- *   - matchIntent scores keyword hits and returns the strongest intent
- *   - unmatched input resolves to the "fallback" intent
- *   - getAssistantReply returns intent copy; the fallback offers a human agent
- *   - the support page wires getAssistantReply into its chat flow
+ * Implementation requirements:
+ * - Use the shadcn/ui Alert component (warning variant)
+ * - Show the alert only when the AI returns the "fallback" intent
+ * - Include an "Escalate to Human Agent" button
+ * - Alert should appear above the chat messages
+ * - Clicking the button should navigate to /support/queue or trigger a handoff
  */
 
 import { describe, it, expect } from 'vitest'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { useRouter } from 'next/navigation'
+import SupportPage from '@/app/support/page'
 import { join, resolve } from 'path'
 import fs from 'fs'
 
 const clientRoot = process.env.DEVSIM_CLIENT_ROOT ?? resolve(__dirname, '../../../')
-const intentMatcherPath = join(clientRoot, 'src', 'lib', 'intentMatcher.ts')
-const supportPagePath = join(clientRoot, 'src', 'app', 'support', 'page.tsx')
 
-describe('Level 2 - Task 2.1: intentMatcher module', () => {
-  it('should exist at src/lib/intentMatcher.ts', () => {
-    expect(
-      fs.existsSync(intentMatcherPath),
-      `Expected intentMatcher at ${intentMatcherPath} but it was not found.`
-    ).toBe(true)
+describe('Level 2 - Task 2.1: AI Fallback Alert in Support Chat', () => {
+  it('shows a fallback alert when AI returns unknown intent', () => {
+    render(<SupportPage />)
+
+    // Alert banner should be present when fallback is triggered
+    const alert = screen.getByRole('alert')
+    expect(alert).toBeInTheDocument()
+
+    // Uses warning variant for fallback notice
+    expect(alert).toHaveClass('border-l-4')
+    expect(alert).toHaveClass('border-l-amber-500')
+    expect(alert).toHaveClass('bg-amber-50')
+    expect(alert).toHaveClass('text-amber-900')
+
+    // AlertTitle mentions human agent / escalation
+    const title = screen.getByRole('heading', { level: 5 })
+    expect(title).toBeInTheDocument()
+    expect(title.textContent).toMatch(/human agent|escalat/i)
   })
 
-  it('should export matchIntent and getAssistantReply', async () => {
-    expect(fs.existsSync(intentMatcherPath)).toBe(true)
-    const mod = (await import('@/lib/intentMatcher')) as Record<string, unknown>
-    expect(typeof mod.matchIntent).toBe('function')
-    expect(typeof mod.getAssistantReply).toBe('function')
-  })
+  it('includes an "Escalate to Human Agent" button', () => {
+    render(<SupportPage />)
 
-  it('matchIntent should detect the permits intent', async () => {
-    const { matchIntent } = await import('@/lib/intentMatcher')
-    const result = matchIntent('How do I apply for a building permit license?')
-    expect(result.intent).toBe('permits')
-    expect(result.score).toBeGreaterThan(0)
-  })
-
-  it('matchIntent should detect the taxes intent', async () => {
-    const { matchIntent } = await import('@/lib/intentMatcher')
-    expect(matchIntent('I need to pay my property tax bill').intent).toBe('taxes')
-  })
-
-  it('matchIntent should pick the intent with the most keyword hits', async () => {
-    const { matchIntent } = await import('@/lib/intentMatcher')
-    // Three trash keywords (trash, garbage, pickup) vs one permits keyword.
-    const result = matchIntent('my trash and garbage pickup was missed, also a permit question')
-    expect(result.intent).toBe('trash')
-  })
-
-  it('matchIntent should fall back when nothing matches', async () => {
-    const { matchIntent } = await import('@/lib/intentMatcher')
-    const result = matchIntent('zxcvbnm qwerty asdfgh')
-    expect(result.intent).toBe('fallback')
-    expect(result.score).toBe(0)
-  })
-
-  it('getAssistantReply should return a non-empty reply for a known intent', async () => {
-    const { getAssistantReply } = await import('@/lib/intentMatcher')
-    const reply = getAssistantReply('Where do I get a parking permit?')
-    expect(typeof reply).toBe('string')
-    expect(reply.length).toBeGreaterThan(0)
-  })
-
-  it('getAssistantReply should offer a human agent on the fallback path', async () => {
-    const { getAssistantReply } = await import('@/lib/intentMatcher')
-    expect(getAssistantReply('zxcvbnm qwerty asdfgh')).toMatch(/agent/i)
-  })
-})
-
-describe('Level 2 - Task 2.1: support page integration', () => {
-  it('should route chat replies through the intentMatcher module', () => {
-    expect(fs.existsSync(supportPagePath)).toBe(true)
-    const source = fs.readFileSync(supportPagePath, 'utf-8')
-    expect(source).toMatch(/from\s+['"][^'"]*intentMatcher['"]/)
-    expect(source).toMatch(/getAssistantReply/)
+    const escalateBtn = screen.getByRole('button', { name: /escalate|transfer|human agent/i })
+    expect(escalateBtn).toBeInTheDocument()
   })
 })

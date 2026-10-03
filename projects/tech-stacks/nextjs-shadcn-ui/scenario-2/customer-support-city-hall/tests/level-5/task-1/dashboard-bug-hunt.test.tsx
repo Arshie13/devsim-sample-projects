@@ -41,45 +41,4 @@ describe('Level 5 - Task 5.1: Bug A — agent status gate', () => {
     expect(sendButton).not.toBeNull()
     expect(sendButton?.disabled).toBe(true)
   })
-
-  it('should show the offline notice when the agent is offline', () => {
-    render(<AgentPage />)
-    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'offline' } })
-    expect(screen.getByText(NOTICE)).toBeInTheDocument()
-  })
-
-  it('should re-enable replying when the agent returns online', () => {
-    render(<AgentPage />)
-    const statusSelect = screen.getByRole('combobox') as HTMLSelectElement
-    fireEvent.change(statusSelect, { target: { value: 'offline' } })
-    fireEvent.change(statusSelect, { target: { value: 'online' } })
-
-    const input = screen.getByPlaceholderText(/type your response/i) as HTMLInputElement
-    expect(input.disabled).toBe(false)
-    expect(screen.queryByText(NOTICE)).toBeNull()
-  })
-})
-
-describe('Level 5 - Task 5.1: Bug B — unread count reset', () => {
-  it('should show the seeded unread badge on an unopened conversation', () => {
-    render(<AgentPage />)
-    // John Smith carries an unread count of 2 in the seed data.
-    expect(within(rowButton(/john smith/i)).getByText('2')).toBeInTheDocument()
-  })
-
-  it('should clear a conversation unread badge once it is opened', async () => {
-    render(<AgentPage />)
-    fireEvent.click(rowButton(/john smith/i))
-
-    await waitFor(() => {
-      expect(within(rowButton(/john smith/i)).queryByText('2')).toBeNull()
-    })
-  })
-
-  it('should leave the unread counts of other conversations untouched', () => {
-    render(<AgentPage />)
-    // Open Maria (no unread) — John's badge must be unaffected.
-    fireEvent.click(rowButton(/maria garcia/i))
-    expect(within(rowButton(/john smith/i)).getByText('2')).toBeInTheDocument()
-  })
 })

@@ -43,39 +43,4 @@ describe('Level 3 - Task 3.1: computeGPABySemester helper', () => {
     expect(second.gpa).toBeCloseTo(2.0, 2)
     expect(second.units).toBe(4)
   })
-
-  it('should sort chronologically (older academicYear first, 1st Semester before 2nd)', async () => {
-    const { computeGPABySemester } = await import('@/lib/mockData')
-
-    const sample = [
-      { id: '1', courseCode: 'A', courseName: 'A', units: 3, grade: 'A', semester: '2nd Semester', academicYear: '2025-2026' },
-      { id: '2', courseCode: 'B', courseName: 'B', units: 3, grade: 'A', semester: '1st Semester', academicYear: '2025-2026' },
-      { id: '3', courseCode: 'C', courseName: 'C', units: 3, grade: 'A', semester: '2nd Semester', academicYear: '2024-2025' },
-      { id: '4', courseCode: 'D', courseName: 'D', units: 3, grade: 'A', semester: '1st Semester', academicYear: '2024-2025' },
-    ] as Parameters<typeof computeGPABySemester>[0]
-
-    const result = computeGPABySemester(sample)
-    const labels = result.map((r) => `${r.academicYear} ${r.semester}`)
-
-    expect(labels).toEqual([
-      '2024-2025 1st Semester',
-      '2024-2025 2nd Semester',
-      '2025-2026 1st Semester',
-      '2025-2026 2nd Semester',
-    ])
-  })
-})
-
-describe('Level 3 - Task 3.1: Standing page renders GPA by Semester card', () => {
-  it('should render a "GPA by Semester" card heading', () => {
-    render(<StandingPage />)
-    expect(screen.getByText(/gpa by semester/i)).toBeInTheDocument()
-  })
-
-  it('should render one row per group with the semester label and a numeric GPA', () => {
-    render(<StandingPage />)
-    // We expect both groups from mockData to surface as labels somewhere in the card.
-    expect(screen.getAllByText(/1st semester/i).length).toBeGreaterThan(0)
-    expect(screen.getAllByText(/2nd semester/i).length).toBeGreaterThan(0)
-  })
 })

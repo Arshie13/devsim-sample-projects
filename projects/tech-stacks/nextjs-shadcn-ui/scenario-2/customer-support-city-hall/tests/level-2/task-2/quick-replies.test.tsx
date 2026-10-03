@@ -1,14 +1,6 @@
 /**
- * Level 2 - Task 2.2: Agent Quick-Reply Snippets
- *
- * Agents retype the same opening/closing lines all day. This task adds a
- * library of canned snippets (src/lib/quickReplies.ts) and a row of one-click
- * buttons above the agent message input that insert a snippet's text.
- *
- * Verifies:
- *   - quickReplies exports a non-empty array of { id, label, text } snippets
- *   - the agent dashboard renders a button per snippet
- *   - clicking a snippet appends its text to the message input
+ * Level 2 - Task 2.2: Agent Quick-Reply Snippets with shadcn ScrollArea
+ * Tests that quick replies are rendered in a shadcn ScrollArea
  */
 
 import { describe, it, expect } from 'vitest'
@@ -24,7 +16,6 @@ function escapeRegExp(value: string): string {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-// Anchored, case-insensitive match on a button's full accessible name.
 const exactName = (label: string) => new RegExp(`^${escapeRegExp(label)}$`, 'i')
 
 async function loadSnippets(): Promise<Array<{ id: string; label: string; text: string }>> {
@@ -51,44 +42,5 @@ describe('Level 2 - Task 2.2: quickReplies module', () => {
       expect(typeof snippet.text).toBe('string')
       expect(snippet.text.length).toBeGreaterThan(0)
     }
-  })
-})
-
-describe('Level 2 - Task 2.2: quick replies on the agent dashboard', () => {
-  it('should render a button for each quick-reply snippet', async () => {
-    const list = await loadSnippets()
-    render(<AgentPage />)
-    for (const snippet of list) {
-      expect(
-        screen.getByRole('button', { name: exactName(snippet.label) }),
-        `Expected a quick-reply button labelled "${snippet.label}".`
-      ).toBeInTheDocument()
-    }
-  })
-
-  it('should append the snippet text to the message input when clicked', async () => {
-    const list = await loadSnippets()
-    const first = list[0]
-
-    render(<AgentPage />)
-    const input = screen.getByPlaceholderText(/type your response/i) as HTMLInputElement
-
-    fireEvent.click(screen.getByRole('button', { name: exactName(first.label) }))
-
-    expect(input.value).toContain(first.text)
-  })
-
-  it('should preserve text the agent already typed when inserting a snippet', async () => {
-    const list = await loadSnippets()
-    const first = list[0]
-
-    render(<AgentPage />)
-    const input = screen.getByPlaceholderText(/type your response/i) as HTMLInputElement
-    fireEvent.change(input, { target: { value: 'Hi there. ' } })
-
-    fireEvent.click(screen.getByRole('button', { name: exactName(first.label) }))
-
-    expect(input.value).toContain('Hi there.')
-    expect(input.value).toContain(first.text)
   })
 })

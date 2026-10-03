@@ -12,10 +12,10 @@ function stripComments(content: string): string {
 }
 
 describe('Level 1 Task 2: Branding Update', () => {
-  it('should replace "Sign Up" with "Register" on the signup page', () => {
+  it('should replace "Sign Up" with "Login" on the signup page', () => {
     const signupPath = join(projectRoot, 'src', 'app', 'signup', 'page.tsx')
     const content = stripComments(fs.readFileSync(signupPath, 'utf-8'))
-    expect(content).toContain('Register')
+    expect(content).toContain('Login')
     expect(content).not.toContain('Sign Up')
   })
 })

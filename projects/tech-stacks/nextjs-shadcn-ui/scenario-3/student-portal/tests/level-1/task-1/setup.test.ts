@@ -91,4 +91,51 @@ describe('Level 1 Task 1: Project Setup', () => {
     expect(content).toMatch(/\bAlertTitle\b/)
     expect(content).toMatch(/\bAlertDescription\b/)
   })
+
+  it('should have the dropdown-menu component from shadcn', () => {
+    const dropdownPath = join(projectRoot, 'src', 'components', 'ui', 'dropdown-menu.tsx')
+    expect(
+      fs.existsSync(dropdownPath),
+      'dropdown-menu.tsx not found. Run "pnpm dlx shadcn@latest add dropdown-menu" to add it.'
+    ).toBe(true)
+
+    const content = fs.readFileSync(dropdownPath, 'utf-8')
+    expect(content).toMatch(/\bDropdownMenu\b/)
+    expect(content).toMatch(/\bDropdownMenuTrigger\b/)
+    expect(content).toMatch(/\bDropdownMenuContent\b/)
+    expect(content).toMatch(/\bDropdownMenuItem\b/)
+    expect(content).toMatch(/\bDropdownMenuSeparator\b/)
+    expect(content).toMatch(/\bDropdownMenuLabel\b/)
+    expect(content).toMatch(/\bDropdownMenuGroup\b/)
+  })
+
+  it('should have the collapsible component from shadcn', () => {
+    const collapsiblePath = join(projectRoot, 'src', 'components', 'ui', 'collapsible.tsx')
+    expect(
+      fs.existsSync(collapsiblePath),
+      'collapsible.tsx not found. Run "pnpm dlx shadcn@latest add collapsible" to add it.'
+    ).toBe(true)
+
+    const content = fs.readFileSync(collapsiblePath, 'utf-8')
+    expect(content).toMatch(/\bCollapsible\b/)
+    expect(content).toMatch(/\bCollapsibleTrigger\b/)
+    expect(content).toMatch(/\bCollapsibleContent\b/)
+  })
+
+  it('should have the dialog component from shadcn', () => {
+    const dialogPath = join(projectRoot, 'src', 'components', 'ui', 'dialog.tsx')
+    expect(
+      fs.existsSync(dialogPath),
+      'dialog.tsx not found. Run "pnpm dlx shadcn@latest add dialog" to add it.'
+    ).toBe(true)
+
+    const content = fs.readFileSync(dialogPath, 'utf-8')
+    expect(content).toMatch(/\bDialog\b/)
+    expect(content).toMatch(/\bDialogTrigger\b/)
+    expect(content).toMatch(/\bDialogContent\b/)
+    expect(content).toMatch(/\bDialogHeader\b/)
+    expect(content).toMatch(/\bDialogTitle\b/)
+    expect(content).toMatch(/\bDialogDescription\b/)
+    expect(content).toMatch(/\bDialogFooter\b/)
+  })
 })
