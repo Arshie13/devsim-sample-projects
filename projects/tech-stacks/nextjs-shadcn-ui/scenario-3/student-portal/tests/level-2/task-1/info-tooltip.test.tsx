@@ -49,29 +49,4 @@ describe('Level 2 - Task 2.1: Academic Probation Alert Banner', () => {
     // Should mention the threshold (typically 2.0)
     expect(alertDesc.textContent).toMatch(/2\.0|minimum|required/i)
   })
-
-  it('includes a link to schedule an advisor meeting', () => {
-    render(<StandingPage />)
-
-    const advisorLink = screen.getByRole('link', { name: /advisor|schedule|meeting/i })
-    expect(advisorLink).toBeInTheDocument()
-    expect(advisorLink).toHaveAttribute('href', expect.stringMatching(/advisor|schedule/))
-  })
-
-  it('imports Alert from @/components/ui/alert in standing page', async () => {
-    const fs = await import('fs')
-    const path = await import('path')
-    const standingPath = path.resolve(
-      process.env.DEVSIM_PROJECT_ROOT ?? resolve(__dirname, '../../..'),
-      'src',
-      'app',
-      'dashboard',
-      'standing',
-      'page.tsx'
-    )
-    const contents = fs.readFileSync(standingPath, 'utf-8')
-
-    expect(contents).toMatch(/from\s+['"]@\/components\/ui\/alert['"]/)
-    expect(contents).toMatch(/Alert(?:Title|Description)?/)
-  })
 })

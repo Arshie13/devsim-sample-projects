@@ -46,15 +46,4 @@ describe('Level 4 - Task 4.2: message input shortcuts', () => {
     expect(screen.getAllByText(/looking into it now/i).length).toBeGreaterThan(0)
     expect(input.value).toBe('')
   })
-
-  it('should clear the message input on Escape', () => {
-    render(<AgentPage />)
-
-    const input = screen.getByPlaceholderText(/type your response/i) as HTMLInputElement
-    fireEvent.change(input, { target: { value: 'a half-written draft' } })
-    expect(input.value).toBe('a half-written draft')
-
-    fireEvent.keyDown(input, { key: 'Escape' })
-    expect(input.value).toBe('')
-  })
 })

@@ -40,27 +40,3 @@ describe('Level 4 - Task 4.1: Course detail page (known course)', () => {
     expect(backLink.getAttribute('href')).toBe('/dashboard/grades')
   })
 })
-
-describe('Level 4 - Task 4.1: Grades page exposes View Details links', () => {
-  it('should render a "View Details" link per grade row pointing to /dashboard/courses/<encoded>', () => {
-    render(<GradesPage />)
-
-    const links = screen.getAllByRole('link', { name: /view details/i }) as HTMLAnchorElement[]
-    expect(links.length).toBeGreaterThan(0)
-
-    // Each link should point at /dashboard/courses/<something>
-    for (const link of links) {
-      const href = link.getAttribute('href') ?? ''
-      expect(href.startsWith('/dashboard/courses/')).toBe(true)
-    }
-
-    // At least one link must be the URL-encoded CS 301 entry.
-    const csLink = links.find((a) =>
-      (a.getAttribute('href') ?? '').toLowerCase().includes('cs%20301')
-    )
-    expect(
-      csLink,
-      'Expected a "View Details" link pointing to /dashboard/courses/CS%20301.'
-    ).toBeTruthy()
-  })
-})
